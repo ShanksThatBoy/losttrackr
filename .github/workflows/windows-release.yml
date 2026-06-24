@@ -1,0 +1,70 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag
+        required: true
+        default: v1.4.0-beta-win
+      upload_release:
+        description: Attach installer to GitHub Release
+        required: true
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "v*-win"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "x64"
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: ./windows/build_windows.ps1 -Version "1.4.0-beta-win"
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LostTrackrSetup-v1.4.0-beta-win-x64
+          path: windows/dist/installer/LostTrackrSetup-v1.4.0-beta-win-x64.exe
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: ${{ github.event_name == 'push' || inputs.upload_release }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $tag = "${{ inputs.tag }}"
+          } else {
+            $tag = "${{ github.ref_name }}"
+          }
+
+          $installer = "windows/dist/installer/LostTrackrSetup-v1.4.0-beta-win-x64.exe"
+          $notes = Get-Content "windows/release_notes_v1.4.0-beta-win.md" -Raw
+
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create $tag $installer --title "LostTrackr v1.4.0 beta Windows" --notes "$notes" --prerelease
+          } else {
+            gh release upload $tag $installer --clobber
+          }
