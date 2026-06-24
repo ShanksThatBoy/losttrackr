@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-LostTrackr macOS app entrypoint.
+LostTrackr desktop app entrypoint.
 
 The app renders losttrackr_ui.html in a native pywebview window and exposes
 scan/apply/restore to JavaScript through window.pywebview.api.
@@ -18,6 +18,7 @@ from datetime import datetime
 from pathlib import Path
 
 import serato_relocate as serato
+import losttrackr_platform as platform
 
 
 APP_NAME = "LostTrackr"
@@ -34,9 +35,15 @@ SKIP_DIR_NAMES = {
     ".venv",
     "__pycache__",
     "Applications",
+    "AppData",
     "Library",
+    "Program Files",
+    "Program Files (x86)",
+    "ProgramData",
     "System",
+    "System Volume Information",
     "Volumes",
+    "Windows",
     "node_modules",
 }
 SKIP_DIR_PREFIXES = (".venv", "venv", "env")
@@ -107,13 +114,7 @@ def common_suffix_len(a, b):
 def keep_walk_dir(name):
     if name in SKIP_DIR_NAMES:
         return False
-    if name.startswith("."):
-        return False
-    if any(name.startswith(prefix) for prefix in SKIP_DIR_PREFIXES):
-        return False
-    if name.endswith(".app") or name.endswith(".framework") or name.endswith(".photoslibrary"):
-        return False
-    return True
+    return platform.keep_walk_dir(name)
 
 
 def walk_dirs(root):
@@ -191,21 +192,11 @@ def cleanup_tree_missing_references(nodes, cleanup_paths):
 
 
 def volume_root_for(serato_dir):
-    serato_dir = serato_dir.resolve()
-    if serato_dir.parent.parent == Path("/Volumes"):
-        return serato_dir.parent
-    return Path("/")
+    return platform.library_volume_root(serato_dir)
 
 
 def stored_candidates(stored, serato_dir):
-    if stored.startswith("/"):
-        return [stored]
-
-    candidates = ["/" + stored]
-    volume_root = volume_root_for(serato_dir)
-    if volume_root != Path("/"):
-        candidates.insert(0, str(volume_root / stored))
-    return list(dict.fromkeys(candidates))
+    return platform.stored_candidates(stored, serato_dir)
 
 
 def stored_exists(stored, serato_dir):
@@ -213,22 +204,11 @@ def stored_exists(stored, serato_dir):
 
 
 def old_display_path(stored, serato_dir):
-    candidates = stored_candidates(stored, serato_dir)
-    return candidates[0] if candidates else stored
+    return platform.display_path(stored, serato_dir)
 
 
 def new_stored_path(old_stored, real_path, serato_dir):
-    real = Path(real_path)
-    if old_stored.startswith("/"):
-        return str(real)
-
-    volume_root = volume_root_for(serato_dir)
-    if volume_root != Path("/"):
-        try:
-            return str(real.relative_to(volume_root))
-        except ValueError:
-            pass
-    return str(real).lstrip("/")
+    return platform.new_stored_path(old_stored, real_path, serato_dir)
 
 
 def build_index(search_roots):
@@ -360,18 +340,18 @@ class LostTrackrApi:
         self.last_backups = []
 
     def volume_roots(self):
-        volumes = Path("/Volumes")
-        if not volumes.is_dir():
-            return []
-        return [volume for volume in volumes.iterdir() if volume.is_dir()]
+        return platform.library_roots()
 
     def discover_libraries(self):
         home = Path.home()
-        candidates = [home / "Music" / "_Serato_"]
-        for root in [home, *self.volume_roots()]:
-            for directory in walk_dirs(root):
-                if directory.name == "_Serato_":
-                    candidates.append(directory)
+        candidates = [platform.default_serato_dir()]
+
+        if not platform.is_windows():
+            for root in [home, *self.volume_roots()]:
+                for directory in walk_dirs(root):
+                    if directory.name == "_Serato_":
+                        candidates.append(directory)
+
         for volume in self.volume_roots():
             candidates.append(volume / "_Serato_")
 
@@ -386,17 +366,12 @@ class LostTrackrApi:
                 continue
             seen.add(key)
             parent = serato_dir.parent
-            label = parent.name if parent.parent == Path("/Volumes") else "Macintosh HD"
+            label = platform.library_label(serato_dir)
             libraries.append({"name": label, "seratoDir": str(serato_dir), "root": str(parent)})
         return libraries
 
     def search_roots(self, libraries):
-        roots = [Path.home()]
-        for library in libraries:
-            root = Path(library["root"])
-            if root.is_dir() and root.parent == Path("/Volumes"):
-                roots.append(root)
-        return list(dict.fromkeys(str(root) for root in roots))
+        return platform.default_search_roots(libraries)
 
     def scan_library(self, library, index):
         serato_dir = Path(library["seratoDir"])
@@ -459,7 +434,7 @@ class LostTrackrApi:
 
         libraries = self.discover_libraries()
         if not libraries:
-            raise RuntimeError("Aucune bibliotheque _Serato_ detectee dans le Mac ou les volumes connectes.")
+            raise RuntimeError("Aucune bibliotheque _Serato_ detectee sur l'ordinateur ou les disques connectes.")
 
         roots = self.search_roots(libraries)
         index = build_index(roots)
@@ -729,10 +704,20 @@ class LostTrackrApi:
 
 
 def run():
+    if platform.is_windows() and not platform.webview2_runtime_installed():
+        platform.show_native_message(
+            APP_NAME,
+            "Microsoft Edge WebView2 Runtime semble absent.\n\n"
+            "LostTrackr peut ne pas s'ouvrir correctement. Installe le runtime WebView2 "
+            "depuis Microsoft, puis relance LostTrackr.\n\n"
+            "Microsoft Edge WebView2 Runtime appears to be missing.\n"
+            "Install it from Microsoft, then restart LostTrackr.",
+        )
+
     try:
         import webview
     except ImportError as exc:
-        raise SystemExit("pywebview n'est pas installe. Lance ./setup_losttrackr_macos_env.sh puis relance.") from exc
+        raise SystemExit("pywebview n'est pas installe. Installe les dependances LostTrackr puis relance.") from exc
 
     html_path = resource_path("losttrackr_ui.html")
     api = LostTrackrApi()

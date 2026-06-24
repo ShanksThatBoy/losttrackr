@@ -13,7 +13,7 @@ Ce script NE MODIFIE RIEN. Il se contente de :
 
 Aucune écriture dans _Serato_. Le seul fichier produit est le rapport CSV.
 
-Usage typique (macOS) :
+Usage typique :
     python3 serato_scan.py
     python3 serato_scan.py --search-root ~/Desktop/"DJ Shanks"
     python3 serato_scan.py --serato ~/Music/_Serato_ --report ~/Desktop/rapport.csv
@@ -26,6 +26,8 @@ import sys
 import unicodedata
 from collections import defaultdict
 from pathlib import Path
+
+import losttrackr_platform as platform
 
 # --- Tags Serato (format TLV : 4o tag ASCII + 4o longueur big-endian + payload) ---
 # Les conteneurs commencent par 'o' (otrk, osrt, ovct...).
@@ -86,9 +88,9 @@ def read_paths_from_crates(serato_dir):
     return out
 
 
-def to_abs(stored_path):
+def to_abs(stored_path, serato_dir=None):
     """Serato stocke les chemins du volume de boot sans slash de tête."""
-    return stored_path if stored_path.startswith("/") else "/" + stored_path
+    return platform.display_path(stored_path, serato_dir or platform.default_serato_dir())
 
 
 def exists_any_norm(abs_path):
@@ -117,7 +119,8 @@ def build_basename_index(search_root):
     index = defaultdict(list)
     if not search_root or not os.path.isdir(search_root):
         return index
-    for dirpath, _dirnames, filenames in os.walk(search_root):
+    for dirpath, dirnames, filenames in os.walk(search_root):
+        dirnames[:] = [name for name in dirnames if platform.keep_walk_dir(name)]
         for fn in filenames:
             key = unicodedata.normalize("NFC", fn)
             index[key].append(os.path.join(dirpath, fn))
@@ -137,8 +140,8 @@ def infer_mapping(old_abs, new_abs):
 
 def main():
     ap = argparse.ArgumentParser(description="Scanner READ-ONLY de bibliothèque Serato.")
-    ap.add_argument("--serato", default=os.path.expanduser("~/Music/_Serato_"),
-                    help="Dossier _Serato_ (défaut: ~/Music/_Serato_)")
+    ap.add_argument("--serato", default=str(platform.default_serato_dir()),
+                    help="Dossier _Serato_ (défaut: dossier Music utilisateur)")
     ap.add_argument("--search-root", default=os.path.expanduser("~/Desktop"),
                     help="Dossier où chercher les fichiers déplacés (défaut: ~/Desktop)")
     ap.add_argument("--report", default=os.path.expanduser("~/Desktop/serato_scan_report.csv"),
@@ -158,7 +161,7 @@ def main():
     # --- Résolution : on ne garde que les cassés, en dédupliquant par chemin ---
     broken = {}  # chemin_stocké -> {"abs":..., "sources": set(), "prefix":...}
     for stored, source in entries:
-        abs_p = to_abs(stored)
+        abs_p = to_abs(stored, serato_dir)
         if exists_any_norm(abs_p):
             continue
         rec = broken.setdefault(stored, {"abs": abs_p, "sources": set(), "prefix": None})

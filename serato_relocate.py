@@ -40,6 +40,8 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+import losttrackr_platform as platform
+
 PATH_TAGS = (b"pfil", b"ptrk")
 
 
@@ -125,8 +127,8 @@ def cleanup_tree_missing_references(nodes, cleanup_paths):
 
 # ----------------------------- résolution disque -----------------------------
 
-def to_abs(stored):
-    return stored if stored.startswith("/") else "/" + stored
+def to_abs(stored, serato_dir=None):
+    return platform.display_path(stored, serato_dir or platform.default_serato_dir())
 
 
 def exists_any_norm(abs_path):
@@ -145,7 +147,8 @@ def build_index(search_roots):
         root = os.path.expanduser(root)
         if not os.path.isdir(root):
             continue
-        for dirpath, _d, files in os.walk(root):
+        for dirpath, dirnames, files in os.walk(root):
+            dirnames[:] = [name for name in dirnames if platform.keep_walk_dir(name)]
             for fn in files:
                 index[unicodedata.normalize("NFC", fn)].append(os.path.join(dirpath, fn))
     return index
@@ -157,9 +160,9 @@ def _tail(path_str, k):
     return tuple(parts[-k:]) if len(parts) >= k else tuple(parts)
 
 
-def resolve(stored, index):
+def resolve(stored, index, serato_dir=None):
     """Renvoie le chemin réel sur disque (vérifié) ou None. Jamais de devinette."""
-    abs_p = to_abs(stored)
+    abs_p = to_abs(stored, serato_dir)
     base = unicodedata.normalize("NFC", os.path.basename(abs_p))
     cands = index.get(base, [])
     if not cands:
@@ -179,7 +182,7 @@ def resolve(stored, index):
 
 # ----------------------------- traitement d'un fichier -----------------------------
 
-def process_file(path, index):
+def process_file(path, index, serato_dir=None):
     """Renvoie (n_total_paths, changes:list[(old,new)], new_bytes|None, status)."""
     raw = path.read_bytes()
     try:
@@ -200,11 +203,11 @@ def process_file(path, index):
             elif tag in PATH_TAGS:
                 total[0] += 1
                 stored = value.decode("utf-16-be")
-                if exists_any_norm(to_abs(stored)):
+                if exists_any_norm(to_abs(stored, serato_dir)):
                     continue
-                real = resolve(stored, index)
+                real = resolve(stored, index, serato_dir)
                 if real and os.path.exists(real):
-                    new_stored = real.lstrip("/")  # Serato : pas de slash de tête
+                    new_stored = platform.new_stored_path(stored, real, serato_dir or platform.default_serato_dir())
                     nodes[i] = (tag, new_stored.encode("utf-16-be"))
                     changes.append((stored, new_stored))
 
@@ -213,8 +216,8 @@ def process_file(path, index):
     return (total[0], changes, new_bytes, "OK")
 
 
-def candidate_count(stored, index):
-    abs_p = to_abs(stored)
+def candidate_count(stored, index, serato_dir=None):
+    abs_p = to_abs(stored, serato_dir)
     base = unicodedata.normalize("NFC", os.path.basename(abs_p))
     return sum(1 for candidate in index.get(base, []) if os.path.exists(candidate))
 
@@ -234,14 +237,7 @@ def cleanup_file(path, cleanup_paths):
 
 
 def serato_running():
-    # On vise l'app réelle ("Serato DJ Pro"/"Serato DJ Lite") et on exclut notre
-    # propre process (dont la ligne de commande contient "_Serato_").
-    try:
-        out = subprocess.run(["pgrep", "-f", "Serato DJ"], capture_output=True, text=True)
-        pids = [p for p in out.stdout.split() if p and int(p) != os.getpid()]
-        return bool(pids)
-    except Exception:
-        return False
+    return platform.serato_running()
 
 
 def latest_backup(serato_dir, explicit_backup=None):
@@ -297,7 +293,7 @@ def restore_backup(serato_dir, explicit_backup=None):
 
 def main():
     ap = argparse.ArgumentParser(description="Répare les chemins cassés Serato (sûr).")
-    ap.add_argument("--serato", default=os.path.expanduser("~/Music/_Serato_"))
+    ap.add_argument("--serato", default=str(platform.default_serato_dir()))
     ap.add_argument("--search-root", action="append", default=None,
                     help="Dossier(s) où chercher les fichiers (répétable). Défaut: ~/Desktop")
     ap.add_argument("--apply", action="store_true", help="Écrit réellement (sinon dry-run)")
@@ -354,11 +350,11 @@ def main():
                 skipped.append((t.name, "INTÉGRITÉ KO (re-sérialisation != original) -> ignoré"))
                 continue
             for stored in iter_tree_paths(tree):
-                if exists_any_norm(to_abs(stored)):
+                if exists_any_norm(to_abs(stored, serato_dir)):
                     continue
-                if resolve(stored, index):
+                if resolve(stored, index, serato_dir):
                     continue
-                if candidate_count(stored, index):
+                if candidate_count(stored, index, serato_dir):
                     kept_ambiguous.add(stored)
                     continue
                 cleanup_paths.add(stored)
@@ -418,7 +414,7 @@ def main():
     total_fixed, total_paths, skipped = 0, 0, []
     pending = []  # (path, new_bytes, n_changes)
     for t in targets:
-        n_paths, changes, new_bytes, status = process_file(t, index)
+        n_paths, changes, new_bytes, status = process_file(t, index, serato_dir)
         total_paths += n_paths
         if status != "OK":
             skipped.append((t.name, status))
@@ -438,7 +434,7 @@ def main():
         print("\n[DRY-RUN] Rien n'a été écrit. Exemples de réparations prévues :")
         shown = 0
         for t, _nb, _n in pending:
-            n_paths, changes, _x, _s = process_file(t, index)
+            n_paths, changes, _x, _s = process_file(t, index, serato_dir)
             for old, new in changes:
                 print(f"   {os.path.basename(old)}")
                 print(f"      ancien: {old}")
@@ -471,7 +467,7 @@ def main():
                 if isinstance(value, list):
                     check(value)
                 elif tag in PATH_TAGS:
-                    if not exists_any_norm(to_abs(value.decode("utf-16-be"))):
+                    if not exists_any_norm(to_abs(value.decode("utf-16-be"), serato_dir)):
                         still_broken += 1
         check(tree)
     print(f"Chemins encore cassés après réparation : {still_broken}")

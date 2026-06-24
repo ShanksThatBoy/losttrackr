@@ -9,9 +9,14 @@ env/
 
 build/
 dist/
+windows/build/
+windows/dist/
+windows/generated/
+windows/.venv-windows/
 *.spec.bak
 
 *.dmg
+*.exe
 *.tar.gz
 
 LostTrackr_MISSING_CLEANUP_*.csv
