@@ -17,9 +17,10 @@ if [[ ! -x ".venv-losttrackr-macos/bin/python" ]]; then
 fi
 
 . .venv-losttrackr-macos/bin/activate
+PYTHON=".venv-losttrackr-macos/bin/python"
 
 rm -rf build dist
-python -m PyInstaller \
+"$PYTHON" -m PyInstaller \
   --noconfirm --clean --windowed --name "$APP_NAME" \
   --osx-bundle-identifier "$BUNDLE_ID" \
   --icon "assets/LostTrackr.icns" \
