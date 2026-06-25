@@ -100,13 +100,17 @@
   .brand-copy strong{display:block;font-size:28px;line-height:1;font-weight:700;color:#eff6ff}
   .brand-copy span{display:block;margin-top:10px;font-size:19px;font-weight:700;color:#138cff}
 
+  .lt-icon{display:block;object-fit:contain;filter:drop-shadow(0 18px 24px rgba(0,0,0,.36)) drop-shadow(0 0 22px rgba(20,152,255,.20))}
+  .nav-icon{width:34px;height:34px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 0 10px rgba(33,158,255,.20));opacity:.88}
+  .nav-btn.is-active .nav-icon{opacity:1;filter:drop-shadow(0 0 14px rgba(42,174,255,.46))}
+  .source-icon{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(36,157,255,.24))}
+
   .nav{display:grid;gap:14px}
   .nav-btn{
     height:62px;width:100%;display:flex;align-items:center;gap:22px;padding:0 18px;border-radius:14px;
     color:#aab6c7;background:transparent;border:1px solid transparent;cursor:pointer;text-align:left;font-size:19px;font-weight:500;
     transition:background .18s,border-color .18s,color .18s,box-shadow .18s;
   }
-  .nav-btn svg{width:30px;height:30px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
   .nav-btn:hover{color:#dbe8f8;background:rgba(20,42,66,.36)}
   .nav-btn.is-active{color:#2ea2ff;background:linear-gradient(90deg,rgba(17,110,232,.30),rgba(14,59,115,.34));border-color:rgba(41,139,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 28px rgba(0,102,255,.10)}
   .nav-btn.is-disabled{opacity:.52;cursor:not-allowed}
@@ -116,7 +120,7 @@
     display:grid;grid-template-columns:58px 1fr 18px;align-items:center;gap:14px;padding:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
   }
   .avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 50% 34%,#12365d,#02070d 70%);border:1px solid rgba(66,130,194,.35);overflow:hidden;color:#54b8ff}
-  .avatar svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.6}
+  .avatar img{width:54px;height:54px;object-fit:contain;filter:drop-shadow(0 0 12px rgba(42,170,255,.24))}
   .profile strong{font-size:17px;font-weight:600;color:#eef4fb;white-space:nowrap}
   .profile strong span{color:var(--orange);font-weight:700}
   .chevron{width:16px;height:16px;border-right:2px solid #718197;border-bottom:2px solid #718197;transform:rotate(45deg);margin-top:-6px}
@@ -147,7 +151,7 @@
   .badge{position:relative;z-index:2;display:inline-flex;align-items:center;min-height:35px;padding:0 16px;border-radius:999px;border:1px solid rgba(21,137,255,.55);background:rgba(7,43,93,.35);color:#2ea2ff;font-size:16px;font-weight:600;float:left}
   .badge.soon{border-color:rgba(255,133,14,.42);background:rgba(88,47,8,.22);color:#ff9b2a}
   .feature-art{height:216px;display:grid;place-items:center;clear:both;margin-top:13px;position:relative;z-index:1}
-  .feature-img{width:clamp(150px,13vw,220px);height:180px;display:block;object-fit:contain;margin:0 auto;filter:drop-shadow(0 22px 26px rgba(0,0,0,.38))}
+  .feature-img{width:clamp(150px,13vw,220px);height:180px;display:block;object-fit:contain;margin:0 auto;filter:drop-shadow(0 22px 26px rgba(0,0,0,.38)) drop-shadow(0 0 24px rgba(23,150,255,.18))}
   .feature-card.disabled .feature-img{opacity:.72;filter:grayscale(.48) drop-shadow(0 16px 20px rgba(0,0,0,.34))}
   .fallback-art{width:210px;height:190px;position:relative;margin:auto}
   .fallback-art[hidden]{display:none!important}
@@ -192,7 +196,7 @@
     mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent),linear-gradient(180deg,transparent 8px,#000 9px,#000 18px,transparent 19px);
   }
 
-  .prepare-view,.scan-view,.review-view{padding-top:42px;text-align:left;overflow:auto}
+  .prepare-view,.scan-view,.results-view,.preview-view,.review-view,.completed-view{padding-top:42px;text-align:left;overflow:auto}
   .page-top{display:flex;align-items:flex-start;justify-content:space-between;gap:28px;margin-bottom:28px}
   .back-btn{height:40px;border-radius:12px;padding:0 16px;background:rgba(12,23,36,.72);border:1px solid rgba(125,171,231,.17);color:#9fb2ca;cursor:pointer;font-weight:650}
   .back-btn:hover{color:#fff;border-color:rgba(43,150,255,.42)}
@@ -210,16 +214,16 @@
   .radar-visual{height:204px;display:grid;place-items:center;position:relative;z-index:2;margin-top:4px}
   .radar-card h2{position:relative;z-index:2;margin:12px 0 12px;text-align:center;font-size:32px;line-height:1.12;color:#fff}
   .radar-card p{position:relative;z-index:2;margin:0 auto;max-width:640px;color:#b1bdcc;font-size:18px;line-height:1.48}
-  .steps{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
-  .step{min-height:96px;border:1px solid rgba(121,171,231,.15);border-radius:18px;background:rgba(6,14,24,.66);padding:16px;text-align:left}
-  .step b{display:flex;align-items:center;gap:10px;color:#fff;font-size:17px;line-height:1.18}
+  .steps{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+  .step{min-width:0;min-height:96px;border:1px solid rgba(121,171,231,.15);border-radius:18px;background:rgba(6,14,24,.66);padding:16px;text-align:left}
+  .step b{display:flex;align-items:center;gap:10px;color:#fff;font-size:17px;line-height:1.18;overflow-wrap:anywhere}
   .step b span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(21,152,255,.17);color:#38aaff;border:1px solid rgba(21,152,255,.42);font-size:14px;flex:0 0 auto}
   .step small{display:block;margin-top:9px;color:#8290a4;font-size:14px;line-height:1.35}
   .side-stack{display:grid;gap:16px}
   .side-card{padding:22px}
   .side-card h3{margin:0 0 16px;font-size:20px;color:#fff}
   .source-list{display:grid;gap:12px}
-  .source{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:13px 14px;border-radius:14px;background:rgba(5,13,23,.70);border:1px solid rgba(117,164,221,.14)}
+  .source{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;padding:13px 14px;border-radius:14px;background:rgba(5,13,23,.70);border:1px solid rgba(117,164,221,.14)}
   .source b{display:block;font-size:15px;color:#e9f1fb}
   .source small{display:block;margin-top:4px;color:#7e8da1;font-size:13px}
   .state-pill{border-radius:999px;border:1px solid rgba(70,236,106,.35);color:#6ff584;background:rgba(34,147,59,.10);padding:6px 10px;font-size:13px;font-weight:700;white-space:nowrap}
@@ -254,6 +258,55 @@
   .progress{height:8px;border-radius:999px;background:rgba(99,132,171,.18);overflow:hidden;margin-top:28px;position:relative}
   .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#126dff,#2bb8ff);box-shadow:0 0 20px rgba(34,175,255,.55);transition:width .2s}
 
+  .mission-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:24px;align-items:start}
+  .mission-card,.confidence-card,.preview-panel,.complete-card,.vault-card,.compact-card{
+    border-radius:24px;border:1px solid rgba(117,164,221,.16);background:linear-gradient(180deg,rgba(15,28,44,.88),rgba(7,15,25,.90));box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.05)
+  }
+  .mission-card{min-width:0;min-height:620px;padding:34px;display:grid;place-items:center;text-align:center;position:relative;overflow:hidden}
+  .recovery-radar{width:min(430px,80vw);aspect-ratio:1;border-radius:50%;position:relative;display:grid;place-items:center;background:radial-gradient(circle,rgba(22,152,255,.14),rgba(7,16,28,.36) 42%,transparent 70%)}
+  .recovery-radar::before,.recovery-radar::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(48,168,255,.22);box-shadow:0 0 0 44px rgba(31,147,255,.035),0 0 0 92px rgba(31,147,255,.022);animation:softPulse 4.8s ease-in-out infinite}
+  .recovery-radar::after{inset:18%;border-color:rgba(255,133,14,.18);box-shadow:none;animation:orbitSlow 8s linear infinite}
+  .radar-sweep{position:absolute;left:50%;top:50%;width:48%;height:2px;transform-origin:left center;background:linear-gradient(90deg,rgba(45,177,255,.92),transparent);animation:scanSweep 3.8s linear infinite;filter:drop-shadow(0 0 10px rgba(45,177,255,.68))}
+  .radar-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:#26baff;box-shadow:0 0 18px rgba(38,186,255,.80);animation:float 5.8s ease-in-out infinite}
+  .radar-dot.orange{background:#ff850e;box-shadow:0 0 16px rgba(255,133,14,.62);animation-delay:-1.4s}
+  .radar-dot.one{left:25%;top:35%}.radar-dot.two{right:22%;top:48%}.radar-dot.three{left:48%;bottom:24%}
+  .radar-center{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;background:rgba(5,13,23,.72);border:1px solid rgba(64,174,255,.28);box-shadow:0 0 42px rgba(30,143,255,.18),inset 0 1px 0 rgba(255,255,255,.08);position:relative;z-index:2}
+  .radar-center img{width:104px;height:104px;object-fit:contain}
+  .mission-title{margin:28px 0 8px;font-size:42px;line-height:1.04;font-weight:850;color:#fff}
+  .mission-sub{margin:0 auto;color:#adbacb;font-size:18px;line-height:1.45;max-width:540px;overflow-wrap:break-word}
+  .timeline{display:grid;gap:12px;margin-top:22px}
+  .timeline-step{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:center;padding:13px 14px;border-radius:16px;background:rgba(5,13,23,.64);border:1px solid rgba(117,164,221,.12);color:#d8e4f3}
+  .timeline-step i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.36);color:#42b0ff;font-style:normal;font-weight:800}
+  .recovery-list{display:grid;gap:12px;margin-top:16px}
+  .recovery-item{display:grid;grid-template-columns:38px 1fr auto;gap:12px;align-items:center;padding:13px;border-radius:16px;background:rgba(5,13,23,.60);border:1px solid rgba(117,164,221,.12)}
+  .recovery-item b{display:block;color:#fff;font-size:15px}.recovery-item span{display:block;color:#8392a8;font-size:13px;margin-top:3px}.recovery-item em{font-style:normal;color:#6ff584;font-size:13px;font-weight:800}.recovery-item em.warn{color:#ff9b2a}
+
+  .confidence-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+  .confidence-card{padding:22px;min-height:170px;position:relative;overflow:hidden}
+  .confidence-card::before{content:"";position:absolute;inset:auto -30px -60px auto;width:160px;height:160px;border-radius:50%;background:rgba(35,162,255,.10);filter:blur(2px)}
+  .confidence-card.good{border-color:rgba(70,236,106,.28)}.confidence-card.warn{border-color:rgba(255,133,14,.30)}.confidence-card.bad{border-color:rgba(255,106,85,.28)}
+  .confidence-card img{width:54px;height:54px;object-fit:contain}.confidence-card strong{display:block;margin-top:12px;font-size:34px;color:#fff}.confidence-card span{display:block;color:#a7b5c6;margin-top:4px;line-height:1.35}
+  .trust-copy{margin-top:18px;border-radius:20px;border:1px solid rgba(117,164,221,.14);background:rgba(5,13,23,.62);padding:20px;color:#c8d4e4;font-size:18px;line-height:1.45}
+  .screen-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;align-items:center}
+
+  .preview-panel{padding:24px;margin-top:22px;overflow:hidden}
+  .safe-banner{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:center;border-radius:18px;border:1px solid rgba(70,236,106,.22);background:rgba(20,71,37,.22);padding:14px 16px;color:#d8f8df}
+  .safe-banner img{width:38px;height:38px;object-fit:contain}
+  .before-after{display:grid;grid-template-columns:1fr 56px 1fr;gap:14px;margin-top:20px;align-items:stretch}
+  .path-column{border-radius:20px;border:1px solid rgba(117,164,221,.14);background:rgba(5,13,23,.62);padding:18px}.path-column.before{border-color:rgba(255,106,85,.22)}.path-column.after{border-color:rgba(70,236,106,.24)}
+  .path-column h3{margin:0;color:#fff;font-size:24px}.path-column p{margin:6px 0 16px;color:#8998ac}.path-list{display:grid;gap:12px;max-height:min(54vh,680px);overflow:auto;padding-right:6px;overscroll-behavior:contain;scrollbar-color:rgba(46,162,255,.55) rgba(99,132,171,.14)}
+  .path-row{min-height:64px;border-radius:14px;background:rgba(9,18,30,.72);border:1px solid rgba(117,164,221,.10);padding:12px;display:grid;gap:6px}.path-row code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#b8c6d8;font-size:12px;overflow-wrap:anywhere}.path-row span{font-size:12px;font-weight:800;color:#ff9a8b}.after .path-row span{color:#6ff584}.arrow-lane{display:grid;gap:12px;align-content:start;padding-top:72px;max-height:min(54vh,680px);overflow:hidden}.arrow-lane i{height:64px;position:relative}.arrow-lane i::before{content:"";position:absolute;left:3px;right:3px;top:50%;border-top:1px dashed rgba(56,165,255,.55)}.arrow-lane i::after{content:"→";position:absolute;right:-2px;top:50%;transform:translateY(-56%);color:#39aaff;font-size:18px}
+  .mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}.mini-stat{border-radius:16px;background:rgba(5,13,23,.62);border:1px solid rgba(117,164,221,.12);padding:16px}.mini-stat strong{display:block;color:#fff;font-size:26px}.mini-stat span{display:block;color:#94a4b8;font-size:13px;margin-top:4px}
+
+  .completed-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:22px;align-items:start;margin-top:20px}.complete-card,.vault-card{padding:24px}.success-mark{width:98px;height:98px;border-radius:50%;display:grid;place-items:center;background:rgba(70,236,106,.12);border:1px solid rgba(70,236,106,.32);box-shadow:0 0 42px rgba(70,236,106,.10)}.success-mark img{width:78px;height:78px;object-fit:contain}.completion-timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:24px}.completion-step{border-radius:16px;background:rgba(5,13,23,.64);border:1px solid rgba(117,164,221,.12);padding:14px;color:#d8e4f3}.completion-step b{display:block;color:#fff;margin-bottom:8px}.backup-list{display:grid;gap:12px;margin-top:14px}.backup-point{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border-radius:16px;background:rgba(5,13,23,.62);border:1px solid rgba(117,164,221,.12);padding:14px}.backup-point b{display:block;color:#fff}.backup-point span{display:block;color:#8d9db1;font-size:13px;margin-top:4px}
+
+  @keyframes softPulse{0%,100%{opacity:.72;transform:scale(.98)}50%{opacity:1;transform:scale(1.02)}}
+  @keyframes orbitSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes scanSweep{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  @keyframes float{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(10px,-14px,0) scale(1.18)}}
+  @keyframes waveformIdle{0%,100%{opacity:.26;transform:translateX(0)}50%{opacity:.46;transform:translateX(-18px)}}
+  .bottom-wave::before{animation:waveformIdle 9s ease-in-out infinite}
+
   .review-layout{display:grid;gap:18px}
   .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .summary-card{border-radius:20px;border:1px solid rgba(117,164,221,.16);background:rgba(9,18,30,.72);padding:20px}
@@ -279,6 +332,7 @@
   .modal-box{width:min(520px,100%);border-radius:24px;border:1px solid rgba(125,171,231,.18);background:linear-gradient(180deg,#101d2d,#07111d);box-shadow:0 40px 120px rgba(0,0,0,.54);padding:30px;text-align:center}
   .modal-icon{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;margin:0 auto 18px;background:rgba(23,102,179,.18);border:1px solid rgba(37,155,255,.36);color:#3bb1ff}
   .modal-icon svg{width:46px;height:46px;fill:none;stroke:currentColor;stroke-width:2.2}
+  .modal-icon img{width:58px;height:58px;object-fit:contain}
   .modal-box h2{margin:0 0 10px;font-size:30px}
   .modal-box p{margin:0 0 8px;color:#aeb9c8;line-height:1.45;font-size:16px}
   .backup{margin-top:15px;border-radius:14px;border:1px solid rgba(117,164,221,.12);background:rgba(5,13,23,.66);padding:12px;color:#7f8da1;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;overflow-wrap:anywhere}
@@ -297,10 +351,10 @@
   .onboarding-actions{display:flex;justify-content:center;gap:12px;margin-top:28px}
 
   @media (max-width:1200px){
-    .workspace{grid-template-columns:236px 1fr}.sidebar{padding-left:16px;padding-right:16px}.view{padding-left:34px;padding-right:34px}.cards{gap:18px}.feature-card{padding-left:22px;padding-right:22px}.feature-card h2{font-size:24px}.feature-card p{font-size:16px}.prepare-layout{grid-template-columns:1fr}.side-stack{grid-template-columns:repeat(2,1fr)}.toast{left:258px}
+    .workspace{grid-template-columns:236px 1fr}.sidebar{padding-left:16px;padding-right:16px}.view{padding-left:34px;padding-right:34px}.cards{gap:18px}.feature-card{padding-left:22px;padding-right:22px}.feature-card h2{font-size:24px}.feature-card p{font-size:16px}.prepare-layout,.mission-grid,.completed-hero{grid-template-columns:1fr}.side-stack{grid-template-columns:repeat(2,1fr)}.toast{left:258px}.completion-timeline{grid-template-columns:repeat(2,1fr)}
   }
   @media (max-width:900px){
-    body{overflow:auto}.app{height:auto;min-height:100vh;overflow:visible}.workspace{grid-template-columns:1fr}.sidebar{display:none}.main{min-height:100vh}.view{position:relative;min-height:100vh;overflow:visible;padding:28px 20px 80px}.cards,.status-strip,.summary-grid,.review-grid,.scan-metrics{grid-template-columns:1fr}.feature-card{min-height:0}.prepare-actions,.review-actions{flex-direction:column;align-items:stretch}.prepare-actions .left-actions,.prepare-actions .right-actions{display:grid}.side-stack{grid-template-columns:1fr}.toast{left:20px;right:20px;max-width:none}.titlebar{border-radius:0}
+    body{overflow:auto}.app{height:auto;min-height:100vh;overflow:visible}.workspace{grid-template-columns:1fr}.sidebar{display:none}.main{min-height:100vh}.view{position:relative;min-height:100vh;overflow:visible;padding:28px 20px 80px}.cards,.status-strip,.summary-grid,.review-grid,.scan-metrics,.confidence-grid,.mini-stats,.completion-timeline{grid-template-columns:1fr}.feature-card{min-height:0}.prepare-actions,.review-actions,.screen-actions{flex-direction:column;align-items:stretch}.prepare-actions .left-actions,.prepare-actions .right-actions{display:grid}.side-stack{grid-template-columns:1fr}.toast{left:20px;right:20px;max-width:none}.titlebar{border-radius:0}.before-after{grid-template-columns:1fr}.arrow-lane{display:none}.mission-card{min-height:520px}.recovery-radar{width:min(340px,86vw)}.page-title{font-size:40px}.hero-title{font-size:40px}
   }
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -314,31 +368,31 @@
   <div class="workspace">
     <aside class="sidebar" aria-label="Navigation principale">
       <div class="brand">
-        <div class="brand-mark"><img src="assets/LostTrackr_Icon_transparent.png" alt=""></div>
+        <div class="brand-mark"><img src="assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png" alt=""></div>
         <div class="brand-copy"><strong>LostTrackr</strong><span>V2</span></div>
       </div>
 
       <nav class="nav">
         <button class="nav-btn is-active" id="navHome" type="button" data-target="home">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V21h5v-6h3v6h5V10.5"/></svg>
+          <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_home_v2_clean.png" alt="" aria-hidden="true">
           <span>Accueil</span>
         </button>
         <button class="nav-btn" id="navRepair" type="button" data-target="prepare">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+          <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true">
           <span>Réparer</span>
         </button>
         <button class="nav-btn" id="navOrganize" type="button" aria-disabled="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v14H5z"/><path d="M8 6V4h8v2"/><path d="M8.5 11h7"/><path d="M9 15h3"/></svg>
+          <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" aria-hidden="true">
           <span>Ranger</span>
         </button>
         <button class="nav-btn" id="navLibrary" type="button">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5a1 1 0 0 1 1-1h4v16"/><path d="M10 20V4h4v16"/><path d="M15 20V4h4l1 16"/><path d="M6.5 15h1"/><path d="M11.5 8h1"/><path d="M17 13h1"/></svg>
+          <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" aria-hidden="true">
           <span>Bibliothèque</span>
         </button>
       </nav>
 
       <div class="profile" aria-label="Profil utilisateur">
-        <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg></div>
+        <div class="avatar" aria-hidden="true"><img src="assets/losttrackr_icons/clean/icon_user_v2_clean.png" alt=""></div>
         <strong>DJ Cipher — <span>Pro</span></strong>
         <i class="chevron" aria-hidden="true"></i>
       </div>
@@ -353,7 +407,7 @@
           <article class="feature-card">
             <span class="badge">Gratuit</span>
             <div class="feature-art">
-              <img class="feature-img" src="assets/feature_repair.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art repair" hidden><i class="wave-icon" aria-hidden="true"></i></div>
             </div>
             <h2>Retrouver mes<br>sons perdus</h2>
@@ -364,7 +418,7 @@
           <article class="feature-card disabled" aria-disabled="true" id="comingCard">
             <span class="badge soon">À venir</span>
             <div class="feature-art">
-              <img class="feature-img" src="assets/feature_smart_import.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
             <h2>Ranger mes<br>nouveaux sons</h2>
@@ -375,7 +429,7 @@
 
           <article class="feature-card">
             <div class="feature-art" style="margin-top:48px">
-              <img class="feature-img" src="assets/feature_library_health.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art shield" hidden></div>
             </div>
             <h2>Vérifier ma<br>bibliothèque</h2>
@@ -403,7 +457,7 @@
         <div class="prepare-layout">
           <article class="radar-card">
             <div class="radar-visual">
-              <img class="feature-img" src="assets/feature_repair.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art repair" hidden><i class="wave-icon" aria-hidden="true"></i></div>
             </div>
             <h2>Prêt à retrouver tes sons perdus</h2>
@@ -419,29 +473,29 @@
             <article class="side-card">
               <h3>Sources détectées</h3>
               <div class="source-list">
-                <div class="source"><div><b>Bibliothèque Serato détectée</b><small id="seratoSourcePath">_Serato_</small></div><span class="state-pill" id="seratoSourceState">OK</span></div>
-                <div class="source"><div><b>Dossier musique utilisateur</b><small>Musique</small></div><span class="state-pill blue">Inclus</span></div>
-                <div class="source"><div><b>Disques externes connectés</b><small id="externalStatus">Inclus si détectés</small></div><span class="state-pill blue">Inclus</span></div>
-                <div class="source"><div><b>Sauvegarde avant modification</b><small>Automatique</small></div><span class="state-pill">Activée</span></div>
+                <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true"><div><b>Bibliothèque Serato détectée</b><small id="seratoSourcePath">_Serato_</small></div><span class="state-pill" id="seratoSourceState">OK</span></div>
+                <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt="" aria-hidden="true"><div><b>Dossier musique utilisateur</b><small>Musique</small></div><span class="state-pill blue">Inclus</span></div>
+                <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_external_drive_v2_clean.png" alt="" aria-hidden="true"><div><b>Disques externes connectés</b><small id="externalStatus">Inclus si détectés</small></div><span class="state-pill blue">Inclus</span></div>
+                <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" aria-hidden="true"><div><b>Sauvegarde avant modification</b><small>Automatique</small></div><span class="state-pill">Activée</span></div>
               </div>
               <button class="advanced-toggle" id="advancedToggle" type="button">Choisir les emplacements à scanner</button>
               <div class="advanced" id="advancedOptions">
                 <label><input type="checkbox" checked> Bibliothèque Serato</label>
                 <label><input type="checkbox" checked> Dossier Musique</label>
-                <label><input type="checkbox" checked> Bureau</label>
-                <label><input type="checkbox" checked> Téléchargements</label>
+                <label><input type="checkbox"> Bureau</label>
+                <label><input type="checkbox"> Téléchargements</label>
                 <label><input type="checkbox" checked> Disques externes</label>
                 <label><input type="checkbox"> Ajouter un dossier</label>
               </div>
             </article>
 
             <article class="side-card notice">
-              <div class="notice-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v6c0 5-3.4 8-8 9-4.6-1-8-4-8-9V6z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></div>
+              <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" aria-hidden="true"></div>
               <div><b>Sécurité</b><p>LostTrackr commence toujours par un aperçu. La réparation ne sera appliquée qu’après ta confirmation.</p></div>
             </article>
 
             <article class="side-card notice">
-              <div class="notice-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 4.3 2.8 17.2A2 2 0 0 0 4.5 20h15a2 2 0 0 0 1.7-2.8L13.7 4.3a2 2 0 0 0-3.4 0Z"/></svg></div>
+              <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_tip_v2_clean.png" alt="" aria-hidden="true"></div>
               <div><b>Conseil avant scan</b><p>Pour éviter les conflits, ferme Serato DJ Pro avant de lancer le scan.</p></div>
             </article>
           </div>
@@ -454,21 +508,139 @@
       </section>
 
       <section class="view scan-view" id="scanView" aria-labelledby="scanTitle">
-        <article class="scan-panel">
-          <div class="radar-visual" style="height:180px">
-            <img class="feature-img" src="assets/feature_repair.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
-            <div class="fallback-art repair" hidden><i class="wave-icon" aria-hidden="true"></i></div>
+        <div class="page-top">
+          <div>
+            <h1 class="page-title" id="scanTitle">Mission de récupération</h1>
+            <p class="page-sub" id="scanText">Recherche des morceaux déplacés dans ta bibliothèque…</p>
           </div>
-          <h1 id="scanTitle">Scan en cours</h1>
-          <p id="scanText">Recherche des morceaux déplacés...</p>
-          <div class="scan-metrics">
-            <div class="metric"><strong id="filesAnalyzed">0</strong><span>Fichiers analysés</span></div>
-            <div class="metric"><strong id="possibleMatches">0</strong><span>Correspondances probables</span></div>
-            <div class="metric"><strong id="remainingMissing">0</strong><span>Introuvables restants</span></div>
+        </div>
+        <div class="mission-grid">
+          <article class="mission-card" aria-label="Recovery Radar">
+            <div class="recovery-radar">
+              <i class="radar-sweep" aria-hidden="true"></i>
+              <i class="radar-dot one" aria-hidden="true"></i>
+              <i class="radar-dot orange two" aria-hidden="true"></i>
+              <i class="radar-dot three" aria-hidden="true"></i>
+              <div class="radar-center"><img src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""></div>
+            </div>
+            <h2 class="mission-title">Recovery Radar</h2>
+            <p class="mission-sub">LostTrackr inspecte Serato, tes dossiers musique et les disques connectés. Aucun fichier n’est modifié pendant cette phase.</p>
+          </article>
+          <div class="side-stack">
+            <article class="side-card">
+              <h3>Progression</h3>
+              <div class="timeline">
+                <div class="timeline-step"><i>1</i><span>Bibliothèque détectée</span></div>
+                <div class="timeline-step"><i>2</i><span>Disques inspectés</span></div>
+                <div class="timeline-step"><i>3</i><span>Correspondances trouvées</span></div>
+                <div class="timeline-step"><i>4</i><span>Aperçu en préparation</span></div>
+              </div>
+              <div class="progress"><i id="scanProgress"></i></div>
+            </article>
+            <article class="side-card">
+              <h3>Statistiques</h3>
+              <div class="scan-metrics">
+                <div class="metric"><strong id="filesAnalyzed">0</strong><span>Fichiers analysés</span></div>
+                <div class="metric"><strong id="possibleMatches">0</strong><span>Correspondances probables</span></div>
+                <div class="metric"><strong id="remainingMissing">0</strong><span>Introuvables restants</span></div>
+              </div>
+            </article>
+            <article class="side-card">
+              <h3>Zones inspectées</h3>
+              <div class="recovery-list">
+                <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""><div><b>Bibliothèque Serato</b><span>Crates et database V2</span></div><em id="seratoScanLabel">En cours</em></div>
+                <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt=""><div><b>Dossier Musique</b><span>Bibliothèque utilisateur</span></div><em id="musicScanLabel">+0 fichiers</em></div>
+                <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_external_drive_v2_clean.png" alt=""><div><b>DJ SSD</b><span>Disques externes branchés</span></div><em class="warn" id="externalScanLabel">Analyse</em></div>
+              </div>
+            </article>
+            <article class="side-card notice">
+              <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_tip_v2_clean.png" alt=""></div>
+              <div><b>Voir les détails</b><p>Les détails techniques restent cachés pendant le scan pour garder l’écran lisible.</p></div>
+            </article>
+            <div class="screen-actions"><button class="tertiary" id="cancelScan" type="button">Annuler le scan</button><button class="secondary" id="scanDetails" type="button">Voir les détails</button></div>
           </div>
-          <div class="progress"><i id="scanProgress"></i></div>
-          <div style="margin-top:24px"><button class="tertiary" id="cancelScan" type="button">Annuler le scan</button></div>
+        </div>
+      </section>
+
+      <section class="view results-view" id="resultsView" aria-labelledby="resultsTitle">
+        <button class="back-btn" id="resultsBack" type="button">← Retour</button>
+        <h1 class="page-title" id="resultsTitle">Résultats du scan</h1>
+        <p class="page-sub">LostTrackr a retrouvé une grande partie de ta bibliothèque. Voici ce qu’il te propose.</p>
+        <div class="trust-copy" id="resultsHeroText">LostTrackr prépare le résumé de confiance.</div>
+        <div class="confidence-grid">
+          <article class="confidence-card good"><img src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""><strong id="reliableCount">0</strong><span>Très fiable<br>LostTrackr est sûr de lui sur ces résultats.</span></article>
+          <article class="confidence-card warn"><img src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""><strong id="reviewCount">0</strong><span>À vérifier<br>Quelques morceaux demandent ton avis.</span></article>
+          <article class="confidence-card bad"><img src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt=""><strong id="notFoundCount">0</strong><span>Introuvables<br>Ces morceaux restent introuvables pour l’instant.</span></article>
+        </div>
+        <div class="side-card notice" style="margin-top:18px">
+          <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""></div>
+          <div><b>Aucune modification n’a encore été appliquée.</b><p>Tu gardes le contrôle total. Tout est sécurisé.</p></div>
+        </div>
+        <div class="screen-actions">
+          <button class="primary" id="repairReliable" type="button">Réparer les résultats fiables</button>
+          <button class="secondary" id="reviewAmbiguous" type="button">Vérifier les morceaux</button>
+          <button class="tertiary" id="quitWithoutChanges" type="button">Quitter sans modifier</button>
+        </div>
+      </section>
+
+      <section class="view preview-view" id="previewView" aria-labelledby="previewTitle">
+        <button class="back-btn" id="previewBack" type="button">← Retour</button>
+        <h1 class="page-title" id="previewTitle">Aperçu avant réparation</h1>
+        <p class="page-sub">Compare les chemins cassés et les nouveaux chemins retrouvés avant d’appliquer quoi que ce soit.</p>
+        <article class="preview-panel">
+          <div class="safe-banner"><img src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""><span>Aucune modification n’a encore été faite. Tu peux vérifier avant d’appliquer.</span></div>
+          <div class="before-after">
+            <div class="path-column before"><h3>Avant</h3><p>Chemins cassés détectés</p><div class="path-list" id="beforePaths"></div></div>
+            <div class="arrow-lane" id="pathArrows" aria-hidden="true"></div>
+            <div class="path-column after"><h3>Après</h3><p>Nouveaux chemins retrouvés</p><div class="path-list" id="afterPaths"></div></div>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat"><strong id="previewReliable">0</strong><span>résultats très fiables</span></div>
+            <div class="mini-stat"><strong id="previewReview">0</strong><span>à vérifier</span></div>
+            <div class="mini-stat"><strong id="previewMissing">0</strong><span>introuvables</span></div>
+          </div>
+          <div class="side-card notice" style="margin-top:18px">
+            <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""></div>
+            <div><b>Une sauvegarde sera créée avant l’application des changements.</b><p>La version actuelle pourra être restaurée si tu changes d’avis.</p></div>
+          </div>
+          <div class="screen-actions">
+            <button class="secondary" id="previewToResults" type="button">Retour</button>
+            <button class="secondary" id="previewToReview" type="button">Vérifier les cas ambigus</button>
+            <button class="primary" id="applyPreview" type="button">Appliquer les réparations</button>
+          </div>
         </article>
+      </section>
+
+      <section class="view completed-view" id="completedView" aria-labelledby="completedTitle">
+        <h1 class="page-title" id="completedTitle">Réparation terminée</h1>
+        <p class="page-sub">Ta bibliothèque est prête. Voici ce qui a été réparé et ce que tu peux faire ensuite.</p>
+        <div class="completed-hero">
+          <article class="complete-card">
+            <div class="success-mark"><img src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""></div>
+            <div class="mini-stats">
+              <div class="mini-stat"><strong id="completedFixed">0</strong><span>chemins corrigés</span></div>
+              <div class="mini-stat"><strong id="completedPending">0</strong><span>en attente</span></div>
+              <div class="mini-stat"><strong>0</strong><span>fichier supprimé</span></div>
+            </div>
+            <div class="completion-timeline">
+              <div class="completion-step"><b>Sauvegarde créée</b><span>Point de retour prêt.</span></div>
+              <div class="completion-step"><b>Chemins corrigés</b><span id="completedTimelineFixed">Bibliothèque reconnectée.</span></div>
+              <div class="completion-step"><b>Morceaux en attente</b><span id="completedTimelinePending">À vérifier plus tard.</span></div>
+              <div class="completion-step"><b>Serato prêt</b><span>Tu peux relancer Serato.</span></div>
+            </div>
+            <p class="trust-copy">La version actuelle a été sauvegardée avant chaque action.</p>
+            <div class="screen-actions"><button class="secondary" id="openReport" type="button">Ouvrir le rapport</button><button class="primary" id="rescanDone" type="button">Relancer un scan</button><button class="tertiary" id="openSerato" type="button">Ouvrir dans Serato</button></div>
+          </article>
+          <article class="vault-card">
+            <h3>Coffre de sauvegarde</h3>
+            <p class="page-sub" style="font-size:16px;margin-top:8px">Tes points de restauration sont sécurisés et prêts à être utilisés.</p>
+            <div class="backup-list">
+              <div class="backup-point"><div><b>24 juin 2026 — Avant réparation</b><span id="backupBeforeLabel">183 fichiers concernés</span></div><span class="state-pill">Restaurable</span></div>
+              <div class="backup-point"><div><b>24 juin 2026 — Après nettoyage</b><span>12 références retirées</span></div><span class="state-pill">Restaurable</span></div>
+            </div>
+            <div class="screen-actions"><button class="secondary" id="restoreCompleted" type="button">Restaurer</button><button class="tertiary" id="backupDetails" type="button">Voir le détail</button></div>
+          </article>
+        </div>
       </section>
 
       <section class="view review-view" id="reviewView" aria-labelledby="reviewTitle">
@@ -499,7 +671,7 @@
 
   <section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-box">
-      <div class="modal-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <div class="modal-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" aria-hidden="true"></div>
       <h2 id="modalTitle">Bibliothèque reconnectée</h2>
       <p id="modalText">Les chemins réparables pointent de nouveau vers les bons fichiers.</p>
       <p id="modalMissing">Aucun fichier introuvable après réparation.</p>
@@ -516,7 +688,7 @@
 
   <section class="onboarding" id="onboarding" role="dialog" aria-modal="true" aria-label="Bienvenue sur LostTrackr">
     <div class="onboarding-card">
-      <div class="brand-mark" style="margin:0 auto"><img src="assets/LostTrackr_Icon_transparent.png" alt=""></div>
+      <div class="brand-mark" style="margin:0 auto"><img src="assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png" alt=""></div>
       <h2>Bienvenue sur LostTrackr</h2>
       <p>Retrouve les morceaux que Serato ne trouve plus, puis valide chaque réparation avant que quoi que ce soit soit modifié.</p>
       <div class="onboarding-actions"><button class="secondary" id="skipOnboarding" type="button">Passer</button><button class="primary" id="finishOnboarding" type="button">Commencer</button></div>
@@ -525,6 +697,19 @@
 </div>
 
 <script>
+  const LT_ICONS = Object.freeze({
+    logo: "assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png",
+    home: "assets/losttrackr_icons/clean/icon_home_v2_clean.png",
+    repair: "assets/losttrackr_icons/clean/icon_repair_v2_clean.png",
+    smartImport: "assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png",
+    library: "assets/losttrackr_icons/clean/icon_library_v2_clean.png",
+    health: "assets/losttrackr_icons/clean/icon_library_health_v2_clean.png",
+    folderMusic: "assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png",
+    externalDrive: "assets/losttrackr_icons/clean/icon_external_drive_v2_clean.png",
+    tip: "assets/losttrackr_icons/clean/icon_tip_v2_clean.png",
+    user: "assets/losttrackr_icons/clean/icon_user_v2_clean.png"
+  });
+
   const MOCK = {
     libraries:[{name:"Macintosh HD",root:"~/Music/_Serato_",found:588,missing:2},{name:"DJ-USB",root:"/Volumes/DJ-USB/_Serato_",found:32,missing:0}],
     totals:{found:620,missing:2},
@@ -549,13 +734,14 @@
     async preflight(){ if(window.pywebview?.api?.preflight) return window.pywebview.api.preflight(); await wait(120); return {libraryFound:true,libraries:MOCK.libraries,searchRoots:["~/Music","/Volumes/DJ-USB"],defaultSeratoDir:"~/Music/_Serato_"}; },
     async apply(){ if(window.pywebview?.api?.apply) return window.pywebview.api.apply(); await wait(450); return {fixed:620,missing:2,backupPath:"~/Music/_Serato_BACKUP_20260624_121500"}; },
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
-    async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; }
+    async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
+    async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; }
   };
 
   const $ = id => document.getElementById(id);
   const app = $("app");
-  const views = {home:$("homeView"), prepare:$("prepareView"), scan:$("scanView"), review:$("reviewView")};
-  const navButtons = {home:$("navHome"), prepare:$("navRepair")};
+  const views = {home:$("homeView"), prepare:$("prepareView"), scan:$("scanView"), results:$("resultsView"), preview:$("previewView"), review:$("reviewView"), completed:$("completedView")};
+  const navButtons = {home:$("navHome"), prepare:$("navRepair"), library:$("navLibrary")};
   const toast = $("toast");
   const modal = $("modal");
   const confirmed = $("confirmed");
@@ -564,22 +750,26 @@
   let applyResult = null;
   let totalFound = 0;
   let totalMissing = 0;
+  let totalReview = 0;
   let trackEls = [];
 
   function esc(value){ return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char])); }
   function fmt(n,singular,plural){ return `${n} ${n > 1 ? plural : singular}`; }
+  function backendAvailable(){ return Boolean(window.pywebview?.api?.scan); }
   function showToast(message){ toast.textContent = message; toast.classList.add("is-open"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("is-open"), 3600); }
   function setState(state){ app.dataset.state = state; }
   function setNav(active){
     Object.values(navButtons).forEach(btn => btn.classList.remove("is-active"));
     if(active === "home") navButtons.home.classList.add("is-active");
+    else if(active === "library") navButtons.library.classList.add("is-active");
     else navButtons.prepare.classList.add("is-active");
   }
   function showView(name){
     Object.entries(views).forEach(([key, view]) => view.classList.toggle("is-active", key === name));
     app.dataset.view = name;
-    setNav(name === "home" ? "home" : "prepare");
+    setNav(name === "home" ? "home" : name === "library" ? "library" : "prepare");
   }
+  function showScreen(name){ showView(name); }
 
   function goHome(){ setState("idle"); showView("home"); }
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
@@ -631,24 +821,125 @@
     requestAnimationFrame(step);
   }
 
+  function deriveScanCounts(){
+    const matches = scanData?.matches || [];
+    const ambiguous = scanData?.review || scanData?.ambiguous || [];
+    totalReview = Number(scanData?.totals?.review ?? scanData?.totals?.ambiguous ?? (Array.isArray(ambiguous) ? ambiguous.length : 0));
+    return {
+      reliable: totalFound,
+      review: totalReview,
+      missing: totalMissing,
+      scanned: totalFound + totalMissing + totalReview,
+      libraries: (scanData?.libraries || []).length
+    };
+  }
+
+  function sampleMatches(){
+    const matches = scanData?.matches || [];
+    if(matches.length) return matches;
+    return backendAvailable() ? [] : MOCK.matches;
+  }
+
+  function renderResults(){
+    const counts = deriveScanCounts();
+    const repairableText = counts.reliable > 0 ? `${counts.reliable} morceaux retrouvés` : "Aucun morceau retrouvé";
+    const total = Math.max(counts.scanned, counts.reliable + counts.missing);
+    const percent = total ? Math.round((counts.reliable / total) * 100) : 0;
+    $("reliableCount").textContent = counts.reliable;
+    $("reviewCount").textContent = counts.review;
+    $("notFoundCount").textContent = counts.missing;
+    $("repairReliable").textContent = counts.reliable > 0 ? `Réparer les ${counts.reliable} résultats fiables` : "Aucune réparation fiable";
+    $("repairReliable").disabled = counts.reliable <= 0;
+    $("reviewAmbiguous").textContent = counts.review > 0 ? `Vérifier les ${counts.review} morceaux` : "Vérifier les détails";
+    $("resultsHeroText").textContent = `${repairableText} sur ${total}. Tu peux réparer ${percent}% de ta bibliothèque maintenant. ${counts.review} morceau${counts.review > 1 ? "x" : ""} demandent ton avis. Aucun fichier audio ne sera supprimé. Une sauvegarde est prête.`;
+  }
+
+  function renderPreview(){
+    const counts = deriveScanCounts();
+    const rows = sampleMatches();
+    const before = $("beforePaths");
+    const after = $("afterPaths");
+    const arrows = $("pathArrows");
+    before.innerHTML = "";
+    after.innerHTML = "";
+    arrows.innerHTML = "";
+    if(!rows.length){
+      before.innerHTML = `<div class="empty">Aucun exemple détaillé renvoyé par ce scan.</div>`;
+      after.innerHTML = `<div class="empty">L’aperçu détaillé apparaîtra quand des correspondances exploitables seront disponibles.</div>`;
+    }
+    rows.forEach((item, index) => {
+      const beforeRow = document.createElement("div");
+      beforeRow.className = "path-row";
+      beforeRow.innerHTML = `<code>${esc(item.old || ".../OldFolder/track.mp3")}</code><span>Introuvable</span>`;
+      before.appendChild(beforeRow);
+      const afterRow = document.createElement("div");
+      afterRow.className = "path-row";
+      afterRow.innerHTML = `<code>${esc(item.new || ".../DJ SSD/Music/track.mp3")}</code><span>${index === rows.length - 1 && counts.review ? "À vérifier" : "Très fiable"}</span>`;
+      after.appendChild(afterRow);
+      arrows.appendChild(document.createElement("i"));
+    });
+    syncPathScroll();
+    $("previewReliable").textContent = counts.reliable;
+    $("previewReview").textContent = counts.review;
+    $("previewMissing").textContent = counts.missing;
+  }
+
+  function syncPathScroll(){
+    const before = $("beforePaths");
+    const after = $("afterPaths");
+    const arrows = $("pathArrows");
+    let syncing = false;
+    const sync = (source, targets) => {
+      if(syncing) return;
+      syncing = true;
+      targets.forEach(target => { target.scrollTop = source.scrollTop; });
+      requestAnimationFrame(() => { syncing = false; });
+    };
+    before.onscroll = () => sync(before, [after, arrows]);
+    after.onscroll = () => sync(after, [before, arrows]);
+  }
+
+  function renderCompleted(){
+    const fixed = Number(applyResult?.fixed ?? totalFound);
+    const pending = Number(applyResult?.missing ?? totalMissing);
+    $("completedFixed").textContent = fixed;
+    $("completedPending").textContent = pending;
+    $("completedTimelineFixed").textContent = `${fixed} chemin${fixed > 1 ? "s" : ""} corrigé${fixed > 1 ? "s" : ""}.`;
+    $("completedTimelinePending").textContent = pending ? `${pending} morceau${pending > 1 ? "x" : ""} à vérifier plus tard.` : "Aucun morceau en attente.";
+    $("backupBeforeLabel").textContent = `${fixed + pending} fichiers concernés`;
+  }
+
+  function goResults(){ setState("results"); renderResults(); showScreen("results"); }
+  function goPreview(){ setState("preview"); renderPreview(); showScreen("preview"); }
+  function goReview(){ setState("review"); renderReview(); showScreen("review"); }
+  function goCompleted(){ setState("done"); renderCompleted(); showScreen("completed"); }
+
   async function startRepairScan(){
     setState("scanning");
     showView("scan");
     $("startScan").disabled = true;
-    $("filesAnalyzed").textContent = "0";
-    $("possibleMatches").textContent = "0";
-    $("remainingMissing").textContent = "0";
+    $("filesAnalyzed").textContent = "…";
+    $("possibleMatches").textContent = "…";
+    $("remainingMissing").textContent = "…";
     $("scanProgress").style.width = "12%";
+    $("seratoScanLabel").textContent = "En cours";
+    $("musicScanLabel").textContent = "+0 fichiers";
+    $("externalScanLabel").textContent = "Analyse";
     try{
       const progress = animateScanProgress();
       scanData = await API.scan();
       clearInterval(progress);
       totalFound = Number(scanData?.totals?.found ?? (scanData?.libraries || []).reduce((sum, lib) => sum + Number(lib.found || 0), 0));
+      totalReview = Number(scanData?.totals?.review ?? (scanData?.review || []).length);
       totalMissing = Number(scanData?.totals?.missing ?? (scanData?.missing || []).length);
+      const totalAnalyzed = Number((scanData?.libraries || []).reduce((sum, lib) => sum + Number(lib.pathsRead || 0), 0)) || totalFound + totalReview + totalMissing;
       $("scanProgress").style.width = "100%";
-      rollTo($("filesAnalyzed"), totalFound + totalMissing, 450);
-      rollTo($("possibleMatches"), totalFound, 450);
+      rollTo($("filesAnalyzed"), totalAnalyzed, 450);
+      rollTo($("possibleMatches"), totalFound + totalReview, 450);
       rollTo($("remainingMissing"), totalMissing, 450);
+      $("seratoScanLabel").textContent = "OK";
+      $("musicScanLabel").textContent = `+${totalFound} fichiers`;
+      $("externalScanLabel").textContent = totalMissing ? "À vérifier" : "OK";
       await wait(reduced ? 80 : 520);
       finishScan();
     }catch(error){
@@ -665,20 +956,17 @@
     return setInterval(() => {
       width = Math.min(88, width + Math.random() * 10);
       $("scanProgress").style.width = `${width}%`;
-      rollTo($("filesAnalyzed"), Math.round(width * 9), 180);
-      rollTo($("possibleMatches"), Math.round(width * 5.2), 180);
     }, reduced ? 500 : 260);
   }
 
   function finishScan(){
-    setState("review");
-    renderReview();
-    showView("review");
+    goResults();
   }
 
   function renderReview(){
     const libraries = scanData?.libraries || [];
     const matches = scanData?.matches || [];
+    const review = scanData?.review || [];
     const missing = scanData?.missing || [];
     $("summaryFound").textContent = totalFound;
     $("summaryMissing").textContent = totalMissing;
@@ -689,7 +977,7 @@
 
     const matchRows = $("matchRows");
     const missingRows = $("missingRows");
-    matchRows.innerHTML = matches.length ? "" : `<div class="empty">Aucun fichier réparable trouvé.</div>`;
+    matchRows.innerHTML = (matches.length || review.length) ? "" : `<div class="empty">Aucun fichier réparable trouvé.</div>`;
     trackEls = matches.slice(0,10).map(item => {
       const row = document.createElement("div");
       row.className = "track-row";
@@ -697,6 +985,14 @@
       row.addEventListener("click", () => row.classList.toggle("peek"));
       matchRows.appendChild(row);
       return row;
+    });
+    review.slice(0,10).forEach(item => {
+      const row = document.createElement("div");
+      row.className = "track-row";
+      const candidate = (item.candidates || [])[0] || "à choisir manuellement";
+      row.innerHTML = `<b>${esc(item.file || "Fichier")}</b><code>à vérifier : ${esc(item.reason || "plusieurs candidats possibles")}</code><code class="new-path">candidat : ${esc(candidate)}</code>`;
+      row.addEventListener("click", () => row.classList.toggle("peek"));
+      matchRows.appendChild(row);
     });
 
     missingRows.innerHTML = missing.length ? "" : `<div class="empty">Aucun fichier manquant après scan.</div>`;
@@ -712,17 +1008,23 @@
 
   async function doApply(){
     setState("repairing");
+    const previewApply = $("applyPreview");
+    const returnView = app.dataset.view === "preview" ? "preview" : "review";
     applyBtn.disabled = true;
     applyBtn.textContent = "Réparation en cours...";
+    if(previewApply){ previewApply.disabled = true; previewApply.textContent = "Réparation en cours..."; }
     try{
       applyResult = await API.apply();
       trackEls.forEach(row => row.classList.add("fixed"));
-      finishDone();
+      goCompleted();
     }catch(error){
-      setState("review");
+      setState(returnView);
+      showView(returnView);
       applyBtn.textContent = totalFound > 0 ? `Réparer ${fmt(totalFound,"morceau","morceaux")}` : "Aucune réparation disponible";
       setRepairEnabled();
       showToast("La réparation a échoué. La sauvegarde existante n’a pas été modifiée.");
+    }finally{
+      if(previewApply){ previewApply.disabled = false; previewApply.textContent = "Appliquer les réparations"; }
     }
   }
 
@@ -770,12 +1072,29 @@
     }
   }
 
+  async function openSeratoApp(){
+    const button = $("openSerato");
+    button.disabled = true;
+    const previous = button.textContent;
+    button.textContent = "Ouverture...";
+    try{
+      const result = await API.openSerato();
+      showToast(`${result?.app || "Serato"} est en cours d’ouverture.`);
+    }catch(error){
+      showToast(error?.message || "Impossible d’ouvrir Serato DJ Pro ou Lite.");
+    }finally{
+      button.disabled = false;
+      button.textContent = previous;
+    }
+  }
+
   function resetFlow(){
     modal.classList.remove("is-open");
     scanData = null;
     applyResult = null;
     totalFound = 0;
     totalMissing = 0;
+    totalReview = 0;
     trackEls = [];
     confirmed.checked = false;
     applyBtn.disabled = true;
@@ -792,9 +1111,23 @@
   $("healthBtn").addEventListener("click", () => showToast("Diagnostic bientôt disponible."));
   $("topBack").addEventListener("click", goHome);
   $("bottomBack").addEventListener("click", goHome);
-  $("reviewBack").addEventListener("click", goPrepare);
+  $("reviewBack").addEventListener("click", () => scanData ? goResults() : goPrepare());
   $("startScan").addEventListener("click", startRepairScan);
   $("cancelScan").addEventListener("click", goPrepare);
+  $("scanDetails").addEventListener("click", () => showToast("Détails techniques disponibles après le scan dans l’écran de vérification."));
+  $("resultsBack").addEventListener("click", goPrepare);
+  $("repairReliable").addEventListener("click", () => { if(!$("repairReliable").disabled) goPreview(); });
+  $("reviewAmbiguous").addEventListener("click", goReview);
+  $("quitWithoutChanges").addEventListener("click", () => { showToast("Aucune modification appliquée. Tu gardes le contrôle."); goHome(); });
+  $("previewBack").addEventListener("click", goResults);
+  $("previewToResults").addEventListener("click", goResults);
+  $("previewToReview").addEventListener("click", goReview);
+  $("applyPreview").addEventListener("click", doApply);
+  $("openReport").addEventListener("click", () => showToast("Ouverture du rapport bientôt disponible."));
+  $("rescanDone").addEventListener("click", resetFlow);
+  $("openSerato").addEventListener("click", openSeratoApp);
+  $("restoreCompleted").addEventListener("click", () => { modal.classList.add("is-open"); doRestore(); });
+  $("backupDetails").addEventListener("click", () => showToast("Détail des sauvegardes bientôt disponible."));
   $("chooseFolder").addEventListener("click", () => showToast("Le choix manuel d’un dossier sera ajouté à la sélection avancée."));
   $("advancedToggle").addEventListener("click", () => $("advancedOptions").classList.toggle("is-open"));
   confirmed.addEventListener("change", setRepairEnabled);

@@ -213,6 +213,7 @@ def new_stored_path(old_stored, real_path, serato_dir):
 
 def build_index(search_roots):
     index = defaultdict(list)
+    seen_by_key = defaultdict(set)
     for root in search_roots:
         root = Path(root).expanduser()
         if not root.is_dir():
@@ -220,7 +221,13 @@ def build_index(search_roots):
         for dirpath, dirnames, files in os.walk(root):
             dirnames[:] = [name for name in dirnames if keep_walk_dir(name)]
             for filename in files:
-                index[filename_key(filename)].append(os.path.join(dirpath, filename))
+                key = filename_key(filename)
+                path = os.path.join(dirpath, filename)
+                real_key = os.path.realpath(os.path.normcase(path))
+                if real_key in seen_by_key[key]:
+                    continue
+                seen_by_key[key].add(real_key)
+                index[key].append(path)
     return index
 
 
@@ -288,11 +295,14 @@ def resolve_real_path(stored, index, serato_dir):
     old_abs = old_display_path(stored, serato_dir)
     basename = os.path.basename(old_abs)
     candidates = list(index.get(filename_key(basename), []))
+    seen_candidates = {os.path.realpath(os.path.normcase(path)) for path in candidates}
 
     # Spotlight catches files in unusual locations and helps when a walked
     # directory was skipped or not yet indexed by our broad home/volume scan.
     for candidate in spotlight_candidates(basename):
-        if candidate not in candidates:
+        candidate_key = os.path.realpath(os.path.normcase(candidate))
+        if candidate_key not in seen_candidates:
+            seen_candidates.add(candidate_key)
             candidates.append(candidate)
 
     candidates = [candidate for candidate in candidates if os.path.isfile(candidate)]
@@ -343,14 +353,7 @@ class LostTrackrApi:
         return platform.library_roots()
 
     def discover_libraries(self):
-        home = Path.home()
         candidates = [platform.default_serato_dir()]
-
-        if not platform.is_windows():
-            for root in [home, *self.volume_roots()]:
-                for directory in walk_dirs(root):
-                    if directory.name == "_Serato_":
-                        candidates.append(directory)
 
         for volume in self.volume_roots():
             candidates.append(volume / "_Serato_")
@@ -408,6 +411,7 @@ class LostTrackrApi:
                 record["sources"].add(target.name)
 
         matches = []
+        review = []
         missing = []
         for stored, record in broken.items():
             real, info = resolve_real_path(stored, index, serato_dir)
@@ -426,6 +430,10 @@ class LostTrackrApi:
                 item["method"] = info.get("method", "match")
                 item["alternatives"] = info.get("alternatives", [])
                 matches.append(item)
+            elif info.get("candidateCount", 0) > 0 or info.get("status") == "ambiguous":
+                item["reason"] = info.get("reason") or "candidat a verifier avant reparation"
+                item["candidates"] = info.get("candidates", [])
+                review.append(item)
             else:
                 item["reason"] = info.get("reason") or "aucun candidat fiable sur les disques scannes"
                 item["candidates"] = info.get("candidates", [])
@@ -436,10 +444,12 @@ class LostTrackrApi:
             "root": library["root"],
             "seratoDir": library["seratoDir"],
             "found": len(matches),
+            "review": len(review),
             "missing": len(missing),
             "pathsRead": total_paths,
             "skipped": skipped,
             "matches": matches,
+            "reviewItems": review,
             "missingItems": missing,
         }
 
@@ -459,6 +469,7 @@ class LostTrackrApi:
         index = build_index(roots)
         scanned = [self.scan_library(library, index) for library in libraries]
         matches = [item for library in scanned for item in library["matches"]]
+        review = [item for library in scanned for item in library["reviewItems"]]
         missing = [item for library in scanned for item in library["missingItems"]]
         payload = {
             "libraries": [
@@ -466,14 +477,16 @@ class LostTrackrApi:
                     "name": library["name"],
                     "root": library["root"],
                     "found": library["found"],
+                    "review": library["review"],
                     "missing": library["missing"],
                     "pathsRead": library["pathsRead"],
                     "skipped": library["skipped"],
                 }
                 for library in scanned
             ],
-            "totals": {"found": len(matches), "missing": len(missing)},
+            "totals": {"found": len(matches), "review": len(review), "missing": len(missing)},
             "matches": matches,
+            "review": review,
             "missing": missing,
             "searchRoots": roots,
         }
@@ -720,6 +733,43 @@ class LostTrackrApi:
             "previousMovedTo": ", ".join(filter(None, (item["previousMovedTo"] for item in restores))),
             "restores": restores,
         }
+
+    def open_serato(self):
+        if platform.is_macos():
+            app_names = ["Serato DJ Pro", "Serato DJ Lite", "Serato DJ"]
+            for app_name in app_names:
+                result = subprocess.run(["open", "-a", app_name], capture_output=True, text=True, check=False)
+                if result.returncode == 0:
+                    return {"opened": True, "app": app_name}
+            raise RuntimeError("Serato DJ Pro/Lite est introuvable dans Applications.")
+
+        if platform.is_windows():
+            program_roots = [
+                os.environ.get("ProgramFiles"),
+                os.environ.get("ProgramFiles(x86)"),
+                os.environ.get("LOCALAPPDATA"),
+            ]
+            relative_paths = [
+                Path("Serato") / "Serato DJ Pro" / "Serato DJ Pro.exe",
+                Path("Serato") / "Serato DJ Lite" / "Serato DJ Lite.exe",
+                Path("Serato") / "Serato DJ" / "Serato DJ.exe",
+            ]
+            for root in filter(None, program_roots):
+                for relative in relative_paths:
+                    candidate = Path(root) / relative
+                    if candidate.is_file():
+                        os.startfile(str(candidate))  # type: ignore[attr-defined]
+                        return {"opened": True, "app": str(candidate)}
+            try:
+                subprocess.Popen(["cmd", "/c", "start", "", "Serato DJ Pro"], shell=False)
+                return {"opened": True, "app": "Serato DJ Pro"}
+            except Exception as exc:
+                raise RuntimeError("Serato DJ Pro/Lite est introuvable sur ce Windows.") from exc
+
+        raise RuntimeError("Ouverture de Serato non disponible sur cette plateforme.")
+
+    def openSerato(self):
+        return self.open_serato()
 
 
 def run():

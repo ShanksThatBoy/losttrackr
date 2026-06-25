@@ -17,6 +17,7 @@ windows/.venv-windows/
 
 *.dmg
 *.exe
+*.pkg
 *.tar.gz
 
 LostTrackr_MISSING_CLEANUP_*.csv
