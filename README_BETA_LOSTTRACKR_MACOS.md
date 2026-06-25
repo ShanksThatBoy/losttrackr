@@ -1,4 +1,4 @@
-# LostTrackr macOS - Beta privee
+# LostTrackr macOS 1.1.1 - Beta privee non notarisee
 
 Merci de tester LostTrackr.
 
@@ -6,13 +6,13 @@ LostTrackr est un outil macOS pour aider les DJs a retrouver automatiquement les
 
 ## Important avant de commencer
 
-Cette version est une beta privee. Elle n'est pas encore signee ni notarisee par Apple avec un certificat Developer ID.
+Cette version 1.1.1 est une beta privee. Elle n'est pas encore signee ni notarisee par Apple avec un certificat Developer ID.
 
 macOS peut donc afficher une alerte du type :
 
 > Apple ne peut pas verifier que cette app ne contient pas de logiciel malveillant.
 
-C'est normal pour cette beta. L'app n'est pas encore distribuee publiquement.
+C'est normal pour cette beta. L'app n'est pas encore distribuee publiquement et ne necessite pas encore de compte Apple Developer payant.
 
 ## Comment ouvrir LostTrackr sur macOS
 
@@ -29,6 +29,25 @@ Si macOS bloque encore l'app :
 3. Descends jusqu'au message concernant `LostTrackr`.
 4. Clique sur `Ouvrir quand meme`.
 5. Relance `LostTrackr.app`.
+
+## Si macOS affiche "Element non ouvert"
+
+Sur certaines versions de macOS, le clic droit ne suffit pas apres un telechargement depuis GitHub ou Google Drive.
+
+Dans ce cas :
+
+1. Installe `LostTrackr.app` dans `Applications`.
+2. Ouvre `Terminal`.
+3. Colle cette commande :
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/LostTrackr.app"
+```
+
+4. Appuie sur Entree.
+5. Relance `LostTrackr.app`.
+
+Cette commande retire uniquement le marquage de quarantaine ajoute par macOS au fichier telecharge. Elle ne modifie pas ta bibliotheque Serato.
 
 ## Avant de scanner
 
