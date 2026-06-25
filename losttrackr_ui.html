@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LostTrackr</title>
-<script>
-  document.documentElement.classList.add(/Windows/i.test(navigator.userAgent) ? "platform-windows" : "platform-macos");
-</script>
 <style>
   :root{
     color-scheme:dark;
@@ -76,12 +73,6 @@
     box-shadow:0 10px 24px rgba(0,0,0,.18);
     z-index:5;
   }
-  .traffic{position:absolute;left:20px;top:19px;display:flex;gap:10px}
-  .platform-windows .traffic{display:none}
-  .traffic i{width:15px;height:15px;border-radius:50%;display:block;box-shadow:inset 0 -1px 0 rgba(0,0,0,.28)}
-  .traffic i:nth-child(1){background:#ff5e57}
-  .traffic i:nth-child(2){background:#ffbd2e}
-  .traffic i:nth-child(3){background:#28c840}
   .window-title{font-size:18px;font-weight:500;color:#cbd4e2}
 
   .workspace{height:calc(100% - 54px);display:grid;grid-template-columns:clamp(236px,16vw,270px) 1fr;min-height:0}
@@ -317,7 +308,6 @@
 <body>
 <div class="app" id="app" data-view="home" data-state="idle">
   <header class="titlebar" aria-label="Fenêtre LostTrackr">
-    <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="window-title">LostTrackr</div>
   </header>
 
