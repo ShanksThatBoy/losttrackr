@@ -64,7 +64,7 @@ jobs:
 
           gh release view $tag 2>$null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag $installer --title "LostTrackr v1.0.1 Windows" --notes "$notes"
+            gh release create $tag $installer --target "${{ github.sha }}" --title "LostTrackr v1.0.1 Windows" --notes "$notes"
           } else {
             gh release upload $tag $installer --clobber
           }
