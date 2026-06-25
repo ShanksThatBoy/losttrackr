@@ -725,9 +725,9 @@ def run():
         APP_NAME,
         str(html_path),
         js_api=api,
-        width=1120,
-        height=760,
-        min_size=(940, 620),
+        width=1672,
+        height=941,
+        min_size=(1180, 720),
         text_select=True,
     )
     webview.start(debug=False)
