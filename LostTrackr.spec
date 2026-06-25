@@ -58,8 +58,8 @@ app = BUNDLE(
     info_plist={
         'CFBundleDisplayName': 'LostTrackr',
         'CFBundleName': 'LostTrackr',
-        'CFBundleShortVersionString': '1.4.0',
-        'CFBundleVersion': '1.4.0-beta',
+        'CFBundleShortVersionString': '1.0.1',
+        'CFBundleVersion': '1.0.1',
         'LSApplicationCategoryType': 'public.app-category.music',
         'NSHighResolutionCapable': True,
     },
