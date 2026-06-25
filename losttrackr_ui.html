@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LostTrackr</title>
+<script>
+  document.documentElement.classList.add(/Windows/i.test(navigator.userAgent) ? "platform-windows" : "platform-macos");
+</script>
 <style>
   :root{
     color-scheme:dark;
@@ -48,14 +51,14 @@
   button{border:0}
 
   .app{
-    width:min(1672px,100vw);
-    height:min(941px,100vh);
-    min-width:1024px;
-    min-height:700px;
+    width:100vw;
+    height:100vh;
+    min-width:0;
+    min-height:0;
     position:relative;
     overflow:hidden;
     border:1px solid rgba(148,178,214,.22);
-    border-radius:14px;
+    border-radius:0;
     background:
       radial-gradient(780px 520px at 63% 18%,rgba(20,130,255,.10),transparent 65%),
       radial-gradient(620px 520px at 96% 72%,rgba(9,98,183,.10),transparent 72%),
@@ -74,13 +77,14 @@
     z-index:5;
   }
   .traffic{position:absolute;left:20px;top:19px;display:flex;gap:10px}
+  .platform-windows .traffic{display:none}
   .traffic i{width:15px;height:15px;border-radius:50%;display:block;box-shadow:inset 0 -1px 0 rgba(0,0,0,.28)}
   .traffic i:nth-child(1){background:#ff5e57}
   .traffic i:nth-child(2){background:#ffbd2e}
   .traffic i:nth-child(3){background:#28c840}
   .window-title{font-size:18px;font-weight:500;color:#cbd4e2}
 
-  .workspace{height:calc(100% - 54px);display:grid;grid-template-columns:270px 1fr;min-height:0}
+  .workspace{height:calc(100% - 54px);display:grid;grid-template-columns:clamp(236px,16vw,270px) 1fr;min-height:0}
   .sidebar{
     position:relative;
     display:flex;
@@ -133,13 +137,13 @@
     background-size:70px 70px;
     mask-image:radial-gradient(circle at 50% 34%,#000 0%,transparent 76%);
   }
-  .view{position:absolute;inset:0;display:none;overflow:hidden;padding:0 92px 34px;z-index:1}
+  .view{position:absolute;inset:0;display:none;overflow:hidden;padding:0 clamp(28px,5.5vw,92px) 34px;z-index:1}
   .view.is-active{display:block}
 
   .home-view{padding-top:48px;text-align:center}
   .hero-title{margin:0;font-size:clamp(42px,4vw,57px);line-height:1.05;font-weight:800;color:#fff;text-shadow:0 8px 26px rgba(0,0,0,.38)}
   .hero-sub{margin:16px auto 0;max-width:680px;color:#adb8c9;font-size:22px;line-height:1.34;font-weight:400}
-  .cards{width:min(1190px,100%);margin:31px auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;text-align:center}
+  .cards{width:min(1190px,100%);margin:31px auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,2vw,32px);text-align:center}
   .feature-card{
     position:relative;min-height:495px;border-radius:22px;border:1px solid var(--line-strong);background:linear-gradient(180deg,rgba(16,28,44,.82),rgba(7,15,25,.82));
     padding:21px 34px 24px;overflow:hidden;box-shadow:0 26px 70px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.06);
@@ -229,6 +233,7 @@
   .source small{display:block;margin-top:4px;color:#7e8da1;font-size:13px}
   .state-pill{border-radius:999px;border:1px solid rgba(70,236,106,.35);color:#6ff584;background:rgba(34,147,59,.10);padding:6px 10px;font-size:13px;font-weight:700;white-space:nowrap}
   .state-pill.blue{border-color:rgba(37,148,255,.36);color:#42aaff;background:rgba(15,94,178,.15)}
+  .state-pill.warn{border-color:rgba(255,133,14,.38);color:#ff9b2a;background:rgba(104,58,12,.18)}
   .notice{display:grid;grid-template-columns:36px 1fr;gap:13px;align-items:start}
   .notice-icon{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;border:1px solid rgba(36,157,255,.32);background:rgba(13,83,148,.18);color:#2fa6ff}
   .notice-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2}
@@ -301,7 +306,7 @@
   .onboarding-actions{display:flex;justify-content:center;gap:12px;margin-top:28px}
 
   @media (max-width:1200px){
-    .app{min-width:0;border-radius:0;width:100vw;height:100vh}.workspace{grid-template-columns:236px 1fr}.sidebar{padding-left:16px;padding-right:16px}.view{padding-left:34px;padding-right:34px}.cards{gap:18px}.feature-card{padding-left:22px;padding-right:22px}.feature-card h2{font-size:24px}.feature-card p{font-size:16px}.prepare-layout{grid-template-columns:1fr}.side-stack{grid-template-columns:repeat(2,1fr)}.toast{left:258px}
+    .workspace{grid-template-columns:236px 1fr}.sidebar{padding-left:16px;padding-right:16px}.view{padding-left:34px;padding-right:34px}.cards{gap:18px}.feature-card{padding-left:22px;padding-right:22px}.feature-card h2{font-size:24px}.feature-card p{font-size:16px}.prepare-layout{grid-template-columns:1fr}.side-stack{grid-template-columns:repeat(2,1fr)}.toast{left:258px}
   }
   @media (max-width:900px){
     body{overflow:auto}.app{height:auto;min-height:100vh;overflow:visible}.workspace{grid-template-columns:1fr}.sidebar{display:none}.main{min-height:100vh}.view{position:relative;min-height:100vh;overflow:visible;padding:28px 20px 80px}.cards,.status-strip,.summary-grid,.review-grid,.scan-metrics{grid-template-columns:1fr}.feature-card{min-height:0}.prepare-actions,.review-actions{flex-direction:column;align-items:stretch}.prepare-actions .left-actions,.prepare-actions .right-actions{display:grid}.side-stack{grid-template-columns:1fr}.toast{left:20px;right:20px;max-width:none}.titlebar{border-radius:0}
@@ -424,7 +429,7 @@
             <article class="side-card">
               <h3>Sources détectées</h3>
               <div class="source-list">
-                <div class="source"><div><b>Bibliothèque Serato détectée</b><small>_Serato_</small></div><span class="state-pill">OK</span></div>
+                <div class="source"><div><b>Bibliothèque Serato détectée</b><small id="seratoSourcePath">_Serato_</small></div><span class="state-pill" id="seratoSourceState">OK</span></div>
                 <div class="source"><div><b>Dossier musique utilisateur</b><small>Musique</small></div><span class="state-pill blue">Inclus</span></div>
                 <div class="source"><div><b>Disques externes connectés</b><small id="externalStatus">Inclus si détectés</small></div><span class="state-pill blue">Inclus</span></div>
                 <div class="source"><div><b>Sauvegarde avant modification</b><small>Automatique</small></div><span class="state-pill">Activée</span></div>
@@ -551,6 +556,7 @@
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const API = {
     async scan(){ if(window.pywebview?.api?.scan) return window.pywebview.api.scan(); await wait(450); return MOCK; },
+    async preflight(){ if(window.pywebview?.api?.preflight) return window.pywebview.api.preflight(); await wait(120); return {libraryFound:true,libraries:MOCK.libraries,searchRoots:["~/Music","/Volumes/DJ-USB"],defaultSeratoDir:"~/Music/_Serato_"}; },
     async apply(){ if(window.pywebview?.api?.apply) return window.pywebview.api.apply(); await wait(450); return {fixed:620,missing:2,backupPath:"~/Music/_Serato_BACKUP_20260624_121500"}; },
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; }
@@ -586,7 +592,41 @@
   }
 
   function goHome(){ setState("idle"); showView("home"); }
-  function goPrepare(){ setState("prepare"); showView("prepare"); }
+  function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
+
+  function sourceMissingMessage(){
+    return "Aucun dossier source Serato (_Serato_) n'a ete trouve. Ouvre Serato au moins une fois, verifie que le dossier _Serato_ existe dans Musique ou branche le disque externe qui contient ta bibliotheque.";
+  }
+
+  function scanErrorMessage(error){
+    const raw = String(error?.message || error || "");
+    const lower = raw.toLowerCase();
+    if(raw.includes("_Serato_") || lower.includes("aucun dossier source") || lower.includes("bibliotheque _serato")){
+      return raw;
+    }
+    if(lower.includes("serato dj") || lower.includes("serato semble ouvert")){
+      return raw;
+    }
+    return "Le scan a échoué. Vérifie que Serato DJ Pro est fermé, que tes disques sont branchés, puis relance.";
+  }
+
+  async function refreshPreflight(){
+    try{
+      const info = await API.preflight();
+      const libraries = info?.libraries || [];
+      const firstLibrary = libraries[0];
+      const found = Boolean(info?.libraryFound || libraries.length);
+      $("seratoSourcePath").textContent = firstLibrary?.seratoDir || info?.defaultSeratoDir || "_Serato_";
+      $("seratoSourceState").textContent = found ? "OK" : "Introuvable";
+      $("seratoSourceState").classList.toggle("warn", !found);
+      $("externalStatus").textContent = libraries.length > 1 ? `${libraries.length - 1} source externe détectée${libraries.length > 2 ? "s" : ""}` : "Aucun disque externe détecté";
+      if(!found){
+        showToast(info?.message || sourceMissingMessage());
+      }
+    }catch(error){
+      showToast(scanErrorMessage(error));
+    }
+  }
 
   function rollTo(el,to,duration=700){
     if(reduced){ el.textContent = to; return; }
@@ -624,7 +664,7 @@
     }catch(error){
       setState("prepare");
       showView("prepare");
-      showToast("Le scan a échoué. Vérifie que Serato DJ Pro est fermé, puis relance.");
+      showToast(scanErrorMessage(error));
     }finally{
       $("startScan").disabled = false;
     }

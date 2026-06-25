@@ -373,6 +373,21 @@ class LostTrackrApi:
     def search_roots(self, libraries):
         return platform.default_search_roots(libraries)
 
+    def preflight(self):
+        libraries = self.discover_libraries()
+        roots = self.search_roots(libraries) if libraries else platform.default_search_roots([])
+        return {
+            "libraryFound": bool(libraries),
+            "libraries": libraries,
+            "searchRoots": roots,
+            "defaultSeratoDir": str(platform.default_serato_dir()),
+            "message": None if libraries else (
+                "Aucun dossier source Serato (_Serato_) n'a ete trouve. "
+                "Ouvre Serato au moins une fois, verifie que le dossier _Serato_ existe "
+                "dans Musique ou branche le disque externe qui contient ta bibliotheque."
+            ),
+        }
+
     def scan_library(self, library, index):
         serato_dir = Path(library["seratoDir"])
         broken = {}
@@ -434,7 +449,11 @@ class LostTrackrApi:
 
         libraries = self.discover_libraries()
         if not libraries:
-            raise RuntimeError("Aucune bibliotheque _Serato_ detectee sur l'ordinateur ou les disques connectes.")
+            raise RuntimeError(
+                "Aucun dossier source Serato (_Serato_) n'a ete trouve. "
+                "LostTrackr cherche dans le dossier Musique de l'utilisateur et a la racine des disques connectes. "
+                "Ouvre Serato au moins une fois ou branche le disque qui contient ta bibliotheque, puis relance le scan."
+            )
 
         roots = self.search_roots(libraries)
         index = build_index(roots)
