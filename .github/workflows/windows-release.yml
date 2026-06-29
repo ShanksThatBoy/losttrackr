@@ -6,7 +6,7 @@ on:
       tag:
         description: Release tag
         required: true
-        default: v1.4.0-beta-win
+        default: v1.1.2
       upload_release:
         description: Attach installer to GitHub Release
         required: true
@@ -38,13 +38,13 @@ jobs:
 
       - name: Build installer
         shell: pwsh
-        run: ./windows/build_windows.ps1 -Version "1.4.0-beta-win"
+        run: ./windows/build_windows.ps1 -Version "1.1.2"
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LostTrackrSetup-v1.4.0-beta-win-x64
-          path: windows/dist/installer/LostTrackrSetup-v1.4.0-beta-win-x64.exe
+          name: LostTrackrSetup-v1.1.2-x64
+          path: windows/dist/installer/LostTrackrSetup-v1.1.2-x64.exe
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -59,12 +59,12 @@ jobs:
             $tag = "${{ github.ref_name }}"
           }
 
-          $installer = "windows/dist/installer/LostTrackrSetup-v1.4.0-beta-win-x64.exe"
-          $notes = Get-Content "windows/release_notes_v1.4.0-beta-win.md" -Raw
+          $installer = "windows/dist/installer/LostTrackrSetup-v1.1.2-x64.exe"
+          $notes = Get-Content "windows/release_notes_v1.1.2-win.md" -Raw
 
           gh release view $tag 2>$null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag $installer --title "LostTrackr v1.4.0 beta Windows" --notes "$notes" --prerelease
+            gh release create $tag $installer --target "${{ github.sha }}" --title "LostTrackr v1.1.2 Windows" --notes "$notes"
           } else {
             gh release upload $tag $installer --clobber
           }

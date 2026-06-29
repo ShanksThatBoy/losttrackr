@@ -9,10 +9,11 @@ if [[ ! -x ".venv-losttrackr-macos/bin/python" ]]; then
 fi
 
 . .venv-losttrackr-macos/bin/activate
+PYTHON=".venv-losttrackr-macos/bin/python"
 
 rm -rf build dist
 
-python -m PyInstaller \
+"$PYTHON" -m PyInstaller \
   --noconfirm \
   --clean \
   --windowed \
@@ -21,13 +22,15 @@ python -m PyInstaller \
   --icon "assets/LostTrackr.icns" \
   --add-data "losttrackr_ui.html:." \
   --add-data "assets:assets" \
+  --add-data "css:css" \
+  --add-data "js:js" \
   --collect-all webview \
   losttrackr_app.py
 
 PLIST="dist/LostTrackr.app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName LostTrackr" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string LostTrackr" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.4.0" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string 1.4.0" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion 1.4.0-beta" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string 1.4.0-beta" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.1.2" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string 1.1.2" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion 1.1.2" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string 1.1.2" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :LSApplicationCategoryType public.app-category.music" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :LSApplicationCategoryType string public.app-category.music" "$PLIST"
 
 codesign --force --deep --sign - "dist/LostTrackr.app"

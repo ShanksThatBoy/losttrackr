@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="LostTrackr"
-APP_VERSION="1.4.0"
-APP_BUILD="1.4.0-beta"
+APP_VERSION="1.1.2"
+APP_BUILD="1.1.2"
 BUNDLE_ID="com.djshanks.losttrackr"
 VOL_NAME="${APP_NAME} ${APP_VERSION}"
 DMG_NAME="${1:-${APP_NAME}-v${APP_BUILD}.dmg}"
@@ -17,14 +17,17 @@ if [[ ! -x ".venv-losttrackr-macos/bin/python" ]]; then
 fi
 
 . .venv-losttrackr-macos/bin/activate
+PYTHON=".venv-losttrackr-macos/bin/python"
 
 rm -rf build dist
-python -m PyInstaller \
+"$PYTHON" -m PyInstaller \
   --noconfirm --clean --windowed --name "$APP_NAME" \
   --osx-bundle-identifier "$BUNDLE_ID" \
   --icon "assets/LostTrackr.icns" \
   --add-data "losttrackr_ui.html:." \
   --add-data "assets:assets" \
+  --add-data "css:css" \
+  --add-data "js:js" \
   --collect-all webview \
   losttrackr_app.py
 
@@ -39,6 +42,7 @@ PLIST="${APP_PATH}/Contents/Info.plist"
 
 codesign --force --deep --sign - "$APP_PATH"
 codesign --verify --deep --strict "$APP_PATH"
+xattr -cr "$APP_PATH" 2>/dev/null || true
 
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/losttrackr-dmg.XXXXXX")"
 STAGE="${TMP_ROOT}/stage"
@@ -57,6 +61,7 @@ mkdir -p "$STAGE/.background"
 ditto "$APP_PATH" "$STAGE/${APP_NAME}.app"
 ln -s /Applications "$STAGE/Applications"
 cp README_BETA_LOSTTRACKR_MACOS.md "$STAGE/"
+cp OUVRIR_LOSTTRACKR_MACOS_BETA.txt "$STAGE/"
 cp assets/LostTrackr.icns "$STAGE/.VolumeIcon.icns"
 
 LOGO_TMP="${TMP_ROOT}/logo.png"
