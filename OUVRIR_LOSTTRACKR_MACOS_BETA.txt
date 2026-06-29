@@ -1,0 +1,15 @@
+LostTrackr macOS 1.1.2 - beta non notarisee
+
+Cette beta est signee localement mais pas notarisee par Apple.
+
+Ouverture sans Terminal :
+1. Glisse LostTrackr.app dans Applications.
+2. Dans Applications, fais clic droit ou Ctrl-clic sur LostTrackr.app.
+3. Clique sur Ouvrir, puis confirme Ouvrir.
+
+Si macOS affiche seulement "Placer dans la corbeille" :
+- Va dans Reglages Systeme > Confidentialite et securite.
+- Clique sur Ouvrir quand meme pour LostTrackr.
+
+Solution de secours Terminal :
+xattr -dr com.apple.quarantine "/Applications/LostTrackr.app"

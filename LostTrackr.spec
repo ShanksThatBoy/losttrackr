@@ -1,7 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('losttrackr_ui.html', '.'), ('assets', 'assets')]
+datas = [
+    ('losttrackr_ui.html', '.'),
+    ('assets', 'assets'),
+    ('css', 'css'),
+    ('js', 'js'),
+]
 binaries = []
 hiddenimports = []
 tmp_ret = collect_all('webview')
@@ -58,8 +63,8 @@ app = BUNDLE(
     info_plist={
         'CFBundleDisplayName': 'LostTrackr',
         'CFBundleName': 'LostTrackr',
-        'CFBundleShortVersionString': '1.0.1',
-        'CFBundleVersion': '1.0.1',
+        'CFBundleShortVersionString': '1.1.2',
+        'CFBundleVersion': '1.1.2',
         'LSApplicationCategoryType': 'public.app-category.music',
         'NSHighResolutionCapable': True,
     },

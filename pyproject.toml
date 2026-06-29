@@ -1,0 +1,26 @@
+[project]
+name = "losttrackr"
+version = "1.1.2"
+description = "Retrouve et répare les morceaux manquants de ta bibliothèque Serato DJ Pro."
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+macos   = ["pywebview>=6.2,<7"]
+windows = ["pywebview>=6.2,<7", "pillow>=10.0,<12"]
+build   = ["pyinstaller>=6.0,<7"]
+dev     = ["pytest>=8.0", "ruff>=0.4"]
+
+[project.scripts]
+losttrackr-scan     = "serato_scan:main"
+losttrackr-relocate = "serato_relocate:main"
+
+[tool.ruff]
+line-length    = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,4 +1,4 @@
-# LostTrackr macOS 1.1.1 - Beta privee non notarisee
+# LostTrackr macOS 1.1.2 - Beta privee non notarisee
 
 Merci de tester LostTrackr.
 
@@ -6,7 +6,7 @@ LostTrackr est un outil macOS pour aider les DJs a retrouver automatiquement les
 
 ## Important avant de commencer
 
-Cette version 1.1.1 est une beta privee. Elle n'est pas encore signee ni notarisee par Apple avec un certificat Developer ID.
+Cette version 1.1.2 est une beta privee. Elle n'est pas encore signee ni notarisee par Apple avec un certificat Developer ID.
 
 macOS peut donc afficher une alerte du type :
 
@@ -29,6 +29,17 @@ Si macOS bloque encore l'app :
 3. Descends jusqu'au message concernant `LostTrackr`.
 4. Clique sur `Ouvrir quand meme`.
 5. Relance `LostTrackr.app`.
+
+## Ouvrir sans Terminal
+
+La methode recommandee pour cette beta non notarisee :
+
+1. Glisse `LostTrackr.app` dans `Applications`.
+2. Dans `Applications`, fais un clic droit ou Ctrl-clic sur `LostTrackr.app`.
+3. Clique sur `Ouvrir`.
+4. Confirme avec `Ouvrir` si macOS affiche un avertissement.
+
+Si macOS affiche seulement `Placer dans la corbeille` et `Termine`, ouvre `Reglages Systeme` > `Confidentialite et securite`, puis clique sur `Ouvrir quand meme` pour LostTrackr.
 
 ## Si macOS affiche "Element non ouvert"
 
