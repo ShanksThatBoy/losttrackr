@@ -13,6 +13,8 @@ webview_datas, webview_binaries, webview_hiddenimports = collect_all("webview")
 datas = [
     (str(ROOT / "losttrackr_ui.html"), "."),
     (str(ROOT / "assets"), "assets"),
+    (str(ROOT / "css"), "css"),
+    (str(ROOT / "js"), "js"),
 ]
 datas += webview_datas
 
