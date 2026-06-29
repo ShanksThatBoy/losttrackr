@@ -1,7 +1,7 @@
 [project]
 name = "losttrackr"
-version = "1.1.2"
-description = "Retrouve et répare les morceaux manquants de ta bibliothèque Serato DJ Pro."
+version = "1.2.0"
+description = "Retrouve et répare les morceaux manquants de tes bibliothèques DJ."
 requires-python = ">=3.11"
 
 [project.optional-dependencies]

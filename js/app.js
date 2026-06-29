@@ -32,7 +32,14 @@
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const API = {
     async scan(){ if(window.pywebview?.api?.scan) return window.pywebview.api.scan(); await wait(450); return MOCK; },
-    async preflight(){ if(window.pywebview?.api?.preflight) return window.pywebview.api.preflight(); await wait(120); return {libraryFound:true,libraries:MOCK.libraries,searchRoots:["~/Music","/Volumes/DJ-USB"],defaultSeratoDir:"~/Music/_Serato_"}; },
+    async preflight(){
+      if(window.pywebview?.api?.preflight) return window.pywebview.api.preflight();
+      await wait(120);
+      const software = {id:"serato",name:"Serato DJ",libraryName:"bibliothèque Serato",containerName:"crate",containerPlural:"crates",groupName:"subcrates",repairSupported:true,betaLabel:"Réparation active",sources:[{path:"~/Music/_Serato_",kind:"Dossier _Serato_",detail:"database V2 + crates"}]};
+      return {libraryFound:true,canScan:true,repairSupported:true,activeSoftwareId:"serato",activeSoftware:software,softwareDetection:{preferredSoftwareId:"serato",multipleDetected:false,softwares:[software],profiles:[software]},libraries:MOCK.libraries,searchRoots:["~/Music","/Volumes/DJ-USB"],defaultSeratoDir:"~/Music/_Serato_"};
+    },
+    async detectSoftware(){ if(window.pywebview?.api?.detectSoftware) return window.pywebview.api.detectSoftware(); const info = await this.preflight(); return info.softwareDetection; },
+    async selectSoftware(id){ if(window.pywebview?.api?.selectSoftware) return window.pywebview.api.selectSoftware(id); const info = await this.preflight(); info.activeSoftwareId = id; return info; },
     async apply(){ if(window.pywebview?.api?.apply) return window.pywebview.api.apply(); await wait(450); return {fixed:620,missing:2,backupPath:"~/Music/_Serato_BACKUP_20260624_121500"}; },
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
@@ -53,6 +60,9 @@
   let totalMissing = 0;
   let totalReview = 0;
   let trackEls = [];
+  let preflightInfo = null;
+  let selectedSoftwareId = null;
+  try{ selectedSoftwareId = localStorage.getItem("lt_preferred_software") || null; }catch(error){}
 
   function esc(value){ return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char])); }
   function fmt(n,singular,plural){ return `${n} ${n > 1 ? plural : singular}`; }
@@ -75,34 +85,120 @@
   function goHome(){ setState("idle"); showView("home"); }
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
 
+  function detectedSoftwares(info){
+    const detected = info?.softwareDetection?.softwares || [];
+    if(detected.length) return detected;
+    return info?.softwareDetection?.profiles || [];
+  }
+
+  function activeSoftware(info = preflightInfo){
+    const choices = detectedSoftwares(info);
+    const wanted = selectedSoftwareId || info?.activeSoftwareId || info?.softwareDetection?.preferredSoftwareId;
+    return choices.find(item => item.id === wanted) || info?.activeSoftware || choices[0] || {
+      id:"serato", name:"Serato DJ", libraryName:"bibliothèque Serato", containerName:"crate", containerPlural:"crates", groupName:"subcrates", repairSupported:true, betaLabel:"Réparation active", sources:[]
+    };
+  }
+
+  function firstSourcePath(software, info = preflightInfo){
+    const firstSource = (software?.sources || [])[0];
+    if(firstSource?.path) return firstSource.path;
+    const firstLibrary = (info?.libraries || [])[0];
+    if(software?.id === "serato" && firstLibrary?.seratoDir) return firstLibrary.seratoDir;
+    if(software?.id === "serato") return info?.defaultSeratoDir || "~/Music/_Serato_";
+    return "Aucune source détectée";
+  }
+
   function sourceMissingMessage(){
-    return "Aucun dossier source Serato (_Serato_) n'a ete trouve. Ouvre Serato au moins une fois, verifie que le dossier _Serato_ existe dans Musique ou branche le disque externe qui contient ta bibliotheque.";
+    const software = activeSoftware();
+    return `Aucun dossier source ${software.name || "DJ"} n'a été trouvé. Ouvre le logiciel au moins une fois ou branche le disque qui contient ta bibliothèque, puis relance la détection.`;
   }
 
   function scanErrorMessage(error){
     const raw = String(error?.message || error || "");
     const lower = raw.toLowerCase();
-    if(raw.includes("_Serato_") || lower.includes("aucun dossier source") || lower.includes("bibliotheque _serato")){
+    if(raw.includes("_Serato_") || lower.includes("aucun dossier source") || lower.includes("bibliotheque _serato") || lower.includes("est bien detecte")){
       return raw;
     }
     if(lower.includes("serato dj") || lower.includes("serato semble ouvert")){
       return raw;
     }
-    return "Le scan a échoué. Vérifie que Serato DJ Pro est fermé, que tes disques sont branchés, puis relance.";
+    return "Le scan a échoué. Vérifie que ton logiciel DJ est fermé, que tes disques sont branchés, puis relance.";
+  }
+
+  function updateSoftwareCopy(info){
+    const software = activeSoftware(info);
+    const libraryName = software.libraryName || `bibliothèque ${software.name || "DJ"}`;
+    const containers = software.containerPlural || "listes";
+    const found = Boolean((software.sources || []).length || info?.libraryFound);
+    const canScan = Boolean(info?.canScan);
+    $("prepareIntro").textContent = `LostTrackr va chercher les morceaux que ${software.name || "ton logiciel DJ"} ne retrouve plus. Rien ne sera modifié avant ta validation.`;
+    $("prepareRadarText").textContent = `LostTrackr va inspecter ta ${libraryName}, tes dossiers musique et les disques connectés pour retrouver les fichiers déplacés.`;
+    $("sourceStepTitle").textContent = `Détecter la ${libraryName}`;
+    $("sourceStepText").textContent = `Identifier les bases et ${containers} à analyser.`;
+    $("primarySourceTitle").textContent = found ? `${libraryName} détectée` : `${libraryName} introuvable`;
+    $("seratoSourcePath").textContent = firstSourcePath(software, info);
+    const state = $("seratoSourceState");
+    state.classList.remove("warn", "blue");
+    state.textContent = found ? (canScan ? "OK" : "Détecté") : "Introuvable";
+    if(!found) state.classList.add("warn");
+    else if(!canScan) state.classList.add("blue");
+    const libraries = info?.libraries || [];
+    $("externalStatus").textContent = libraries.length > 1 ? `${libraries.length - 1} source externe détectée${libraries.length > 2 ? "s" : ""}` : "Inclus si détectés";
+    $("closeAdvice").textContent = `Pour éviter les conflits, ferme ${software.name || "ton logiciel DJ"} avant de lancer le scan.`;
+    $("missionSub").textContent = `LostTrackr inspecte ${software.name || "ta bibliothèque DJ"}, tes dossiers musique et les disques connectés. Aucun fichier n’est modifié pendant cette phase.`;
+    $("softwareScanTitle").textContent = libraryName.charAt(0).toUpperCase() + libraryName.slice(1);
+    $("softwareScanSub").textContent = software.id === "serato" ? "Crates et database V2" : `${containers} et fichiers source`;
+    $("startScan").disabled = !canScan;
+    $("startScan").textContent = canScan ? "Démarrer le scan" : found ? `${software.name} bientôt réparable` : "Source introuvable";
+  }
+
+  function renderSoftwareChoices(info){
+    const container = $("softwareChoice");
+    if(!container) return;
+    const choices = detectedSoftwares(info);
+    const active = activeSoftware(info);
+    container.innerHTML = "";
+    if(!choices.length){
+      container.innerHTML = `<div class="empty">Aucun logiciel DJ détecté pour l’instant.</div>`;
+      return;
+    }
+    choices.forEach(software => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `software-option ${software.id === active.id ? "is-active" : ""} ${software.repairSupported ? "is-supported" : ""}`;
+      const sourceCount = (software.sources || []).length;
+      const sourceText = sourceCount ? `${sourceCount} source${sourceCount > 1 ? "s" : ""} détectée${sourceCount > 1 ? "s" : ""}` : "Non détecté";
+      button.innerHTML = `<span><b>${esc(software.name)}</b><small>${esc(sourceText)} · ${esc(software.libraryName || "bibliothèque DJ")}</small></span><em>${esc(software.betaLabel || (software.repairSupported ? "Réparation active" : "Détection"))}</em>`;
+      button.addEventListener("click", () => chooseSoftware(software.id));
+      container.appendChild(button);
+    });
+  }
+
+  async function chooseSoftware(id){
+    selectedSoftwareId = id;
+    try{ localStorage.setItem("lt_preferred_software", id); }catch(error){}
+    try{
+      preflightInfo = await API.selectSoftware(id);
+      renderSoftwareChoices(preflightInfo);
+      updateSoftwareCopy(preflightInfo);
+      if(preflightInfo?.message) showToast(preflightInfo.message);
+    }catch(error){
+      showToast(error?.message || "Impossible de sélectionner ce logiciel pour l’instant.");
+    }
   }
 
   async function refreshPreflight(){
     try{
-      const info = await API.preflight();
-      const libraries = info?.libraries || [];
-      const firstLibrary = libraries[0];
-      const found = Boolean(info?.libraryFound || libraries.length);
-      $("seratoSourcePath").textContent = firstLibrary?.seratoDir || info?.defaultSeratoDir || "_Serato_";
-      $("seratoSourceState").textContent = found ? "OK" : "Introuvable";
-      $("seratoSourceState").classList.toggle("warn", !found);
-      $("externalStatus").textContent = libraries.length > 1 ? `${libraries.length - 1} source externe détectée${libraries.length > 2 ? "s" : ""}` : "Aucun disque externe détecté";
-      if(!found){
-        showToast(info?.message || sourceMissingMessage());
+      let info = await API.preflight();
+      const choices = detectedSoftwares(info);
+      if(selectedSoftwareId && choices.some(item => item.id === selectedSoftwareId) && info.activeSoftwareId !== selectedSoftwareId){
+        info = await API.selectSoftware(selectedSoftwareId);
+      }
+      preflightInfo = info;
+      renderSoftwareChoices(info);
+      updateSoftwareCopy(info);
+      if(info?.message && !info?.canScan){
+        showToast(info.message);
       }
     }catch(error){
       showToast(scanErrorMessage(error));
@@ -248,7 +344,7 @@
       showView("prepare");
       showToast(scanErrorMessage(error));
     }finally{
-      $("startScan").disabled = false;
+      $("startScan").disabled = !preflightInfo?.canScan;
     }
   }
 

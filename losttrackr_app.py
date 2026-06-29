@@ -17,6 +17,7 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+import dj_software
 import serato_relocate as serato
 import losttrackr_platform as platform
 
@@ -348,9 +349,42 @@ class LostTrackrApi:
         self.last_scan = None
         self.last_index = None
         self.last_backups = []
+        self.selected_software_id = None
 
     def volume_roots(self):
         return platform.library_roots()
+
+    def detect_software(self):
+        return dj_software.detect_all()
+
+    def detectSoftware(self):
+        return self.detect_software()
+
+    def active_software_id(self, detection=None):
+        detection = detection or self.detect_software()
+        detected_ids = {software["id"] for software in detection.get("softwares", [])}
+        if self.selected_software_id in detected_ids:
+            return self.selected_software_id
+        if self.selected_software_id in dj_software.PROFILES:
+            return self.selected_software_id
+        return detection.get("preferredSoftwareId") or "serato"
+
+    def software_payload(self, software_id, detection=None):
+        detection = detection or self.detect_software()
+        for software in detection.get("softwares", []):
+            if software["id"] == software_id:
+                return software
+        profile = dj_software.PROFILES.get(software_id, dj_software.PROFILES["serato"])
+        return {**dj_software.profile_payload(profile), "sources": []}
+
+    def select_software(self, software_id):
+        if software_id not in dj_software.PROFILES:
+            raise RuntimeError(f"Logiciel DJ inconnu : {software_id}")
+        self.selected_software_id = software_id
+        return self.preflight()
+
+    def selectSoftware(self, software_id):
+        return self.select_software(software_id)
 
     def discover_libraries(self):
         candidates = [platform.default_serato_dir()]
@@ -377,18 +411,37 @@ class LostTrackrApi:
         return platform.default_search_roots(libraries)
 
     def preflight(self):
+        detection = self.detect_software()
+        active_id = self.active_software_id(detection)
+        active_software = self.software_payload(active_id, detection)
         libraries = self.discover_libraries()
         roots = self.search_roots(libraries) if libraries else platform.default_search_roots([])
+        active_sources = active_software.get("sources", [])
+        repair_supported = bool(active_software.get("repairSupported"))
+        can_scan = active_id == "serato" and bool(libraries)
+        if can_scan:
+            message = None
+        elif active_sources and not repair_supported:
+            message = (
+                f"{active_software['name']} a ete detecte. "
+                "La reparation automatique de ce logiciel sera branchee dans la suite de la v1.2.0."
+            )
+        else:
+            message = (
+                f"Aucun dossier source {active_software['name']} n'a ete trouve. "
+                "Ouvre ton logiciel DJ au moins une fois ou branche le disque qui contient ta bibliotheque, puis relance la detection."
+            )
         return {
-            "libraryFound": bool(libraries),
+            "libraryFound": bool(active_sources or can_scan),
+            "canScan": can_scan,
+            "repairSupported": repair_supported,
+            "activeSoftwareId": active_id,
+            "activeSoftware": active_software,
+            "softwareDetection": detection,
             "libraries": libraries,
             "searchRoots": roots,
             "defaultSeratoDir": str(platform.default_serato_dir()),
-            "message": None if libraries else (
-                "Aucun dossier source Serato (_Serato_) n'a ete trouve. "
-                "Ouvre Serato au moins une fois, verifie que le dossier _Serato_ existe "
-                "dans Musique ou branche le disque externe qui contient ta bibliotheque."
-            ),
+            "message": message,
         }
 
     def scan_library(self, library, index):
@@ -454,6 +507,15 @@ class LostTrackrApi:
         }
 
     def scan(self):
+        detection = self.detect_software()
+        active_id = self.active_software_id(detection)
+        active_software = self.software_payload(active_id, detection)
+        if active_id != "serato":
+            raise RuntimeError(
+                f"{active_software['name']} est bien detecte, mais la reparation automatique "
+                "sera activee lorsque son adaptateur sera branche. Choisis Serato DJ pour scanner avec le moteur actuel."
+            )
+
         if serato.serato_running():
             raise RuntimeError("Serato DJ Pro semble ouvert. Ferme-le completement avant de scanner.")
 
@@ -472,6 +534,8 @@ class LostTrackrApi:
         review = [item for library in scanned for item in library["reviewItems"]]
         missing = [item for library in scanned for item in library["missingItems"]]
         payload = {
+            "activeSoftwareId": active_id,
+            "activeSoftware": active_software,
             "libraries": [
                 {
                     "name": library["name"],

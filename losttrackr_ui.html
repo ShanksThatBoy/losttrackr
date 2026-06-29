@@ -97,7 +97,7 @@
           <div>
             <button class="back-btn" id="topBack" type="button">← Retour</button>
             <h1 class="page-title" id="prepareTitle">Préparer le scan</h1>
-            <p class="page-sub">LostTrackr va chercher les morceaux que Serato ne retrouve plus. Rien ne sera modifié avant ta validation.</p>
+            <p class="page-sub" id="prepareIntro">LostTrackr va chercher les morceaux que ton logiciel DJ ne retrouve plus. Rien ne sera modifié avant ta validation.</p>
           </div>
         </div>
 
@@ -108,9 +108,9 @@
               <div class="fallback-art repair" hidden><i class="wave-icon" aria-hidden="true"></i></div>
             </div>
             <h2>Prêt à retrouver tes sons perdus</h2>
-            <p>LostTrackr va inspecter ta bibliothèque Serato, tes dossiers musique et les disques connectés pour retrouver les fichiers déplacés.</p>
+            <p id="prepareRadarText">LostTrackr va inspecter ta bibliothèque DJ, tes dossiers musique et les disques connectés pour retrouver les fichiers déplacés.</p>
             <div class="steps">
-              <div class="step"><b><span>1</span>Détecter la bibliothèque Serato</b><small>Identifier les bases et crates à analyser.</small></div>
+              <div class="step"><b><span>1</span><span id="sourceStepTitle">Détecter la bibliothèque DJ</span></b><small id="sourceStepText">Identifier les bases et listes à analyser.</small></div>
               <div class="step"><b><span>2</span>Chercher les fichiers déplacés</b><small>Comparer les noms et les chemins probables.</small></div>
               <div class="step"><b><span>3</span>Préparer un aperçu avant réparation</b><small>Te laisser valider avant toute écriture.</small></div>
             </div>
@@ -118,9 +118,11 @@
 
           <div class="side-stack">
             <article class="side-card">
-              <h3>Sources détectées</h3>
+              <h3>Logiciel détecté</h3>
+              <div class="software-choice" id="softwareChoice"></div>
+              <h3 class="source-heading">Sources détectées</h3>
               <div class="source-list">
-                <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true"><div><b>Bibliothèque Serato détectée</b><small id="seratoSourcePath">_Serato_</small></div><span class="state-pill" id="seratoSourceState">OK</span></div>
+                <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true"><div><b id="primarySourceTitle">Bibliothèque DJ détectée</b><small id="seratoSourcePath">Source à détecter</small></div><span class="state-pill" id="seratoSourceState">OK</span></div>
                 <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt="" aria-hidden="true"><div><b>Dossier musique utilisateur</b><small>Musique</small></div><span class="state-pill blue">Inclus</span></div>
                 <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_external_drive_v2_clean.png" alt="" aria-hidden="true"><div><b>Disques externes connectés</b><small id="externalStatus">Inclus si détectés</small></div><span class="state-pill blue">Inclus</span></div>
                 <div class="source"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" aria-hidden="true"><div><b>Sauvegarde avant modification</b><small>Automatique</small></div><span class="state-pill">Activée</span></div>
@@ -143,7 +145,7 @@
 
             <article class="side-card notice">
               <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_tip_v2_clean.png" alt="" aria-hidden="true"></div>
-              <div><b>Conseil avant scan</b><p>Pour éviter les conflits, ferme Serato DJ Pro avant de lancer le scan.</p></div>
+              <div><b>Conseil avant scan</b><p id="closeAdvice">Pour éviter les conflits, ferme ton logiciel DJ avant de lancer le scan.</p></div>
             </article>
           </div>
         </div>
@@ -171,7 +173,7 @@
               <div class="radar-center"><img src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""></div>
             </div>
             <h2 class="mission-title">Recovery Radar</h2>
-            <p class="mission-sub">LostTrackr inspecte Serato, tes dossiers musique et les disques connectés. Aucun fichier n’est modifié pendant cette phase.</p>
+            <p class="mission-sub" id="missionSub">LostTrackr inspecte ta bibliothèque DJ, tes dossiers musique et les disques connectés. Aucun fichier n’est modifié pendant cette phase.</p>
           </article>
           <div class="side-stack">
             <article class="side-card">
@@ -195,7 +197,7 @@
             <article class="side-card">
               <h3>Zones inspectées</h3>
               <div class="recovery-list">
-                <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""><div><b>Bibliothèque Serato</b><span>Crates et database V2</span></div><em id="seratoScanLabel">En cours</em></div>
+                <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""><div><b id="softwareScanTitle">Bibliothèque DJ</b><span id="softwareScanSub">Sources du logiciel sélectionné</span></div><em id="seratoScanLabel">En cours</em></div>
                 <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt=""><div><b>Dossier Musique</b><span>Bibliothèque utilisateur</span></div><em id="musicScanLabel">+0 fichiers</em></div>
                 <div class="recovery-item"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_external_drive_v2_clean.png" alt=""><div><b>DJ SSD</b><span>Disques externes branchés</span></div><em class="warn" id="externalScanLabel">Analyse</em></div>
               </div>
