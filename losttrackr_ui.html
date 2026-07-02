@@ -351,11 +351,40 @@
   <div class="toast" id="toast" role="status"></div>
 
   <section class="onboarding" id="onboarding" role="dialog" aria-modal="true" aria-label="Bienvenue sur LostTrackr">
-    <div class="onboarding-card">
-      <div class="brand-mark" style="margin:0 auto"><img src="assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png" alt=""></div>
-      <h2>Bienvenue sur LostTrackr</h2>
-      <p>Retrouve les morceaux que Serato ne trouve plus, puis valide chaque réparation avant que quoi que ce soit soit modifié.</p>
-      <div class="onboarding-actions"><button class="secondary" id="skipOnboarding" type="button">Passer</button><button class="primary" id="finishOnboarding" type="button">Commencer</button></div>
+    <div class="onboarding-card ob-card">
+      <div class="ob-steps">
+        <div class="ob-step is-current" data-ob="0">
+          <div class="ob-visual" aria-hidden="true">
+            <div class="brand-mark ob-logo"><img src="assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png" alt=""></div>
+            <div class="ob-wavebars" id="obWave"></div>
+          </div>
+          <h2>Tes morceaux se perdent&nbsp;?</h2>
+          <p>Fichiers déplacés, disques débranchés, dossiers renommés… et ton logiciel DJ affiche des morceaux introuvables.</p>
+        </div>
+        <div class="ob-step" data-ob="1">
+          <div class="ob-visual" aria-hidden="true">
+            <div class="ob-radar"><i class="ob-sweep"></i><i class="ob-dot d1"></i><i class="ob-dot d2"></i><i class="ob-dot d3"></i><span class="ob-radar-core"><img src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt=""></span></div>
+          </div>
+          <h2>LostTrackr les retrouve</h2>
+          <p>Un scan inspecte ta bibliothèque, tes dossiers musique et tes disques pour localiser chaque fichier déplacé. Aucune modification pendant cette phase.</p>
+        </div>
+        <div class="ob-step" data-ob="2">
+          <div class="ob-visual" aria-hidden="true">
+            <div class="ob-shield"><img src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""></div>
+            <div class="ob-paths"><code class="ob-old">…/Musiques/track.mp3</code><span class="ob-arrow">→</span><code class="ob-new">…/DJ SSD/track.mp3</code></div>
+          </div>
+          <h2>Tu valides, il répare</h2>
+          <p>Aperçu avant/après, sauvegarde automatique avant chaque action. Rien n’est modifié sans ta confirmation — beatgrids et cue points restent intacts.</p>
+        </div>
+      </div>
+      <div class="ob-dots" id="obDots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
+      <div class="onboarding-actions ob-actions">
+        <button class="tertiary" id="skipOnboarding" type="button">Passer</button>
+        <div class="ob-nav">
+          <button class="secondary" id="obPrev" type="button" hidden>Précédent</button>
+          <button class="primary" id="obNext" type="button">Continuer</button>
+        </div>
+      </div>
     </div>
   </section>
 </div>

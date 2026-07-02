@@ -387,6 +387,50 @@
   .onboarding-card p{margin:0;color:#aeb9c8;font-size:17px;line-height:1.48}
   .onboarding-actions{display:flex;justify-content:center;gap:12px;margin-top:28px}
 
+  /* ===== Onboarding animé (proto v1.2.4) ===== */
+  .ob-card{width:min(620px,100%);padding:38px 38px 30px}
+  .ob-steps{position:relative;min-height:330px}
+  .ob-step{display:none}
+  .ob-step.is-current{display:block;animation:obIn .32s ease-out}
+  @keyframes obIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+  .ob-step.is-current.ob-back{animation:obInBack .32s ease-out}
+  @keyframes obInBack{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+  .ob-visual{height:170px;display:grid;place-items:center;align-content:center;gap:18px;margin-bottom:6px}
+  .ob-step h2{margin:14px 0 10px;font-size:30px;font-family:var(--font-display)}
+  .ob-step p{margin:0 auto;max-width:480px;color:#aeb9c8;font-size:16.5px;line-height:1.5}
+
+  .ob-logo{margin:0 auto}
+  .ob-wavebars{display:flex;align-items:center;justify-content:center;gap:3px;height:56px;width:min(380px,90%)}
+  .ob-wavebars i{flex:0 0 5px;border-radius:2.5px;height:var(--h,40%);background:linear-gradient(180deg,#2bb8ff,#126dff);box-shadow:0 0 8px rgba(34,175,255,.55)}
+  .ob-wavebars i.missing{background:rgba(255,106,85,.30);box-shadow:none;animation:obBlink 1.5s ease-in-out infinite}
+  @keyframes obBlink{0%,100%{opacity:.35}50%{opacity:.9}}
+
+  .ob-radar{width:160px;height:160px;border-radius:50%;position:relative;display:grid;place-items:center;border:1px solid rgba(48,168,255,.30);background:radial-gradient(circle,rgba(22,152,255,.16),transparent 72%);box-shadow:0 0 0 22px rgba(31,147,255,.045),0 0 0 46px rgba(31,147,255,.025)}
+  .ob-sweep{position:absolute;left:50%;top:50%;width:46%;height:2px;transform-origin:left center;background:linear-gradient(90deg,rgba(45,177,255,.95),transparent);animation:scanSweep 1.8s linear infinite;filter:drop-shadow(0 0 8px rgba(45,177,255,.7))}
+  .ob-radar-core{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:rgba(5,13,23,.78);border:1px solid rgba(64,174,255,.30);position:relative;z-index:2}
+  .ob-radar-core img{width:48px;height:48px;object-fit:contain}
+  .ob-dot{position:absolute;width:9px;height:9px;border-radius:50%;background:#26baff;box-shadow:0 0 14px rgba(38,186,255,.85);animation:obFound 3.6s ease-in-out infinite}
+  .ob-dot.d1{left:22%;top:30%}
+  .ob-dot.d2{right:20%;top:52%;animation-delay:-1.2s}
+  .ob-dot.d3{left:44%;bottom:18%;animation-delay:-2.4s}
+  @keyframes obFound{0%,18%{opacity:0;transform:scale(.4)}30%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.7)}}
+
+  .ob-shield{width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:rgba(70,236,106,.10);border:1px solid rgba(70,236,106,.30);box-shadow:0 0 34px rgba(70,236,106,.12);animation:softPulse 3.4s ease-in-out infinite}
+  .ob-shield img{width:64px;height:64px;object-fit:contain}
+  .ob-paths{display:flex;align-items:center;gap:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+  .ob-paths code{padding:9px 12px;border-radius:10px;border:1px solid rgba(117,164,221,.14);background:rgba(5,13,23,.66)}
+  .ob-old{color:#ff9a8b;text-decoration:line-through;text-decoration-color:rgba(255,106,85,.6);animation:obFade 3s ease-in-out infinite}
+  .ob-new{color:#6ff584;border-color:rgba(70,236,106,.30)!important;animation:obGlow 3s ease-in-out infinite}
+  .ob-arrow{color:#39aaff;font-size:17px}
+  @keyframes obFade{0%,100%{opacity:.55}50%{opacity:.95}}
+  @keyframes obGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 18px rgba(70,236,106,.25)}}
+
+  .ob-dots{display:flex;justify-content:center;gap:8px;margin-top:20px}
+  .ob-dots i{width:8px;height:8px;border-radius:50%;background:rgba(120,150,190,.30);transition:background .25s,transform .25s}
+  .ob-dots i.is-on{background:var(--blue);box-shadow:0 0 10px rgba(21,152,255,.7);transform:scale(1.25)}
+  .ob-actions{justify-content:space-between;align-items:center}
+  .ob-nav{display:flex;gap:10px}
+
   /* ===== Prototype v1.2.3 — expérience DJ ===== */
 
   /* Typo display (titres uniquement) */

@@ -652,12 +652,52 @@
   modal.addEventListener("click", event => { if(event.target === modal) modal.classList.remove("is-open"); });
 
   const onboarding = $("onboarding");
-  function closeOnboarding(){ onboarding.classList.remove("is-open"); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} goHome(); }
-  $("skipOnboarding").addEventListener("click", closeOnboarding);
-  $("finishOnboarding").addEventListener("click", closeOnboarding);
+  const obSteps = Array.from(document.querySelectorAll(".ob-step"));
+  const obDots = Array.from(document.querySelectorAll("#obDots i"));
+  let obIndex = 0;
+  function closeOnboarding(startScanFlow){
+    onboarding.classList.remove("is-open");
+    try{ localStorage.setItem("lt_onboarded","1"); }catch(error){}
+    if(startScanFlow === true) goPrepare();
+    else goHome();
+  }
+  function buildObWave(){
+    const wave = $("obWave");
+    if(!wave || wave.childElementCount) return;
+    const missing = new Set([5,6,12,19,20,27]);
+    for(let i = 0; i < 34; i++){
+      const bar = document.createElement("i");
+      const h = 26 + Math.abs(Math.sin(i * .6)) * 60 + Math.random() * 12;
+      bar.style.setProperty("--h", `${Math.min(Math.round(h), 100)}%`);
+      if(missing.has(i)) bar.classList.add("missing");
+      wave.appendChild(bar);
+    }
+  }
+  function showObStep(index, backwards){
+    obIndex = Math.max(0, Math.min(obSteps.length - 1, index));
+    obSteps.forEach((step, i) => {
+      step.classList.toggle("is-current", i === obIndex);
+      step.classList.toggle("ob-back", i === obIndex && Boolean(backwards));
+    });
+    obDots.forEach((dot, i) => dot.classList.toggle("is-on", i === obIndex));
+    $("obPrev").hidden = obIndex === 0;
+    $("obNext").textContent = obIndex === obSteps.length - 1 ? "Lancer mon premier scan" : "Continuer";
+  }
+  $("obNext").addEventListener("click", () => {
+    if(obIndex === obSteps.length - 1) closeOnboarding(true);
+    else showObStep(obIndex + 1);
+  });
+  $("obPrev").addEventListener("click", () => showObStep(obIndex - 1, true));
+  $("skipOnboarding").addEventListener("click", () => closeOnboarding(false));
+  document.addEventListener("keydown", event => {
+    if(!onboarding.classList.contains("is-open")) return;
+    if(event.key === "ArrowRight" && obIndex < obSteps.length - 1) showObStep(obIndex + 1);
+    else if(event.key === "ArrowLeft" && obIndex > 0) showObStep(obIndex - 1, true);
+    else if(event.key === "Escape") closeOnboarding(false);
+  });
   let onboarded = false;
   try{ onboarded = localStorage.getItem("lt_onboarded") === "1"; }catch(error){}
-  if(!onboarded) onboarding.classList.add("is-open");
+  if(!onboarded){ buildObWave(); showObStep(0); onboarding.classList.add("is-open"); }
 
   buildRepairWave();
   attachCardGlow();
