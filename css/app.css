@@ -395,16 +395,6 @@
   .status-green::before{background:var(--green);box-shadow:0 0 10px rgba(70,236,106,.75);animation-delay:-1.3s}
   @keyframes ledPulse{0%,100%{opacity:.55}50%{opacity:1}}
 
-  /* VU-mètre santé bibliothèque (sidebar) */
-  .vu{display:flex;align-items:flex-end;gap:2.5px;height:24px;justify-self:end}
-  .vu i{width:3.5px;border-radius:2px;background:var(--green);box-shadow:0 0 7px rgba(70,236,106,.5);animation:vuIdle 2.6s ease-in-out infinite}
-  .vu i:nth-child(1){height:26%;animation-delay:0s}
-  .vu i:nth-child(2){height:44%;animation-delay:-.4s}
-  .vu i:nth-child(3){height:64%;animation-delay:-.9s}
-  .vu i:nth-child(4){height:82%;animation-delay:-1.5s}
-  .vu i:nth-child(5){height:100%;animation-delay:-2s}
-  @keyframes vuIdle{0%,100%{opacity:.4;transform:scaleY(.82);transform-origin:bottom}50%{opacity:1;transform:scaleY(1)}}
-
   /* Waveform qui se répare (vue scan) */
   .repair-wave{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:3px;height:48px;margin:20px auto 0;max-width:520px}
   .repair-wave i{flex:0 0 4px;border-radius:2px;height:var(--h,40%);background:rgba(99,132,171,.26);transition:background .35s,box-shadow .35s,transform .35s}
