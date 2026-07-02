@@ -85,6 +85,7 @@
   function hideUpdateBanner(){
     updateBanner.hidden = true;
     updateBanner.classList.remove("is-open","is-mandatory");
+    document.querySelector(".main").classList.remove("has-banner");
   }
 
   function renderUpdateBanner(info){
@@ -98,7 +99,10 @@
     $("updateNotes").disabled = !info.notesUrl;
     updateBanner.hidden = false;
     updateBanner.classList.toggle("is-mandatory", Boolean(info.mandatory));
-    requestAnimationFrame(() => updateBanner.classList.add("is-open"));
+    requestAnimationFrame(() => {
+      updateBanner.classList.add("is-open");
+      document.querySelector(".main").classList.add("has-banner");
+    });
   }
 
   async function checkForAppUpdate(){
@@ -273,6 +277,44 @@
     }
   }
 
+  const repairWave = $("repairWave");
+  function buildRepairWave(){
+    if(!repairWave || repairWave.childElementCount) return;
+    for(let i = 0; i < 56; i++){
+      const bar = document.createElement("i");
+      const h = 24 + Math.abs(Math.sin(i * .55)) * 58 + Math.random() * 16;
+      bar.style.setProperty("--h", `${Math.min(Math.round(h), 100)}%`);
+      repairWave.appendChild(bar);
+    }
+  }
+  function litRepairWave(percent){
+    if(!repairWave) return;
+    const bars = repairWave.children;
+    const lit = Math.round((percent / 100) * bars.length);
+    for(let i = 0; i < bars.length; i++) bars[i].classList.toggle("lit", i < lit);
+    const caption = $("repairWaveCaption");
+    if(caption) caption.textContent = percent >= 100 ? "Bibliothèque reconstruite." : `Ta bibliothèque se reconstruit… ${Math.round(percent)}%`;
+  }
+
+  function attachCardGlow(){
+    document.querySelectorAll(".feature-card:not(.disabled)").forEach(card => {
+      card.addEventListener("pointermove", event => {
+        if(reduced) return;
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        card.style.setProperty("--mx", `${x * 100}%`);
+        card.style.setProperty("--my", `${y * 100}%`);
+        card.style.setProperty("--ry", `${(x - .5) * 4}deg`);
+        card.style.setProperty("--rx", `${(.5 - y) * 4}deg`);
+      });
+      card.addEventListener("pointerleave", () => {
+        card.style.removeProperty("--rx");
+        card.style.removeProperty("--ry");
+      });
+    });
+  }
+
   function rollTo(el,to,duration=700){
     if(reduced){ el.textContent = to; return; }
     const from = parseInt(String(el.textContent).replace(/\D/g,""),10) || 0;
@@ -310,9 +352,9 @@
     const repairableText = counts.reliable > 0 ? `${counts.reliable} morceaux retrouvés` : "Aucun morceau retrouvé";
     const total = Math.max(counts.scanned, counts.reliable + counts.missing);
     const percent = total ? Math.round((counts.reliable / total) * 100) : 0;
-    $("reliableCount").textContent = counts.reliable;
-    $("reviewCount").textContent = counts.review;
-    $("notFoundCount").textContent = counts.missing;
+    rollTo($("reliableCount"), counts.reliable);
+    rollTo($("reviewCount"), counts.review);
+    rollTo($("notFoundCount"), counts.missing);
     $("repairReliable").textContent = counts.reliable > 0 ? `Réparer les ${counts.reliable} résultats fiables` : "Aucune réparation fiable";
     $("repairReliable").disabled = counts.reliable <= 0;
     $("reviewAmbiguous").textContent = counts.review > 0 ? `Vérifier les ${counts.review} morceaux` : "Vérifier les détails";
@@ -344,9 +386,9 @@
       arrows.appendChild(document.createElement("i"));
     });
     syncPathScroll();
-    $("previewReliable").textContent = counts.reliable;
-    $("previewReview").textContent = counts.review;
-    $("previewMissing").textContent = counts.missing;
+    rollTo($("previewReliable"), counts.reliable);
+    rollTo($("previewReview"), counts.review);
+    rollTo($("previewMissing"), counts.missing);
   }
 
   function syncPathScroll(){
@@ -367,8 +409,8 @@
   function renderCompleted(){
     const fixed = Number(applyResult?.fixed ?? totalFound);
     const pending = Number(applyResult?.missing ?? totalMissing);
-    $("completedFixed").textContent = fixed;
-    $("completedPending").textContent = pending;
+    rollTo($("completedFixed"), fixed, 900);
+    rollTo($("completedPending"), pending, 900);
     $("completedTimelineFixed").textContent = `${fixed} chemin${fixed > 1 ? "s" : ""} corrigé${fixed > 1 ? "s" : ""}.`;
     $("completedTimelinePending").textContent = pending ? `${pending} morceau${pending > 1 ? "x" : ""} à vérifier plus tard.` : "Aucun morceau en attente.";
     $("backupBeforeLabel").textContent = `${fixed + pending} fichiers concernés`;
@@ -387,6 +429,7 @@
     $("possibleMatches").textContent = "…";
     $("remainingMissing").textContent = "…";
     $("scanProgress").style.width = "12%";
+    litRepairWave(12);
     $("seratoScanLabel").textContent = "En cours";
     $("musicScanLabel").textContent = "+0 fichiers";
     $("externalScanLabel").textContent = "Analyse";
@@ -399,6 +442,7 @@
       totalMissing = Number(scanData?.totals?.missing ?? (scanData?.missing || []).length);
       const totalAnalyzed = Number((scanData?.libraries || []).reduce((sum, lib) => sum + Number(lib.pathsRead || 0), 0)) || totalFound + totalReview + totalMissing;
       $("scanProgress").style.width = "100%";
+      litRepairWave(100);
       rollTo($("filesAnalyzed"), totalAnalyzed, 450);
       rollTo($("possibleMatches"), totalFound + totalReview, 450);
       rollTo($("remainingMissing"), totalMissing, 450);
@@ -421,6 +465,7 @@
     return setInterval(() => {
       width = Math.min(88, width + Math.random() * 10);
       $("scanProgress").style.width = `${width}%`;
+      litRepairWave(width);
     }, reduced ? 500 : 260);
   }
 
@@ -433,9 +478,9 @@
     const matches = scanData?.matches || [];
     const review = scanData?.review || [];
     const missing = scanData?.missing || [];
-    $("summaryFound").textContent = totalFound;
-    $("summaryMissing").textContent = totalMissing;
-    $("summaryLibraries").textContent = libraries.length;
+    rollTo($("summaryFound"), totalFound);
+    rollTo($("summaryMissing"), totalMissing);
+    rollTo($("summaryLibraries"), libraries.length);
     applyBtn.textContent = totalFound > 0 ? `Réparer ${fmt(totalFound,"morceau","morceaux")}` : "Aucune réparation disponible";
     applyBtn.disabled = true;
     confirmed.checked = false;
@@ -614,6 +659,8 @@
   try{ onboarded = localStorage.getItem("lt_onboarded") === "1"; }catch(error){}
   if(!onboarded) onboarding.classList.add("is-open");
 
+  buildRepairWave();
+  attachCardGlow();
   loadAppInfo();
   goHome();
   setTimeout(checkForAppUpdate, 900);

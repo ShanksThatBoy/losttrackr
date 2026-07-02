@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LostTrackr</title>
+<!-- PROTO v1.2.3 : Space Grotesk via CDN pour validation — à embarquer en woff2 local avant release -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap">
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
@@ -29,20 +33,22 @@
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true">
           <span>Réparer</span>
         </button>
-        <button class="nav-btn" id="navOrganize" type="button" aria-disabled="true">
+        <button class="nav-btn is-soon" id="navOrganize" type="button" aria-disabled="true">
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" aria-hidden="true">
           <span>Ranger</span>
+          <span class="soon-pill" aria-hidden="true">Bientôt</span>
         </button>
-        <button class="nav-btn" id="navLibrary" type="button">
+        <button class="nav-btn is-soon" id="navLibrary" type="button" aria-disabled="true">
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" aria-hidden="true">
           <span>Bibliothèque</span>
+          <span class="soon-pill" aria-hidden="true">Bientôt</span>
         </button>
       </nav>
 
       <div class="profile" aria-label="Profil utilisateur">
         <div class="avatar" aria-hidden="true"><img src="assets/losttrackr_icons/clean/icon_user_v2_clean.png" alt=""></div>
         <strong>DJ Cipher — <span>Pro</span></strong>
-        <i class="chevron" aria-hidden="true"></i>
+        <div class="vu" aria-hidden="true" title="Bibliothèque en bonne santé"><i></i><i></i><i></i><i></i><i></i></div>
       </div>
     </aside>
 
@@ -186,6 +192,8 @@
             </div>
             <h2 class="mission-title">Recovery Radar</h2>
             <p class="mission-sub" id="missionSub">LostTrackr inspecte ta bibliothèque DJ, tes dossiers musique et les disques connectés. Aucun fichier n’est modifié pendant cette phase.</p>
+            <div class="repair-wave" id="repairWave" aria-hidden="true"></div>
+            <div class="repair-wave-caption" id="repairWaveCaption">Ta bibliothèque se reconstruit…</div>
           </article>
           <div class="side-stack">
             <article class="side-card">
