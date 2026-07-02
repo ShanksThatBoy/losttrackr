@@ -1,6 +1,6 @@
 [project]
 name = "losttrackr"
-version = "1.2.4"
+version = "1.2.5"
 description = "Retrouve et répare les morceaux manquants de tes bibliothèques DJ."
 requires-python = ">=3.11"
 

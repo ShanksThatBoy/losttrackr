@@ -864,7 +864,29 @@ class LostTrackrApi:
         return self.check_update()
 
     def install_update(self):
-        return update_manager.install_latest_update(current_version=APP_VERSION)
+        result = update_manager.install_latest_update(current_version=APP_VERSION)
+        if result.get("launched"):
+            # L'installateur remplace le bundle sur disque mais le processus en
+            # cours resterait l'ancienne version : on quitte pour que la
+            # prochaine ouverture soit forcément la nouvelle version.
+            result["quitting"] = True
+            self._schedule_quit_for_update()
+        return result
+
+    def _schedule_quit_for_update(self, delay_seconds=2.5):
+        import threading
+        import time
+
+        def _quit():
+            time.sleep(delay_seconds)
+            try:
+                for window in list(webview.windows):
+                    window.destroy()
+            except Exception:
+                pass
+            os._exit(0)
+
+        threading.Thread(target=_quit, daemon=True).start()
 
     def installUpdate(self):
         return self.install_update()
