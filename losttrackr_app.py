@@ -905,6 +905,8 @@ def run():
         width=1672,
         height=941,
         min_size=(1180, 720),
+        fullscreen=platform.is_macos(),
+        maximized=platform.is_windows(),
         text_select=True,
     )
     webview.start(debug=False)
