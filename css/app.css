@@ -125,6 +125,21 @@
     background-size:70px 70px;
     mask-image:radial-gradient(circle at 50% 34%,#000 0%,transparent 76%);
   }
+  .update-banner[hidden]{display:none!important}
+  .update-banner{
+    position:absolute;left:clamp(22px,4vw,64px);right:clamp(22px,4vw,64px);top:18px;z-index:20;
+    min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 16px 14px 20px;
+    border-radius:18px;border:1px solid rgba(42,160,255,.38);background:linear-gradient(180deg,rgba(14,38,65,.96),rgba(7,18,31,.96));
+    box-shadow:0 22px 60px rgba(0,0,0,.38),0 0 34px rgba(20,141,255,.10),inset 0 1px 0 rgba(255,255,255,.07);
+    transform:translateY(-12px);opacity:0;transition:opacity .22s,transform .22s;
+  }
+  .update-banner.is-open{transform:translateY(0);opacity:1}
+  .update-banner.is-mandatory{border-color:rgba(255,133,14,.44);box-shadow:0 22px 60px rgba(0,0,0,.38),0 0 34px rgba(255,133,14,.08),inset 0 1px 0 rgba(255,255,255,.07)}
+  .update-copy{min-width:0;text-align:left}
+  .update-copy strong{display:block;color:#fff;font-size:17px;line-height:1.2}
+  .update-copy span{display:block;margin-top:4px;color:#aebbd0;font-size:14px;line-height:1.35}
+  .update-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .primary.compact,.secondary.compact,.tertiary.compact{height:42px;border-radius:12px;padding:0 14px;font-size:14px}
   .view{position:absolute;inset:0;display:none;overflow:hidden;padding:0 clamp(28px,5.5vw,92px) 34px;z-index:1}
   .view.is-active{display:block}
 

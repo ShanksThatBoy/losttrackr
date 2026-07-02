@@ -1,12 +1,12 @@
 [project]
 name = "losttrackr"
-version = "1.2.0"
+version = "1.2.1"
 description = "Retrouve et répare les morceaux manquants de tes bibliothèques DJ."
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
-macos   = ["pywebview>=6.2,<7"]
-windows = ["pywebview>=6.2,<7", "pillow>=10.0,<12"]
+macos   = ["pywebview>=6.2,<7", "cryptography>=42,<49"]
+windows = ["pywebview>=6.2,<7", "pillow>=10.0,<12", "cryptography>=42,<49"]
 build   = ["pyinstaller>=6.0,<7"]
 dev     = ["pytest>=8.0", "ruff>=0.4"]
 

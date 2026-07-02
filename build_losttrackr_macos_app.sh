@@ -25,12 +25,13 @@ rm -rf build dist
   --add-data "css:css" \
   --add-data "js:js" \
   --collect-all webview \
+  --collect-all cryptography \
   losttrackr_app.py
 
 PLIST="dist/LostTrackr.app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName LostTrackr" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string LostTrackr" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.2.0" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string 1.2.0" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion 1.2.0" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string 1.2.0" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.2.1" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string 1.2.1" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion 1.2.1" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string 1.2.1" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :LSApplicationCategoryType public.app-category.music" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :LSApplicationCategoryType string public.app-category.music" "$PLIST"
 
 codesign --force --deep --sign - "dist/LostTrackr.app"

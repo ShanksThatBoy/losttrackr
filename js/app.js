@@ -43,7 +43,11 @@
     async apply(){ if(window.pywebview?.api?.apply) return window.pywebview.api.apply(); await wait(450); return {fixed:620,missing:2,backupPath:"~/Music/_Serato_BACKUP_20260624_121500"}; },
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
-    async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; }
+    async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; },
+    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"dev",platform:navigator.platform,updateChannel:"demo"}; },
+    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"dev",updateAvailable:false}; },
+    async installUpdate(){ if(window.pywebview?.api?.installUpdate) return window.pywebview.api.installUpdate(); await wait(120); return {launched:false,message:"Mode aperçu : aucune mise à jour."}; },
+    async openExternalUrl(url){ if(window.pywebview?.api?.openExternalUrl) return window.pywebview.api.openExternalUrl(url); window.open(url,"_blank","noopener"); return {opened:true,url}; }
   };
 
   const $ = id => document.getElementById(id);
@@ -52,10 +56,12 @@
   const navButtons = {home:$("navHome"), prepare:$("navRepair"), library:$("navLibrary")};
   const toast = $("toast");
   const modal = $("modal");
+  const updateBanner = $("updateBanner");
   const confirmed = $("confirmed");
   const applyBtn = $("applyBtn");
   let scanData = null;
   let applyResult = null;
+  let updateInfo = null;
   let totalFound = 0;
   let totalMissing = 0;
   let totalReview = 0;
@@ -68,6 +74,61 @@
   function fmt(n,singular,plural){ return `${n} ${n > 1 ? plural : singular}`; }
   function backendAvailable(){ return Boolean(window.pywebview?.api?.scan); }
   function showToast(message){ toast.textContent = message; toast.classList.add("is-open"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("is-open"), 3600); }
+
+  function hideUpdateBanner(){
+    updateBanner.hidden = true;
+    updateBanner.classList.remove("is-open","is-mandatory");
+  }
+
+  function renderUpdateBanner(info){
+    updateInfo = info;
+    if(!info?.updateAvailable){ hideUpdateBanner(); return; }
+    const latest = info.latestVersion || "nouvelle version";
+    const current = info.currentVersion || "version actuelle";
+    $("updateTitle").textContent = info.mandatory ? `Mise à jour requise : LostTrackr ${latest}` : `LostTrackr ${latest} est disponible`;
+    $("updateSummary").textContent = info.summary || `Tu utilises la version ${current}. Cette mise à jour peut être installée directement depuis LostTrackr.`;
+    $("updateLater").hidden = Boolean(info.mandatory);
+    $("updateNotes").disabled = !info.notesUrl;
+    updateBanner.hidden = false;
+    updateBanner.classList.toggle("is-mandatory", Boolean(info.mandatory));
+    requestAnimationFrame(() => updateBanner.classList.add("is-open"));
+  }
+
+  async function checkForAppUpdate(){
+    try{
+      const info = await API.checkUpdate();
+      if(info?.updateAvailable) renderUpdateBanner(info);
+    }catch(error){
+      console.warn("LostTrackr update check failed", error);
+    }
+  }
+
+  async function installAvailableUpdate(){
+    const button = $("updateNow");
+    const previous = button.textContent;
+    button.disabled = true;
+    button.textContent = "Préparation...";
+    try{
+      const result = await API.installUpdate();
+      if(result?.launched){
+        showToast("Installateur lancé. Termine la mise à jour, puis relance LostTrackr.");
+        hideUpdateBanner();
+      }else{
+        showToast(result?.message || "LostTrackr est déjà à jour.");
+      }
+    }catch(error){
+      showToast(error?.message || "La mise à jour n’a pas pu être lancée.");
+    }finally{
+      button.disabled = false;
+      button.textContent = previous;
+    }
+  }
+
+  async function openUpdateNotes(){
+    if(!updateInfo?.notesUrl) return;
+    try{ await API.openExternalUrl(updateInfo.notesUrl); }
+    catch(error){ showToast("Impossible d’ouvrir les notes de version."); }
+  }
   function setState(state){ app.dataset.state = state; }
   function setNav(active){
     Object.values(navButtons).forEach(btn => btn.classList.remove("is-active"));
@@ -499,6 +560,9 @@
     goPrepare();
   }
 
+  $("updateLater").addEventListener("click", hideUpdateBanner);
+  $("updateNow").addEventListener("click", installAvailableUpdate);
+  $("updateNotes").addEventListener("click", openUpdateNotes);
   $("goPrepare").addEventListener("click", goPrepare);
   $("navHome").addEventListener("click", goHome);
   $("navRepair").addEventListener("click", goPrepare);
@@ -544,3 +608,4 @@
   if(!onboarded) onboarding.classList.add("is-open");
 
   goHome();
+  setTimeout(checkForAppUpdate, 900);

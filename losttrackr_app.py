@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import unicodedata
+import webbrowser
 import csv
 from collections import defaultdict
 from datetime import datetime
@@ -20,9 +21,11 @@ from pathlib import Path
 import dj_software
 import serato_relocate as serato
 import losttrackr_platform as platform
+import update_manager
 
 
 APP_NAME = "LostTrackr"
+APP_VERSION = update_manager.APP_VERSION
 
 SKIP_DIR_NAMES = {
     "$RECYCLE.BIN",
@@ -834,6 +837,47 @@ class LostTrackrApi:
 
     def openSerato(self):
         return self.open_serato()
+
+    def app_info(self):
+        return {
+            "name": APP_NAME,
+            "version": APP_VERSION,
+            "platform": update_manager.platform_key(),
+            "updateChannel": update_manager.DEFAULT_CHANNEL,
+        }
+
+    def getAppInfo(self):
+        return self.app_info()
+
+    def check_update(self):
+        try:
+            return update_manager.check_for_update(current_version=APP_VERSION)
+        except Exception as exc:
+            return {
+                "ok": False,
+                "currentVersion": APP_VERSION,
+                "updateAvailable": False,
+                "error": str(exc),
+            }
+
+    def checkUpdate(self):
+        return self.check_update()
+
+    def install_update(self):
+        return update_manager.install_latest_update(current_version=APP_VERSION)
+
+    def installUpdate(self):
+        return self.install_update()
+
+    def open_external_url(self, url):
+        parsed = str(url or "")
+        if not (parsed.startswith("https://") or parsed.startswith("http://")):
+            raise RuntimeError("Lien externe invalide.")
+        webbrowser.open(parsed)
+        return {"opened": True, "url": parsed}
+
+    def openExternalUrl(self, url):
+        return self.open_external_url(url)
 
 
 def run():

@@ -3,7 +3,7 @@
 #define AppExeName "LostTrackr.exe"
 #define AppVersion GetEnv("LOSTTRACKR_VERSION")
 #if AppVersion == ""
-#define AppVersion "1.2.0"
+#define AppVersion "1.2.1"
 #endif
 #define InstallerName "LostTrackrSetup-v" + AppVersion + "-x64"
 
@@ -15,7 +15,7 @@ AppVerName={#AppName} {#AppVersion}
 AppPublisher={#AppPublisher}
 AppPublisherURL=https://github.com/ShanksThatBoy/losttrackr
 AppSupportURL=https://github.com/ShanksThatBoy/losttrackr/issues
-AppUpdatesURL=https://github.com/ShanksThatBoy/losttrackr/releases
+AppUpdatesURL=https://updates.losttrackr.com/beta/latest.json
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes

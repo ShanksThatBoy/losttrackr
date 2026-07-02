@@ -9,6 +9,7 @@ ROOT = Path(SPECPATH).parent
 ICON = ROOT / "windows" / "generated" / "LostTrackr.ico"
 
 webview_datas, webview_binaries, webview_hiddenimports = collect_all("webview")
+crypto_datas, crypto_binaries, crypto_hiddenimports = collect_all("cryptography")
 
 datas = [
     (str(ROOT / "losttrackr_ui.html"), "."),
@@ -17,13 +18,14 @@ datas = [
     (str(ROOT / "js"), "js"),
 ]
 datas += webview_datas
+datas += crypto_datas
 
 a = Analysis(
     [str(ROOT / "losttrackr_app.py")],
     pathex=[str(ROOT)],
-    binaries=webview_binaries,
+    binaries=webview_binaries + crypto_binaries,
     datas=datas,
-    hiddenimports=webview_hiddenimports,
+    hiddenimports=webview_hiddenimports + crypto_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

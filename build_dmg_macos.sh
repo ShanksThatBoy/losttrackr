@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="LostTrackr"
-APP_VERSION="1.2.0"
-APP_BUILD="1.2.0"
+APP_VERSION="1.2.1"
+APP_BUILD="1.2.1"
 BUNDLE_ID="com.djshanks.losttrackr"
 VOL_NAME="${APP_NAME} ${APP_VERSION}"
 DMG_NAME="${1:-${APP_NAME}-v${APP_BUILD}.dmg}"
@@ -29,6 +29,7 @@ rm -rf build dist
   --add-data "css:css" \
   --add-data "js:js" \
   --collect-all webview \
+  --collect-all cryptography \
   losttrackr_app.py
 
 PLIST="${APP_PATH}/Contents/Info.plist"
