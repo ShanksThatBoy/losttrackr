@@ -1,11 +1,11 @@
 # LostTrackr Windows beta
 
-Version: `v1.2.3`
+Version: `v1.2.4`
 Target: Windows 11 x64, Pro and Home editions.
 
 ## Francais
 
-Cette beta installe LostTrackr comme une application Windows classique avec raccourcis Menu Demarrer et Bureau. La version 1.2.3 ajoute le systeme de mise a jour securise depuis LostTrackr. La detection intelligente Serato DJ, rekordbox, Traktor et VirtualDJ reste incluse. La reparation automatique complete reste active pour Serato DJ.
+Cette beta installe LostTrackr comme une application Windows classique avec raccourcis Menu Demarrer et Bureau. La version 1.2.4 ajoute le systeme de mise a jour securise depuis LostTrackr. La detection intelligente Serato DJ, rekordbox, Traktor et VirtualDJ reste incluse. La reparation automatique complete reste active pour Serato DJ.
 
 Avant de scanner ou reparer une bibliotheque Serato :
 
