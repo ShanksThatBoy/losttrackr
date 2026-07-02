@@ -1,28 +1,28 @@
 {
   "schema": 1,
   "channel": "beta",
-  "latest": "1.2.1",
+  "latest": "1.2.2",
   "minimum_supported": "1.2.1",
   "mandatory": false,
   "rollout": 100,
   "summary": "Mise a jour LostTrackr disponible.",
-  "notes_url": "https://github.com/ShanksThatBoy/losttrackr/releases/tag/v1.2.1",
+  "notes_url": "https://github.com/ShanksThatBoy/losttrackr/releases/tag/v1.2.2",
   "macos": {
     "installer_type": "pkg",
-    "url": "https://github.com/ShanksThatBoy/losttrackr/releases/download/v1.2.1/LostTrackr-v1.2.1-macos.pkg",
-    "sha256": "5384bd27e52f60bedea66b33d529612fa8f98474cccb8f816d044a5984dee6cc",
-    "size_bytes": 45588960,
+    "url": "https://github.com/ShanksThatBoy/losttrackr/releases/download/v1.2.2/LostTrackr-v1.2.2-macos.pkg",
+    "sha256": "f87d716f3ac9142813c9ee5c413a0f6e7c62bcde7e6f00f878a78fc144b0262a",
+    "size_bytes": 49771416,
     "alternate_dmg": {
       "installer_type": "dmg",
-      "url": "https://github.com/ShanksThatBoy/losttrackr/releases/download/v1.2.1/LostTrackr-v1.2.1-macos.dmg",
-      "sha256": "020d2166860d25c019634b9a329e0fd0e194ced624fc7ca852382cb43cade415",
-      "size_bytes": 45681952
+      "url": "https://github.com/ShanksThatBoy/losttrackr/releases/download/v1.2.2/LostTrackr-v1.2.2-macos.dmg",
+      "sha256": "f0826a308dea7c4ed3e4c04361ddb8c4cf94e73990c5bb1910c3199a6014511d",
+      "size_bytes": 49843288
     }
   },
   "windows": {
     "installer_type": "exe",
-    "url": "https://github.com/ShanksThatBoy/losttrackr/releases/download/v1.2.1/LostTrackrSetup-v1.2.1-x64.exe",
-    "sha256": "8fd02b8aa378f8aa8212328556a99c078fbaa43e1ae139ec0780827528042010",
-    "size_bytes": 46839035
+    "url": "https://github.com/ShanksThatBoy/losttrackr/releases/download/v1.2.2/LostTrackrSetup-v1.2.2-x64.exe",
+    "sha256": "408acedb3fd52fbeb3ad8ee9b0405a3d8eb37f4aa336dae770afe3b2b8b5f896",
+    "size_bytes": 46841861
   }
 }
