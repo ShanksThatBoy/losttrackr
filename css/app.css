@@ -325,6 +325,22 @@
   .confidence-card.good{border-color:rgba(70,236,106,.28)}.confidence-card.warn{border-color:rgba(255,133,14,.30)}.confidence-card.bad{border-color:rgba(255,106,85,.28)}
   .confidence-card img{width:54px;height:54px;object-fit:contain}.confidence-card strong{display:block;margin-top:12px;font-size:34px;color:#fff}.confidence-card span{display:block;color:#a7b5c6;margin-top:4px;line-height:1.35}
   .trust-copy{margin-top:18px;border-radius:20px;border:1px solid rgba(117,164,221,.14);background:rgba(5,13,23,.62);padding:20px;color:#c8d4e4;font-size:18px;line-height:1.45}
+
+  /* Intelligence musicale (knowledge base) */
+  .knowledge-card{margin-top:18px;border-radius:22px;border:1px solid rgba(96,110,255,.30);background:linear-gradient(180deg,rgba(20,22,52,.82),rgba(8,12,30,.86));box-shadow:0 22px 60px rgba(0,0,0,.30),0 0 38px rgba(96,110,255,.08),inset 0 1px 0 rgba(255,255,255,.06);padding:20px 22px}
+  .knowledge-head{display:flex;align-items:center;gap:14px}
+  .knowledge-badge{width:42px;height:42px;flex:0 0 auto;border-radius:13px;display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:16px;color:#cdd3ff;background:linear-gradient(135deg,rgba(96,110,255,.35),rgba(45,177,255,.20));border:1px solid rgba(120,132,255,.45);box-shadow:0 0 18px rgba(96,110,255,.25);animation:softPulse 3.6s ease-in-out infinite}
+  .knowledge-head h3{margin:0;font-size:19px;color:#fff;font-family:var(--font-display)}
+  .knowledge-status{margin:4px 0 0;color:#9aa6d8;font-size:14px}
+  .knowledge-rows{display:grid;gap:8px;margin-top:14px}
+  .knowledge-rows:empty{display:none}
+  .knowledge-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-radius:14px;border:1px solid rgba(117,140,221,.14);background:rgba(6,10,25,.62);padding:10px 14px}
+  .knowledge-row b{color:#e8ecff;font-size:14px;font-weight:650;overflow-wrap:anywhere}
+  .knowledge-row .k-sep{color:#5c6890;flex:1 1 auto}
+  .k-chip{flex:0 0 auto;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:750;font-variant-numeric:tabular-nums;border:1px solid rgba(45,177,255,.36);color:#5fc0ff;background:rgba(15,94,178,.14)}
+  .k-chip.key{border-color:rgba(96,110,255,.40);color:#a7b0ff;background:rgba(63,72,180,.16)}
+  .k-chip.genre{border-color:rgba(70,236,106,.30);color:#7df094;background:rgba(34,147,59,.10)}
+  .k-chip.off{border-color:rgba(255,133,14,.36);color:#ffb063;background:rgba(104,58,12,.16)}
   .screen-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px;align-items:center}
 
   .preview-panel{padding:24px;margin-top:22px;overflow:hidden}

@@ -47,6 +47,19 @@
     async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.2.5",platform:navigator.platform,updateChannel:"demo"}; },
     async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.2.5",updateAvailable:false}; },
     async installUpdate(){ if(window.pywebview?.api?.installUpdate) return window.pywebview.api.installUpdate(); await wait(120); return {launched:false,message:"Mode aperçu : aucune mise à jour."}; },
+    async knowledgeMatch(tracks){
+      if(window.pywebview?.api?.knowledgeMatch) return window.pywebview.api.knowledgeMatch(tracks);
+      await wait(700);
+      const demo = {
+        "Wedding March Vs EoO Bad Bunny Mashup":{status:"uncertain",confidence:.48,canonical:{title:"Wedding March Vs EoO Mashup",artist:"DJ Edit",bpm:96,camelot_key:"9A",genre:"Latin"}},
+        "Suavemente":{status:"matched",confidence:.97,canonical:{title:"Suavemente",artist:"Elvis Crespo",bpm:127,camelot_key:"4B",genre:"Merengue"}},
+        "Warmup Edit 124":{status:"unmatched"},
+        "Remix":{status:"unmatched"},
+        "Gasolina":{status:"matched",confidence:.99,canonical:{title:"Gasolina",artist:"Daddy Yankee",bpm:96,camelot_key:"11B",genre:"Reggaeton"}},
+        "Djadja":{status:"matched",confidence:.95,canonical:{title:"Djadja",artist:"Aya Nakamura",bpm:100,camelot_key:"8A",genre:"Afropop"}}
+      };
+      return {ok:true, matches:(tracks||[]).map(t => ({client_track_id:t.client_track_id, status:"unmatched", ...demo[t.title]}))};
+    },
     async openExternalUrl(url){ if(window.pywebview?.api?.openExternalUrl) return window.pywebview.api.openExternalUrl(url); window.open(url,"_blank","noopener"); return {opened:true,url}; }
   };
 
@@ -418,7 +431,53 @@
     $("backupBeforeLabel").textContent = `${fixed + pending} fichiers concernés`;
   }
 
-  function goResults(){ setState("results"); renderResults(); showScreen("results"); }
+  function knowledgeTracksFromScan(){
+    return sampleMatches().map((item, index) => {
+      const base = String(item.file || "").replace(/\.[a-z0-9]{2,4}$/i, "");
+      const parts = base.split(" - ");
+      return {
+        client_track_id: `scan-${index}`,
+        title: parts.length > 1 ? parts.slice(1).join(" - ") : base,
+        artist: parts.length > 1 ? parts[0] : "",
+        source_app: activeSoftware()?.id || "losttrackr"
+      };
+    });
+  }
+
+  async function runKnowledgeMatch(){
+    const card = $("knowledgeCard");
+    const rows = $("knowledgeRows");
+    const status = $("knowledgeStatus");
+    const tracks = knowledgeTracksFromScan();
+    if(!tracks.length){ card.hidden = true; return; }
+    card.hidden = false;
+    rows.innerHTML = "";
+    status.textContent = `Analyse de ${tracks.length} morceaux dans le centre de connaissances…`;
+    let result = null;
+    try{ result = await API.knowledgeMatch(tracks.map(t => ({...t}))); }catch(error){}
+    if(!result?.ok || !Array.isArray(result.matches)){
+      status.textContent = "Centre de connaissances injoignable — l’analyse reprendra au prochain scan.";
+      return;
+    }
+    const byId = new Map(result.matches.map(m => [m.client_track_id, m]));
+    const enriched = tracks.map(t => ({track:t, match:byId.get(t.client_track_id)}))
+      .filter(x => x.match && x.match.status !== "unmatched");
+    const withFeatures = enriched.filter(x => x.match.canonical?.bpm || x.match.canonical?.camelot_key);
+    status.textContent = `${enriched.length} morceau${enriched.length > 1 ? "x" : ""} identifié${enriched.length > 1 ? "s" : ""} sur ${tracks.length} — BPM et clé récupérés pour ${withFeatures.length}.`;
+    enriched.slice(0, 4).forEach(({track, match}) => {
+      const row = document.createElement("div");
+      row.className = "knowledge-row";
+      const c = match.canonical || {};
+      row.innerHTML = `<b>${esc(c.title || track.title)}${c.artist ? " — " + esc(c.artist) : ""}</b><span class="k-sep"></span>` +
+        (c.bpm ? `<span class="k-chip">${Math.round(c.bpm)} BPM</span>` : "") +
+        (c.camelot_key ? `<span class="k-chip key">${esc(c.camelot_key)}</span>` : "") +
+        (c.genre ? `<span class="k-chip genre">${esc(c.genre)}</span>` : "") +
+        (match.status === "uncertain" ? `<span class="k-chip off">à confirmer</span>` : "");
+      rows.appendChild(row);
+    });
+  }
+
+  function goResults(){ setState("results"); renderResults(); showScreen("results"); runKnowledgeMatch(); }
   function goPreview(){ setState("preview"); renderPreview(); showScreen("preview"); }
   function goReview(){ setState("review"); renderReview(); showScreen("review"); }
   function goCompleted(){ setState("done"); renderCompleted(); showScreen("completed"); }

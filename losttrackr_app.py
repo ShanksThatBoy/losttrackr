@@ -19,6 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 import dj_software
+import knowledge_client
 import serato_relocate as serato
 import losttrackr_platform as platform
 import update_manager
@@ -890,6 +891,22 @@ class LostTrackrApi:
 
     def installUpdate(self):
         return self.install_update()
+
+    def knowledge_match(self, tracks):
+        try:
+            result = knowledge_client.match_tracks(tracks or [])
+            return {"ok": True, **result}
+        except knowledge_client.KnowledgeError as exc:
+            return {"ok": False, "error": str(exc), "retryable": exc.retryable}
+        except Exception:
+            return {
+                "ok": False,
+                "error": "LostTrackr n'arrive pas à joindre le centre de connaissances.",
+                "retryable": True,
+            }
+
+    def knowledgeMatch(self, tracks):
+        return self.knowledge_match(tracks)
 
     def open_external_url(self, url):
         parsed = str(url or "")
