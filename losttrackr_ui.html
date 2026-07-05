@@ -10,7 +10,7 @@
 <div class="app" id="app" data-view="home" data-state="idle">
   <header class="titlebar" aria-label="Fenêtre LostTrackr">
     <div class="window-title">LostTrackr</div>
-    <div class="window-version" id="appVersionLabel">v1.2.5</div>
+    <div class="window-version" id="appVersionLabel">v1.3.0</div>
   </header>
 
   <div class="workspace">
@@ -29,15 +29,15 @@
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true">
           <span>Réparer</span>
         </button>
-        <button class="nav-btn is-soon" id="navOrganize" type="button" aria-disabled="true">
+        <button class="nav-btn" id="navOrganize" type="button" data-target="organize">
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" aria-hidden="true">
           <span>Ranger</span>
-          <span class="soon-pill" aria-hidden="true">Bientôt</span>
+          <span class="soon-pill smart-pill" aria-hidden="true">Smart</span>
         </button>
-        <button class="nav-btn is-soon" id="navLibrary" type="button" aria-disabled="true">
+        <button class="nav-btn" id="navLibrary" type="button" data-target="djset">
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" aria-hidden="true">
-          <span>Bibliothèque</span>
-          <span class="soon-pill" aria-hidden="true">Bientôt</span>
+          <span>DJ Set</span>
+          <span class="soon-pill smart-pill" aria-hidden="true">Smart</span>
         </button>
       </nav>
 
@@ -75,26 +75,27 @@
             <button class="action-btn" id="goPrepare" type="button">Lancer un scan</button>
           </article>
 
-          <article class="feature-card disabled" aria-disabled="true" id="comingCard">
-            <span class="badge soon">À venir</span>
+          <article class="feature-card" id="comingCard">
+            <span class="badge smart">Analyse intelligente</span>
             <div class="feature-art">
               <img class="feature-img" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
-            <h2>Ranger mes<br>nouveaux sons</h2>
-            <p>Ajoute un dossier et laisse LostTrackr<br>classer, renommer et organiser<br>tes nouveaux sons.</p>
-            <button class="action-btn" type="button" disabled>Fonction à venir</button>
-            <div class="coming-note">Bientôt disponible dans LostTrackr Pro</div>
+            <h2>Ranger mes<br>titres</h2>
+            <p>Analyse tes fichiers audio,<br>trouve les dossiers cohérents<br>et déplace après validation.</p>
+            <button class="action-btn" id="goSmartImport" type="button">Ranger mes titres</button>
+            <div class="coming-note">Déplacement contrôlé · aperçu obligatoire</div>
           </article>
 
-          <article class="feature-card">
+          <article class="feature-card" id="djSetCard">
+            <span class="badge smart">Smart DJ</span>
             <div class="feature-art" style="margin-top:48px">
-              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
-              <div class="fallback-art shield" hidden></div>
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
-            <h2>Vérifier ma<br>bibliothèque</h2>
-            <p>Analyse l’état de ta bibliothèque,<br>détecte les problèmes et garde<br>ta collection en bonne santé.</p>
-            <button class="action-btn" id="healthBtn" type="button">Voir l’état</button>
+            <h2>Préparer mon<br>DJ Set</h2>
+            <p>Crée des crates, sous-crates<br>ou playlists cohérentes<br>pour tes prochains sets.</p>
+            <button class="action-btn" id="goDjSet" type="button">Préparer un set</button>
           </article>
         </div>
 
@@ -102,6 +103,391 @@
           <div class="status-item status-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v4M17 3v4M4 9h16M5 5h14v15H5z"/><path d="M8 13h2M12 13h2M16 13h2M8 17h2M12 17h2"/></svg><span>Dernier scan&nbsp;: 24 juin 2026</span></div>
           <div class="status-item status-green"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16.5 8.7"/></svg><span>Bibliothèque&nbsp;: OK</span></div>
           <div class="status-item status-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .7-7.94A6 6 0 0 0 6.1 8.9 4.5 4.5 0 0 0 7 18Z"/></svg><span>Sauvegarde disponible</span></div>
+        </div>
+      </section>
+
+      <section class="view smart-view" id="smartImportView" aria-labelledby="smartTitle">
+        <button class="back-btn smart-flow-back" id="smartBackTop" type="button">← Retour</button>
+        <div class="smart-stepper" aria-label="Progression Smart Import">
+          <div class="smart-step is-active"><span>1</span><b>Sélection des dossiers</b></div>
+          <i></i>
+          <div class="smart-step"><span>2</span><b>Analyse</b></div>
+          <i></i>
+          <div class="smart-step"><span>3</span><b>Vérifier</b></div>
+          <i></i>
+          <div class="smart-step"><span>4</span><b>Appliquer</b></div>
+        </div>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="smartTitle">Ranger mes titres</h1>
+            <p class="page-sub">Choisis le dossier des nouveaux sons et le dossier racine qui contient ta bibliothèque rangée.<br>LostTrackr analysera ensuite tous les sous-dossiers disponibles.</p>
+          </div>
+        </header>
+
+        <div class="smart-suggestion-list smart-setup-list" aria-label="Préparation Smart Import">
+          <article class="smart-suggestion-card smart-setup-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>⇩</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Source des nouveaux sons</h2>
+                <em class="smart-confidence-badge smart-confidence-high">Détection automatique</em>
+              </div>
+              <span class="smart-suggestion-count" id="smartSourceLabel">Dossier Téléchargements</span>
+              <p class="smart-suggestion-reason"><span id="smartSourcePath">Détection du dossier…</span><br><small id="smartSourceStatus">Adapté à ton système</small></p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="smartDefaultSource" type="button">Téléchargements</button>
+              <button class="smart-card-btn ghost" id="smartChooseSource" type="button">Autre dossier</button>
+            </div>
+          </article>
+
+          <article class="smart-suggestion-card smart-setup-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>▱</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Dossier de destination</h2>
+                <em class="smart-confidence-badge smart-confidence-medium">Dossier racine</em>
+              </div>
+              <span class="smart-suggestion-count" id="smartDestinationLabel">Dossier à sélectionner</span>
+              <p class="smart-suggestion-reason"><span id="smartDestinationPath">Sélectionne le dossier principal de ta bibliothèque</span><br><small id="smartLibraryRoots">LostTrackr détectera et analysera automatiquement tous les sous-dossiers</small></p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="smartChooseDestination" type="button">Choisir le dossier</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="smart-move-warning" role="note">
+          <strong>Aucune copie, aucune suppression</strong>
+          <span>Les fichiers originaux sont simplement déplacés depuis leur dossier source vers les destinations que tu valides.</span>
+        </div>
+
+        <div class="smart-review-cta-bar smart-flow-cta-bar smart-single-cta">
+          <button class="smart-review-cta smart-review-cta-blue" id="smartAnalyze" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">→</span>
+            <span><b>Suivant</b><small>Lancer l’analyse des fichiers et des sous-dossiers</small></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="view smart-analysis-view" id="smartAnalysisView" aria-labelledby="smartAnalysisTitle">
+        <button class="back-btn smart-flow-back" id="smartAnalysisBack" type="button">← Retour</button>
+        <div class="smart-stepper" aria-label="Progression Smart Import">
+          <div class="smart-step is-done"><span>1</span><b>Sélection des dossiers</b></div>
+          <i></i>
+          <div class="smart-step is-active"><span>2</span><b>Analyse</b></div>
+          <i></i>
+          <div class="smart-step"><span>3</span><b>Vérifier</b></div>
+          <i></i>
+          <div class="smart-step"><span>4</span><b>Appliquer</b></div>
+        </div>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">⌁</span>
+          <div>
+            <h1 class="page-title" id="smartAnalysisTitle">Analyse</h1>
+            <p class="page-sub">LostTrackr inspecte les nouveaux titres, cartographie tes sous-dossiers et prépare une première approche de rangement.</p>
+          </div>
+        </header>
+
+        <div class="smart-analysis-grid" aria-live="polite">
+          <article class="smart-analysis-card is-loading" id="smartAnalysisSourceCard">
+            <div class="smart-analysis-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div>
+              <h2>Fichiers à déplacer</h2>
+              <strong id="smartAnalysisSourceTitle">Analyse du dossier source…</strong>
+              <p id="smartAnalysisSourceDetail">Détection des fichiers audio compatibles.</p>
+            </div>
+          </article>
+          <article class="smart-analysis-card is-loading" id="smartAnalysisDestinationCard">
+            <div class="smart-analysis-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+            <div>
+              <h2>Bibliothèque de destination</h2>
+              <strong id="smartAnalysisDestinationTitle">Cartographie des sous-dossiers…</strong>
+              <p id="smartAnalysisDestinationDetail">Analyse des dossiers enfants et des titres déjà présents.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="smart-analysis-map">
+          <div class="smart-analysis-map-head">
+            <div>
+              <h2>État des lieux de la bibliothèque</h2>
+              <p id="smartAnalysisMapIntro">L’analyse démarre dès maintenant.</p>
+            </div>
+            <span id="smartAnalysisStatus">Analyse en cours</span>
+          </div>
+          <div class="smart-analysis-tree" id="smartAnalysisTree">
+            <div class="smart-analysis-placeholder"><i></i><i></i><i></i><span>Lecture des dossiers…</span></div>
+          </div>
+        </div>
+
+        <div class="smart-review-cta-bar smart-flow-cta-bar smart-single-cta">
+          <button class="smart-review-cta smart-review-cta-blue" id="smartContinueVerify" type="button" disabled>
+            <span class="smart-cta-icon" aria-hidden="true">✓</span>
+            <span><b>Continuer vers Vérifier</b><small>Disponible dès que l’analyse est terminée</small></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="view smart-files-view" id="smartFilesView" aria-labelledby="smartFilesTitle">
+        <button class="back-btn smart-flow-back" id="smartFilesBack" type="button">← Retour</button>
+        <div class="smart-stepper" aria-label="Progression Smart Import">
+          <div class="smart-step is-done"><span>1</span><b>Sélection des dossiers</b></div>
+          <i></i>
+          <div class="smart-step is-done"><span>2</span><b>Analyse</b></div>
+          <i></i>
+          <div class="smart-step is-active"><span>3</span><b>Vérifier</b></div>
+          <i></i>
+          <div class="smart-step"><span>4</span><b>Appliquer</b></div>
+        </div>
+        <div class="smart-review-layout smart-review-layout-full">
+          <div class="smart-review-main">
+            <header class="smart-review-hero">
+              <span class="smart-spark" aria-hidden="true">✦</span>
+              <div>
+                <h1 class="page-title" id="smartFilesTitle">Vérifier les suggestions</h1>
+                <p class="page-sub">LostTrackr a regroupé tes morceaux par dossier cible pour te faire gagner du temps.<br>Vérifie, ajuste si besoin, puis valide avant tout déplacement.</p>
+              </div>
+            </header>
+            <div class="smart-suggestion-list" id="smartSuggestionList" aria-live="polite"></div>
+            <div class="smart-review-cta-bar smart-flow-cta-bar">
+              <button class="smart-review-cta smart-review-cta-blue" id="smartValidateReliable" type="button">
+                <span class="smart-cta-icon" aria-hidden="true">✓</span>
+                <span><b>Valider toutes les suggestions fiables</b><small id="smartValidateReliableSub">0 morceau sera prêt à déplacer</small></span>
+              </button>
+              <button class="smart-review-cta smart-review-cta-orange" id="smartReviewRemaining" type="button">
+                <span class="smart-cta-icon" aria-hidden="true">⌕</span>
+                <span><b>Vérifier les morceaux restants</b><small id="smartReviewRemainingSub">0 morceau nécessite ton avis</small></span>
+              </button>
+              <button class="smart-apply-final" id="smartMoveFiles" type="button">Continuer vers Appliquer</button>
+            </div>
+          </div>
+          <aside class="smart-review-summary" aria-label="Résumé Smart Import" hidden>
+            <div class="smart-summary-check" aria-hidden="true">✓</div>
+            <p>Tu peux valider</p>
+            <strong><span id="smartReliableCount">0</span> morceaux</strong>
+            <p>en 1 clic</p>
+            <div class="smart-summary-alert"><b id="smartReviewNeedsCount">0 morceaux</b><span>demandent encore ton avis</span></div>
+            <div class="smart-summary-safe">
+              <img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" aria-hidden="true">
+              <span>Un manifeste sera créé avant toute modification.<br>Aucun fichier n’est déplacé tant que tu n’as rien validé. Le déplacement reste une action séparée.</span>
+            </div>
+            <div class="smart-summary-paths">
+              <div><img class="source-icon" src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt="" aria-hidden="true"><span><b>Source</b><code id="smartReviewSourcePath" title="">À définir</code></span></div>
+              <div><img class="source-icon" src="assets/losttrackr_icons/clean/icon_folder_music_v2_clean.png" alt="" aria-hidden="true"><span><b>Destination</b><code id="smartReviewDestinationPath" title="">À définir</code></span></div>
+            </div>
+            <div class="smart-summary-intel">
+              <b>Suggestions générées à partir de :</b>
+              <div>
+                <span><i>≋</i>Genre détecté</span>
+                <span><i>◎</i>Artistes présents</span>
+                <span><i>▱</i>Sous-dossiers</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view smart-complete-view" id="smartCompleteView" aria-labelledby="smartCompleteTitle">
+        <div class="smart-stepper" aria-label="Progression Smart Import">
+          <div class="smart-step is-done"><span>1</span><b>Sélection des dossiers</b></div>
+          <i></i>
+          <div class="smart-step is-done"><span>2</span><b>Analyse</b></div>
+          <i></i>
+          <div class="smart-step is-done"><span>3</span><b>Vérifier</b></div>
+          <i></i>
+          <div class="smart-step is-active"><span>4</span><b>Appliquer</b></div>
+        </div>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✓</span>
+          <div>
+            <h1 class="page-title" id="smartCompleteTitle">Appliquer les changements</h1>
+            <p class="page-sub" id="smartCompleteSub">Dernier état des lieux avant déplacement. Rien n’est modifié tant que tu ne valides pas cette page.</p>
+          </div>
+        </header>
+        <div class="smart-suggestion-list smart-complete-list">
+          <article class="smart-suggestion-card smart-setup-card is-validated">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>✓</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Prêts à déplacer</h2>
+                <em class="smart-confidence-badge smart-confidence-high" id="smartApplyReadyBadge">À valider</em>
+              </div>
+              <span class="smart-suggestion-count"><strong id="smartDoneMoved">0</strong> fichiers sélectionnés</span>
+              <p class="smart-suggestion-reason" id="smartDoneManifest">Le manifeste sera créé au moment du déplacement.</p>
+            </div>
+          </article>
+          <article class="smart-suggestion-card smart-setup-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>▱</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Restant à vérifier</h2>
+                <em class="smart-confidence-badge smart-confidence-medium">Contrôle manuel</em>
+              </div>
+              <span class="smart-suggestion-count"><strong id="smartDonePending">0</strong> morceaux non déplacés</span>
+              <p class="smart-suggestion-reason">Les morceaux non validés restent à leur emplacement source. Aucun fichier audio n’est copié.</p>
+            </div>
+          </article>
+          <div class="smart-apply-list" id="smartApplyList" aria-live="polite"></div>
+        </div>
+        <div class="smart-review-cta-bar smart-flow-cta-bar">
+          <button class="smart-review-cta smart-review-cta-blue" id="smartMetadataButton" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">≋</span>
+            <span><b>Compléter les métadonnées</b><small>BPM, artiste, titre, année, genre et clé Camelot</small></span>
+          </button>
+          <button class="smart-review-cta smart-review-cta-orange" id="smartApplyBackReview" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">←</span>
+            <span><b>Retour vérifier</b><small>Ajuster les destinations avant déplacement</small></span>
+          </button>
+          <button class="smart-apply-final" id="smartFinalApply" type="button">Valider et déplacer</button>
+        </div>
+      </section>
+
+      <section class="view smart-djset-view" id="djSetView" aria-labelledby="djSetTitle">
+        <button class="back-btn smart-flow-back" id="djSetBack" type="button">← Retour</button>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetTitle">Préparer mon DJ Set</h1>
+              <p class="page-sub">Cette zone se concentre sur Serato, Rekordbox et les playlists.<br>LostTrackr prépare les crates, tu ajustes, une sauvegarde est créée avant toute écriture.</p>
+          </div>
+        </header>
+
+        <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Choix Préparer mon DJ Set">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>1</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Préparer un nouvel évènement</h2>
+                <em class="smart-confidence-badge smart-confidence-high">Crates intelligentes</em>
+              </div>
+              <span class="smart-suggestion-count">Club ou mariage</span>
+              <p class="smart-suggestion-reason">Choisis un type d’évènement, personnalise la base de crates, puis LostTrackr analysera les titres pour pré-remplir les playlists.</p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="djSetNewEvent" type="button">Choisir</button>
+            </div>
+          </article>
+
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>2</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Organiser mes playlists</h2>
+                <em class="smart-confidence-badge smart-confidence-medium">Analyse cohérence</em>
+              </div>
+              <span class="smart-suggestion-count">Titres, styles, artistes, BPM et tags</span>
+              <p class="smart-suggestion-reason">LostTrackr détectera les titres présents, repèrera les incohérences et proposera des regroupements reliés à la base de connaissance.</p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="djSetOrganizePlaylists" type="button">Choisir</button>
+            </div>
+          </article>
+
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>3</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Envoyer mes derniers imports dans les crates</h2>
+                <em class="smart-confidence-badge smart-confidence-high">Dernier Smart Import</em>
+              </div>
+              <span class="smart-suggestion-count">Titres déplacés lors du dernier Smart Import</span>
+              <p class="smart-suggestion-reason">LostTrackr analyse les titres récemment rangés et prépare leur placement dans les crates ou playlists appropriées.</p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="djSetRecentImports" type="button">Choisir</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view smart-djset-event-view" id="djSetEventView" aria-labelledby="djSetEventTitle">
+        <button class="back-btn smart-flow-back" id="djSetEventBack" type="button">← Retour</button>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetEventTitle">Préparer un nouvel évènement</h1>
+            <p class="page-sub">Choisis la base de travail avant l’analyse.<br>Les crates restent personnalisables avant que LostTrackr propose le placement des titres.</p>
+          </div>
+        </header>
+
+        <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Type d’évènement DJ Set">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>C</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Club</h2>
+                <em class="smart-confidence-badge smart-confidence-high">Base énergique</em>
+              </div>
+              <span class="smart-suggestion-count">Warmup, Groove, Peak Time, Closing</span>
+              <p class="smart-suggestion-reason">Une structure simple pour organiser un set club, inspirée d’une crate principale et affinée par style, artiste et cohérence musicale.</p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="djSetEventClub" type="button">Analyser</button>
+            </div>
+          </article>
+
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>M</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Mariage</h2>
+                <em class="smart-confidence-badge smart-confidence-medium">Base complète</em>
+              </div>
+              <span class="smart-suggestion-count">Cocktail, Dîner, Ouverture, Dancefloor, Fin</span>
+              <p class="smart-suggestion-reason">Une base prête à personnaliser pour les temps forts d’un mariage, avec suggestions de titres dans chaque crate.</p>
+            </div>
+            <div class="smart-suggestion-actions">
+              <button class="smart-card-btn primary" id="djSetEventWedding" type="button">Analyser</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view smart-djset-plan-view" id="djSetPlanView" aria-labelledby="djSetPlanTitle">
+        <button class="back-btn smart-flow-back" id="djSetPlanBack" type="button">← Retour</button>
+        <div class="smart-stepper" aria-label="Progression Préparer mon DJ Set">
+          <div class="smart-step is-done"><span>1</span><b>Choisir</b></div>
+          <i></i>
+          <div class="smart-step is-done"><span>2</span><b>Analyser</b></div>
+          <i></i>
+          <div class="smart-step is-active"><span>3</span><b>Vérifier</b></div>
+          <i></i>
+          <div class="smart-step"><span>4</span><b>Appliquer</b></div>
+        </div>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetPlanTitle">Vérifier les suggestions</h1>
+            <p class="page-sub" id="djSetPlanSub">LostTrackr prépare une proposition de crates et playlists.<br>Une sauvegarde sera obligatoire avant toute écriture dans le logiciel DJ.</p>
+          </div>
+        </header>
+        <div class="smart-flow-stats" aria-label="Résumé du plan DJ Set">
+          <div><strong id="djSetReliableCount">0</strong><span>titres fiables</span></div>
+          <div><strong id="djSetNewTargetCount">0</strong><span>nouvelles destinations</span></div>
+          <div><strong id="djSetReviewCount">0</strong><span>à vérifier</span></div>
+        </div>
+        <div class="smart-suggestion-list smart-djset-plan-list" id="djSetPlanList" aria-live="polite"></div>
+        <div class="smart-review-cta-bar smart-flow-cta-bar">
+          <button class="smart-review-cta smart-review-cta-blue" id="djSetValidateReliable" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">✓</span>
+            <span><b>Valider les suggestions fiables</b><small id="djSetValidateReliableSub">0 titre prêt pour l’aperçu</small></span>
+          </button>
+          <button class="smart-review-cta smart-review-cta-orange" id="djSetReviewRemaining" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">⌕</span>
+            <span><b>Vérifier les groupes restants</b><small id="djSetReviewRemainingSub">0 titre nécessite ton avis</small></span>
+          </button>
+          <button class="smart-apply-final" id="djSetPreviewApply" type="button">Préparer l’écriture sécurisée</button>
         </div>
       </section>
 

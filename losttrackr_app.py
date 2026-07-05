@@ -14,18 +14,32 @@ import sys
 import unicodedata
 import webbrowser
 import csv
+import json
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
+import dj_set
 import dj_software
+import knowledge_client
 import serato_relocate as serato
 import losttrackr_platform as platform
+import smart_import
 import update_manager
 
 
 APP_NAME = "LostTrackr"
 APP_VERSION = update_manager.APP_VERSION
+
+RELEASE_NOTES = {
+    "1.3.0": [
+        "Smart Import devient disponible dans Ranger mes titres.",
+        "Aperçu obligatoire avant déplacement des nouveaux sons.",
+        "Analyse des sous-dossiers existants pour proposer une destination plus propre.",
+        "Préparer mon DJ Set arrive comme espace dédié aux crates et playlists.",
+        "Enrichissement des métadonnées via la base de connaissance LostTrackr.",
+    ],
+}
 
 SKIP_DIR_NAMES = {
     "$RECYCLE.BIN",
@@ -56,6 +70,45 @@ SKIP_DIR_PREFIXES = (".venv", "venv", "env")
 def resource_path(name):
     base = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
     return base / name
+
+
+def app_support_dir():
+    if platform.is_macos():
+        root = Path.home() / "Library" / "Application Support" / APP_NAME
+    elif platform.is_windows():
+        root = Path(os.environ.get("APPDATA", Path.home())) / APP_NAME
+    else:
+        root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / APP_NAME.lower()
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def app_state_path():
+    return app_support_dir() / "app_state.json"
+
+
+def load_app_state():
+    path = app_state_path()
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def save_app_state(state):
+    path = app_state_path()
+    current = load_app_state()
+    current.update(state)
+    current["updatedAt"] = datetime.now().isoformat(timespec="seconds")
+    path.write_text(json.dumps(current, ensure_ascii=False, indent=2), encoding="utf-8")
+    return current
+
+
+def app_release_notes(version=APP_VERSION):
+    return RELEASE_NOTES.get(version, [])
 
 
 def unique_dir(path):
@@ -352,6 +405,8 @@ class LostTrackrApi:
         self.last_scan = None
         self.last_index = None
         self.last_backups = []
+        self.last_smart_import_plan = None
+        self.last_smart_import_result = None
         self.selected_software_id = None
 
     def volume_roots(self):
@@ -446,6 +501,303 @@ class LostTrackrApi:
             "defaultSeratoDir": str(platform.default_serato_dir()),
             "message": message,
         }
+
+    def smart_music_roots(self, libraries=None, detection=None):
+        libraries = libraries if libraries is not None else self.discover_libraries()
+        detection = detection if detection is not None else self.detect_software()
+        weighted = defaultdict(int)
+
+        for library in libraries:
+            root = Path(library["root"]).expanduser()
+            if root.is_dir():
+                weighted[str(root)] += 5
+
+            serato_dir = Path(library["seratoDir"])
+            paths_seen = 0
+            for target in list_targets(serato_dir):
+                try:
+                    tree = serato.parse_tree(target.read_bytes())
+                except Exception:
+                    continue
+                for stored in iter_tree_paths(tree):
+                    paths_seen += 1
+                    for candidate in stored_candidates(stored, serato_dir)[:1]:
+                        parent = Path(candidate).expanduser().parent
+                        if parent.is_dir():
+                            weighted[str(parent)] += 2
+                            if parent.parent.is_dir():
+                                weighted[str(parent.parent)] += 1
+                    if paths_seen >= 1200:
+                        break
+                if paths_seen >= 1200:
+                    break
+
+        for software in detection.get("softwares", []):
+            for source in software.get("sources", []):
+                root = Path(source.get("root") or source.get("path") or "").expanduser()
+                if root.is_file():
+                    root = root.parent
+                if root.is_dir():
+                    weighted[str(root)] += 3
+
+        music_dir = Path.home() / "Music"
+        if music_dir.is_dir():
+            weighted[str(music_dir)] += 4
+
+        roots = []
+        seen = set()
+        for path, _score in sorted(weighted.items(), key=lambda item: (-item[1], len(item[0]))):
+            key = os.path.realpath(os.path.normcase(path))
+            if key in seen:
+                continue
+            seen.add(key)
+            roots.append(path)
+            if len(roots) >= 8:
+                break
+        return roots
+
+    def discover_serato_crates(self, libraries=None):
+        crates = []
+        libraries = libraries if libraries is not None else self.discover_libraries()
+        for library in libraries:
+            subcrates = Path(library["seratoDir"]) / "Subcrates"
+            if not subcrates.is_dir():
+                continue
+            for crate_path in sorted(subcrates.glob("*.crate"))[:160]:
+                track_count = 0
+                sample_files = []
+                try:
+                    tree = serato.parse_tree(crate_path.read_bytes())
+                    for stored in iter_tree_paths(tree):
+                        track_count += 1
+                        if len(sample_files) < 12:
+                            sample_files.append(Path(stored).name)
+                except Exception:
+                    track_count = 0
+                    sample_files = []
+                crates.append(
+                    {
+                        "name": smart_import.crate_name_from_file(crate_path),
+                        "path": str(crate_path),
+                        "library": library["name"],
+                        "trackCount": track_count,
+                        "sampleFiles": sample_files,
+                        "genres": sorted(smart_import.infer_genres_from_text(" ".join([crate_path.stem, *sample_files]))),
+                    }
+                )
+        return crates
+
+    def smart_import_preflight(self):
+        detection = self.detect_software()
+        libraries = self.discover_libraries()
+        library_roots = self.smart_music_roots(libraries, detection)
+        crates = self.discover_serato_crates(libraries)
+        downloads = smart_import.default_downloads_dir()
+        clean_destination = smart_import.default_clean_destination()
+        return {
+            "defaultSourceDir": str(downloads),
+            "defaultSourceDisplay": smart_import.display_path(downloads),
+            "sourceExists": downloads.is_dir(),
+            "defaultDestinationDir": str(clean_destination),
+            "defaultDestinationDisplay": smart_import.display_path(clean_destination),
+            "libraryRoots": library_roots,
+            "libraryRootDisplays": [smart_import.display_path(root) for root in library_roots],
+            "softwareDetection": detection,
+            "crates": crates,
+            "moveOnly": True,
+        }
+
+    def smartImportPreflight(self):
+        return self.smart_import_preflight()
+
+    def smart_import_scan(self, options=None):
+        options = options or {}
+        source_dir = options.get("sourceDir") or smart_import.default_downloads_dir()
+        destination_mode = options.get("destinationMode") or "existing"
+        destination_root = options.get("destinationRoot")
+        library_roots = options.get("libraryRoots")
+
+        preflight = self.smart_import_preflight()
+        plan = smart_import.build_file_plan(
+            source_dir=source_dir,
+            destination_mode=destination_mode,
+            destination_root=destination_root,
+            library_roots=library_roots or preflight["libraryRoots"],
+        )
+        plan["metadataOffer"] = {
+            "available": bool(plan["files"]),
+            "fields": ["artiste", "titre", "annee", "genre", "BPM", "cle Camelot"],
+            "source": "Centre de connaissances LostTrackr",
+        }
+        self.last_smart_import_plan = plan
+        self.last_smart_import_result = None
+        return plan
+
+    def smartImportScan(self, options=None):
+        return self.smart_import_scan(options)
+
+    def smart_import_apply(self, selected_ids=None):
+        if not self.last_smart_import_plan:
+            raise RuntimeError("Aucun plan Smart Import a appliquer.")
+        result = smart_import.apply_move_plan(self.last_smart_import_plan, selected_ids)
+        self.last_smart_import_result = result
+        return result
+
+    def smartImportApply(self, selectedIds=None):
+        return self.smart_import_apply(selectedIds)
+
+    def update_smart_item_destination(self, item, destination_folder):
+        folder = Path(destination_folder).expanduser()
+        destination = smart_import.unique_file(folder / item["file"])
+        item["destination"] = str(destination)
+        item["destinationDisplay"] = smart_import.display_path(destination)
+        item["destinationFolder"] = str(destination.parent)
+        item["destinationFolderDisplay"] = smart_import.display_path(destination.parent)
+        item["confidence"] = "medium"
+        item["confidenceLabel"] = smart_import.confidence_label("medium")
+        item["reason"] = "Destination choisie manuellement"
+        item["reasonCode"] = "manual_destination"
+        item["reasons"] = [{"code": "manual_destination", "label": "Destination choisie manuellement", "score": 7}]
+        item["matchedFolder"] = str(destination.parent)
+        item["matchedFolderDisplay"] = smart_import.display_path(destination.parent)
+
+    def rebuild_smart_import_groups(self):
+        if not self.last_smart_import_plan:
+            return
+        groups, summary = smart_import.build_suggestion_groups(self.last_smart_import_plan.get("files", []))
+        self.last_smart_import_plan["groups"] = groups
+        self.last_smart_import_plan["summary"] = summary
+        self.last_smart_import_plan["totals"]["review"] = sum(
+            1 for item in self.last_smart_import_plan.get("files", []) if item.get("confidence") == "review"
+        )
+
+    def smart_import_choose_destination(self, payload=None):
+        if not self.last_smart_import_plan:
+            raise RuntimeError("Aucun plan Smart Import a modifier.")
+        payload = payload or {}
+        scope = payload.get("scope")
+        target_id = payload.get("id")
+        if scope not in {"group", "track"} or not target_id:
+            raise RuntimeError("Destination a modifier introuvable.")
+
+        destination_folder = payload.get("destinationFolder")
+        if not destination_folder:
+            result = self.choose_folder("Choisir le dossier de destination")
+            destination_folder = result.get("path") if isinstance(result, dict) else None
+        if not destination_folder:
+            return self.last_smart_import_plan
+        if not Path(destination_folder).expanduser().is_dir():
+            raise RuntimeError("Dossier de destination introuvable.")
+
+        file_ids = set()
+        if scope == "track":
+            file_ids.add(target_id)
+        else:
+            for group in self.last_smart_import_plan.get("groups", []):
+                if group.get("id") == target_id:
+                    file_ids.update(group.get("items") or [])
+                    break
+        if not file_ids:
+            raise RuntimeError("Aucun titre trouve pour cette destination.")
+
+        for item in self.last_smart_import_plan.get("files", []):
+            if item.get("id") in file_ids:
+                self.update_smart_item_destination(item, destination_folder)
+        self.rebuild_smart_import_groups()
+        return self.last_smart_import_plan
+
+    def smartImportChooseDestination(self, payload=None):
+        return self.smart_import_choose_destination(payload)
+
+    def dj_set_recent_files(self, require_moved=False):
+        if not self.last_smart_import_plan:
+            return []
+        moved_by_id = {
+            item.get("id"): item
+            for item in (self.last_smart_import_result or {}).get("items", [])
+            if item.get("id")
+        }
+        only_moved = bool(moved_by_id)
+        if require_moved and not only_moved:
+            return []
+        files = []
+        for file_item in self.last_smart_import_plan.get("files", []):
+            file_id = file_item.get("id")
+            if only_moved and file_id not in moved_by_id:
+                continue
+            clone = dict(file_item)
+            moved = moved_by_id.get(file_id)
+            if moved:
+                clone["source"] = moved.get("to") or clone.get("destination")
+                clone["sourceDisplay"] = moved.get("toDisplay") or clone.get("destinationDisplay")
+                clone["destination"] = moved.get("to") or clone.get("destination")
+                clone["destinationDisplay"] = moved.get("toDisplay") or clone.get("destinationDisplay")
+            files.append(clone)
+        return files
+
+    def dj_set_preflight(self):
+        detection = self.detect_software()
+        libraries = self.discover_libraries()
+        active_id = self.active_software_id(detection)
+        active_software = self.software_payload(active_id, detection)
+        existing_targets = self.discover_serato_crates(libraries) if active_id == "serato" else []
+        return {
+            "activeSoftwareId": active_id,
+            "activeSoftware": active_software,
+            "softwareDetection": detection,
+            "existingTargets": existing_targets,
+            "recentFilesCount": len(self.dj_set_recent_files(require_moved=True)),
+            "writeMode": "backup_required",
+            "modes": [
+                {"id": "event", "label": "Préparer un nouvel évènement"},
+                {"id": "organize", "label": "Organiser mes playlists"},
+                {"id": "recent_imports", "label": "Envoyer mes derniers imports dans les crates"},
+            ],
+            "eventTypes": [
+                {"id": "club", "label": "Club"},
+                {"id": "wedding", "label": "Mariage"},
+            ],
+        }
+
+    def djSetPreflight(self):
+        return self.dj_set_preflight()
+
+    def dj_set_plan(self, options=None):
+        options = options or {}
+        preflight = self.dj_set_preflight()
+        mode = options.get("mode") or "event"
+        return dj_set.build_plan(
+            mode=mode,
+            files=self.dj_set_recent_files(require_moved=(mode == "recent_imports")),
+            software_detection=preflight["softwareDetection"],
+            existing_targets=preflight["existingTargets"],
+            event_type=options.get("eventType"),
+        )
+
+    def djSetPlan(self, options=None):
+        return self.dj_set_plan(options)
+
+    def choose_folder(self, title="Choisir un dossier"):
+        try:
+            import webview
+
+            if not webview.windows:
+                return {"path": None}
+            window = webview.windows[0]
+            result = window.create_file_dialog(
+                webview.FOLDER_DIALOG,
+                directory=str(Path.home()),
+                allow_multiple=False,
+            )
+            if not result:
+                return {"path": None}
+            path = result[0] if isinstance(result, (list, tuple)) else result
+            return {"path": str(path), "title": title}
+        except Exception as exc:
+            return {"path": None, "error": str(exc)}
+
+    def chooseFolder(self, title="Choisir un dossier"):
+        return self.choose_folder(title)
 
     def scan_library(self, library, index):
         serato_dir = Path(library["seratoDir"])
@@ -844,10 +1196,51 @@ class LostTrackrApi:
             "version": APP_VERSION,
             "platform": update_manager.platform_key(),
             "updateChannel": update_manager.DEFAULT_CHANNEL,
+            "launchState": self.launch_state(),
         }
 
     def getAppInfo(self):
         return self.app_info()
+
+    def launch_state(self):
+        state = load_app_state()
+        onboarding_completed = bool(state.get("onboardingCompleted"))
+        last_seen_version = str(state.get("lastSeenVersion") or "")
+        show_whats_new = (
+            onboarding_completed
+            and last_seen_version != APP_VERSION
+            and bool(app_release_notes(APP_VERSION))
+        )
+        return {
+            "showOnboarding": not onboarding_completed,
+            "showWhatsNew": show_whats_new,
+            "currentVersion": APP_VERSION,
+            "previousVersion": last_seen_version or None,
+            "releaseNotes": app_release_notes(APP_VERSION),
+        }
+
+    def getLaunchState(self):
+        return self.launch_state()
+
+    def complete_onboarding(self):
+        save_app_state(
+            {
+                "onboardingCompleted": True,
+                "onboardingCompletedAt": datetime.now().isoformat(timespec="seconds"),
+                "lastSeenVersion": APP_VERSION,
+            }
+        )
+        return self.launch_state()
+
+    def completeOnboarding(self):
+        return self.complete_onboarding()
+
+    def acknowledge_launch_state(self):
+        save_app_state({"lastSeenVersion": APP_VERSION})
+        return self.launch_state()
+
+    def acknowledgeLaunchState(self):
+        return self.acknowledge_launch_state()
 
     def check_update(self):
         try:
@@ -890,6 +1283,22 @@ class LostTrackrApi:
 
     def installUpdate(self):
         return self.install_update()
+
+    def knowledge_match(self, tracks):
+        try:
+            result = knowledge_client.match_tracks(tracks or [])
+            return {"ok": True, **result}
+        except knowledge_client.KnowledgeError as exc:
+            return {"ok": False, "error": str(exc), "retryable": exc.retryable}
+        except Exception:
+            return {
+                "ok": False,
+                "error": "LostTrackr n'arrive pas à joindre le centre de connaissances.",
+                "retryable": True,
+            }
+
+    def knowledgeMatch(self, tracks):
+        return self.knowledge_match(tracks)
 
     def open_external_url(self, url):
         parsed = str(url or "")

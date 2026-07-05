@@ -1,12 +1,12 @@
-# LostTrackr macOS 1.2.5 - Beta privee non notarisee
+# LostTrackr macOS 1.3.0 - Beta privee non notarisee
 
 Merci de tester LostTrackr.
 
-LostTrackr est un outil macOS pour aider les DJs a retrouver automatiquement les fichiers audio que leur logiciel DJ marque comme introuvables apres un changement de dossier, de disque ou d'organisation. Dans cette version 1.2.5, LostTrackr ajoute un systeme de mise a jour securise depuis l'application. La detection intelligente reconnait Serato DJ, rekordbox, Traktor et VirtualDJ. La reparation automatique complete reste active pour Serato DJ.
+LostTrackr est un outil macOS pour aider les DJs a retrouver automatiquement les fichiers audio que leur logiciel DJ marque comme introuvables apres un changement de dossier, de disque ou d'organisation. Dans cette version 1.3.0, LostTrackr ajoute Smart Import pour ranger les nouveaux titres dans les dossiers de destination et prepare le nouvel espace DJ Set pour organiser les crates/playlists. La detection intelligente reconnait Serato DJ, rekordbox, Traktor et VirtualDJ. La reparation automatique complete reste active pour Serato DJ.
 
 ## Important avant de commencer
 
-Cette version 1.2.5 est une beta privee. Elle n'est pas encore signee ni notarisee par Apple avec un certificat Developer ID.
+Cette version 1.3.0 est une beta privee. Elle n'est pas encore signee ni notarisee par Apple avec un certificat Developer ID.
 
 macOS peut donc afficher une alerte du type :
 

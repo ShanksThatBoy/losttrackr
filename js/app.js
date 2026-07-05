@@ -25,7 +25,51 @@
     missing:[
       {file:"Afro Latino private edit.mp3",reason:"aucun fichier de ce nom sur les disques scannés"},
       {file:"mix-down-v4.mp3",reason:"probablement supprimé ou disque non branché"}
-    ]
+    ],
+    smartImport:{
+      preflight:{
+        defaultSourceDir:"~/Downloads",
+        defaultSourceDisplay:"~/Downloads",
+        sourceExists:true,
+        defaultDestinationDir:"~/Music/LostTrackr Smart Import",
+        defaultDestinationDisplay:"~/Music/LostTrackr Smart Import",
+        libraryRoots:["~/Music/DJ Library"],
+        libraryRootDisplays:["~/Music/DJ Library"],
+        moveOnly:true,
+        crates:[
+          {name:"Afro / Amapiano",library:"Macintosh HD"},
+          {name:"Club Warmup",library:"Macintosh HD"},
+          {name:"Peak Time",library:"Macintosh HD"}
+        ],
+        softwareDetection:{softwares:[{id:"serato",name:"Serato DJ",containerName:"crate",containerPlural:"crates"}]}
+      },
+      plan:{
+        sourceDir:"~/Downloads",
+        sourceDisplay:"~/Downloads",
+        destinationMode:"existing",
+        destinationRoot:"~/Music/DJ Library",
+        destinationRootDisplay:"~/Music/DJ Library",
+        totals:{audio:6,ready:6,review:1,conflicts:1,limited:false},
+        libraryFolders:[
+          {path:"~/Music/DJ Library/Afro",display:"~/Music/DJ Library/Afro",name:"Afro",audioCount:120,genres:["Afro"]},
+          {path:"~/Music/DJ Library/Afro/Amapiano",display:"~/Music/DJ Library/Afro/Amapiano",name:"Amapiano",audioCount:42,genres:["Afro"]},
+          {path:"~/Music/DJ Library/House",display:"~/Music/DJ Library/House",name:"House",audioCount:180,genres:["House"]},
+          {path:"~/Music/DJ Library/House/Deep House",display:"~/Music/DJ Library/House/Deep House",name:"Deep House",audioCount:36,genres:["House"]},
+          {path:"~/Music/DJ Library/Latino",display:"~/Music/DJ Library/Latino",name:"Latino",audioCount:92,genres:["Latino"]},
+          {path:"~/Music/DJ Library/Pop",display:"~/Music/DJ Library/Pop",name:"Pop",audioCount:74,genres:["Pop"]},
+          {path:"~/Music/DJ Library/Warmup",display:"~/Music/DJ Library/Warmup",name:"Warmup",audioCount:58,genres:["Warmup"]}
+        ],
+        files:[
+          {id:"si-1",file:"Burna Boy - City Boys.mp3",sourceDisplay:"~/Downloads/Burna Boy - City Boys.mp3",destinationDisplay:"~/Music/DJ Library/Afro/Burna Boy - City Boys.mp3",destinationFolderDisplay:"~/Music/DJ Library/Afro",action:"move",confidence:"high",reason:"Match avec Afro",artist:"Burna Boy",title:"City Boys",genre:"Afro",conflict:false},
+          {id:"si-2",file:"Peggy Gou - Nanana.wav",sourceDisplay:"~/Downloads/Peggy Gou - Nanana.wav",destinationDisplay:"~/Music/DJ Library/House/Peggy Gou - Nanana.wav",destinationFolderDisplay:"~/Music/DJ Library/House",action:"move",confidence:"high",reason:"Match avec House",artist:"Peggy Gou",title:"Nanana",genre:"House",conflict:false},
+          {id:"si-3",file:"warmup edit 124.mp3",sourceDisplay:"~/Downloads/warmup edit 124.mp3",destinationDisplay:"~/Music/DJ Library/Warmup/warmup edit 124_2.mp3",destinationFolderDisplay:"~/Music/DJ Library/Warmup",action:"move",confidence:"medium",reason:"Nom ajusté pour éviter un conflit",artist:"",title:"warmup edit 124",genre:"Warmup",conflict:true},
+          {id:"si-4",file:"Daddy Yankee - Gasolina.mp3",sourceDisplay:"~/Downloads/Daddy Yankee - Gasolina.mp3",destinationDisplay:"~/Music/DJ Library/Latino/Daddy Yankee - Gasolina.mp3",destinationFolderDisplay:"~/Music/DJ Library/Latino",action:"move",confidence:"high",reason:"Match avec Latino",artist:"Daddy Yankee",title:"Gasolina",genre:"Latino",conflict:false},
+          {id:"si-5",file:"track-07-final.mp3",sourceDisplay:"~/Downloads/track-07-final.mp3",destinationDisplay:"~/Music/DJ Library/LostTrackr Smart Import/A verifier/track-07-final.mp3",destinationFolderDisplay:"~/Music/DJ Library/LostTrackr Smart Import/A verifier",action:"move",confidence:"review",reason:"Nommage faible, rangement dans À vérifier",artist:"",title:"track-07-final",genre:"A verifier",conflict:false},
+          {id:"si-6",file:"Dua Lipa - Houdini.m4a",sourceDisplay:"~/Downloads/Dua Lipa - Houdini.m4a",destinationDisplay:"~/Music/DJ Library/Pop/Dua Lipa - Houdini.m4a",destinationFolderDisplay:"~/Music/DJ Library/Pop",action:"move",confidence:"medium",reason:"Dossier Pop probable",artist:"Dua Lipa",title:"Houdini",genre:"Pop",conflict:false}
+        ],
+        metadataOffer:{available:true,fields:["artiste","titre","annee","genre","BPM","cle Camelot"],source:"Centre de connaissances LostTrackr"}
+      }
+    }
   };
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -44,16 +88,192 @@
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
     async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; },
-    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.2.5",platform:navigator.platform,updateChannel:"demo"}; },
-    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.2.5",updateAvailable:false}; },
+    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.3.0",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}}; },
+    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}; },
+    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}; },
+    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}; },
+    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.3.0",updateAvailable:false}; },
     async installUpdate(){ if(window.pywebview?.api?.installUpdate) return window.pywebview.api.installUpdate(); await wait(120); return {launched:false,message:"Mode aperçu : aucune mise à jour."}; },
+    async smartImportPreflight(){ if(window.pywebview?.api?.smartImportPreflight) return window.pywebview.api.smartImportPreflight(); await wait(120); return MOCK.smartImport.preflight; },
+    async smartImportScan(options){
+      if(window.pywebview?.api?.smartImportScan) return window.pywebview.api.smartImportScan(options);
+      await wait(520);
+      return {...MOCK.smartImport.plan, sourceDir:options?.sourceDir || MOCK.smartImport.plan.sourceDir, destinationMode:options?.destinationMode || "existing"};
+    },
+    async smartImportApply(selectedIds){
+      if(window.pywebview?.api?.smartImportApply) return window.pywebview.api.smartImportApply(selectedIds || []);
+      await wait(520);
+      const wanted = new Set(selectedIds || []);
+      const files = (MOCK.smartImport.plan.files || []).filter(item => !wanted.size || wanted.has(item.id));
+      return {moved:files.length,skipped:0,errors:0,manifestDisplay:"~/Music/LostTrackr Smart Import/_manifests/smart_import_demo.json",items:files.map(item => ({id:item.id,file:item.file,toDisplay:item.destinationDisplay}))};
+    },
+    async smartImportChooseDestination(payload){
+      if(window.pywebview?.api?.smartImportChooseDestination) return window.pywebview.api.smartImportChooseDestination(payload || {});
+      const folder = payload?.destinationFolder || prompt("Choisir le dossier de destination");
+      const basePlan = smartImportPlan || MOCK.smartImport.plan;
+      if(!folder) return basePlan;
+      const plan = typeof structuredClone === "function" ? structuredClone(basePlan) : JSON.parse(JSON.stringify(basePlan));
+      const planGroups = plan.groups?.length ? plan.groups : buildSmartGroupsFromFiles(plan.files || []);
+      const group = planGroups.find(item => item.id === payload?.id);
+      const wanted = payload?.scope === "track" ? new Set([payload.id]) : new Set(group?.items || []);
+      const cleanFolder = folder.replace(/\/+$/,"");
+      plan.files = (plan.files || []).map(item => {
+        if(!wanted.has(item.id)) return item;
+        return {
+          ...item,
+          destinationFolder:folder,
+          destinationFolderDisplay:folder,
+          destination:`${cleanFolder}/${item.file}`,
+          destinationDisplay:`${cleanFolder}/${item.file}`,
+          confidence:"medium",
+          confidenceLabel:"Bonne suggestion",
+          reason:"Destination choisie manuellement",
+          reasonCode:"manual_destination"
+        };
+      });
+      plan.groups = null;
+      return plan;
+    },
+    async chooseFolder(title){
+      if(window.pywebview?.api?.chooseFolder) return window.pywebview.api.chooseFolder(title);
+      const path = prompt(title || "Chemin du dossier");
+      return {path:path || null};
+    },
+    async knowledgeMatch(tracks){
+      if(window.pywebview?.api?.knowledgeMatch) return window.pywebview.api.knowledgeMatch(tracks);
+      await wait(700);
+      const demo = {
+        "Wedding March Vs EoO Bad Bunny Mashup":{status:"uncertain",confidence:.48,canonical:{title:"Wedding March Vs EoO Mashup",artist:"DJ Edit",bpm:96,camelot_key:"9A",genre:"Latin"}},
+        "Suavemente":{status:"matched",confidence:.97,canonical:{title:"Suavemente",artist:"Elvis Crespo",bpm:127,camelot_key:"4B",genre:"Merengue"}},
+        "Warmup Edit 124":{status:"unmatched"},
+        "Remix":{status:"unmatched"},
+        "Gasolina":{status:"matched",confidence:.99,canonical:{title:"Gasolina",artist:"Daddy Yankee",bpm:96,camelot_key:"11B",genre:"Reggaeton"}},
+        "Djadja":{status:"matched",confidence:.95,canonical:{title:"Djadja",artist:"Aya Nakamura",bpm:100,camelot_key:"8A",genre:"Afropop"}}
+      };
+      return {ok:true, matches:(tracks||[]).map(t => ({client_track_id:t.client_track_id, status:"unmatched", ...demo[t.title]}))};
+    },
+    async djSetPreflight(){
+      if(window.pywebview?.api?.djSetPreflight) return window.pywebview.api.djSetPreflight();
+      await wait(140);
+      return {
+        activeSoftware:MOCK.smartImport.preflight.softwareDetection.softwares[0],
+        softwareDetection:MOCK.smartImport.preflight.softwareDetection,
+        existingTargets:MOCK.smartImport.preflight.crates,
+        recentFilesCount:MOCK.smartImport.plan.files.length,
+        writeMode:"backup_required",
+        modes:[
+          {id:"event",label:"Préparer un nouvel évènement"},
+          {id:"organize",label:"Organiser mes playlists"},
+          {id:"recent_imports",label:"Envoyer mes derniers imports dans les crates"}
+        ],
+        eventTypes:[
+          {id:"club",label:"Club"},
+          {id:"wedding",label:"Mariage"}
+        ]
+      };
+    },
+    async djSetPlan(options){
+      if(window.pywebview?.api?.djSetPlan) return window.pywebview.api.djSetPlan(options || {});
+      await wait(520);
+      const mode = options?.mode === "organize" ? "organize" : options?.mode === "recent_imports" ? "recent_imports" : "event";
+      const eventType = options?.eventType === "wedding" ? "wedding" : "club";
+      const software = MOCK.smartImport.preflight.softwareDetection.softwares[0];
+      const files = MOCK.smartImport.plan.files;
+      const eventTargets = eventType === "wedding"
+        ? {Afro:"Dancefloor",Latino:"Dancefloor",Brazil:"Dancefloor",Dancehall:"Dancefloor",Warmup:"Cocktail",Gospel:"Cérémonie",Disco:"Dancefloor",Club:"Dancefloor",House:"Dancefloor",Electro:"Dancefloor",Pop:"Dancefloor","R&B":"Dîner"}
+        : {Afro:"Groove",Latino:"Groove",Brazil:"Groove",Dancehall:"Groove",Warmup:"Warmup",Club:"Peak Time",House:"Peak Time",Electro:"Peak Time",Pop:"Peak Time",Techno:"Peak Time","Hip-Hop":"Peak Time"};
+      const items = files.map((file, index) => {
+        const existing = MOCK.smartImport.preflight.crates.find(crate => [file.genre, file.artist, file.title].some(value => value && crate.name.toLowerCase().includes(String(value).toLowerCase().split(" ")[0])));
+        const targetName = mode === "event"
+          ? (eventTargets[file.genre] || "LostTrackr Event / A vérifier")
+          : (existing?.name || (file.genre === "A verifier" ? "LostTrackr - A vérifier" : `LostTrackr - ${file.genre}`));
+        const targetType = mode !== "event" && existing ? "existing" : "new";
+        const confidence = file.confidence === "review" ? "review" : (existing ? "high" : "medium");
+        return {
+          id:`dj-demo-${index}`,
+          fileId:file.id,
+          file:file.file,
+          title:file.title,
+          artist:file.artist,
+          trackLabel:file.artist ? `${file.artist} - ${file.title}` : file.title,
+          sourceDisplay:file.destinationDisplay,
+          targetName,
+          targetType,
+          confidence,
+          confidenceLabel:confidence === "high" ? "Très probable" : confidence === "medium" ? "Bonne suggestion" : "À vérifier",
+          reason:mode === "event" ? `Base ${eventType === "wedding" ? "mariage" : "club"} proposée` : (existing ? `Cohérent avec ${existing.name}` : "Nouvelle playlist proposée"),
+          softwareName:software.name,
+          containerName:software.containerName
+        };
+      });
+      const grouped = new Map();
+      items.forEach(item => {
+        if(!grouped.has(item.targetName)) grouped.set(item.targetName, []);
+        grouped.get(item.targetName).push(item);
+      });
+      const groups = [...grouped.entries()].map(([targetName, rows], index) => {
+        const confidence = rows.some(item => item.confidence === "review") ? "review" : (rows.some(item => item.confidence === "medium") ? "medium" : "high");
+        return {
+          id:`dj-demo-group-${index}`,
+          name:targetName,
+          targetName,
+          targetType:rows.some(item => item.targetType === "existing") ? "existing" : "new",
+          trackCount:rows.length,
+          confidence,
+          confidenceLabel:confidence === "high" ? "Très probable" : confidence === "medium" ? "Bonne suggestion" : "À vérifier",
+          status:confidence === "review" ? "review" : "suggested",
+          reason:rows[0]?.reason || "Suggestion LostTrackr",
+          softwareName:software.name,
+          containerName:software.containerName,
+          items:rows.map(item => item.id)
+        };
+      });
+      return {
+        mode,
+        eventType,
+        modeLabel:mode === "event" ? `Préparer un évènement ${eventType === "wedding" ? "mariage" : "club"}` : mode === "recent_imports" ? "Envoyer mes derniers imports dans les crates" : "Organiser mes playlists",
+        headline:mode === "event" ? `Structure ${eventType === "wedding" ? "mariage" : "club"} proposée` : mode === "recent_imports" ? "Derniers imports à envoyer" : "Cohérence des playlists",
+        activeSoftware:software,
+        containerName:software.containerName,
+        containerPlural:software.containerPlural,
+        writeMode:"backup_required",
+        requiresBackup:true,
+        source:"demo",
+        totals:{
+          groupCount:groups.length,
+          itemCount:items.length,
+          reliableCount:groups.reduce((sum, group) => sum + (group.confidence === "review" ? 0 : group.trackCount), 0),
+          reviewCount:groups.reduce((sum, group) => sum + (group.confidence === "review" ? group.trackCount : 0), 0),
+          newTargetCount:groups.filter(group => group.targetType === "new").length,
+          existingTargetCount:groups.filter(group => group.targetType === "existing").length
+        },
+        groups,
+        items,
+        existingTargets:MOCK.smartImport.preflight.crates
+      };
+    },
     async openExternalUrl(url){ if(window.pywebview?.api?.openExternalUrl) return window.pywebview.api.openExternalUrl(url); window.open(url,"_blank","noopener"); return {opened:true,url}; }
   };
 
   const $ = id => document.getElementById(id);
   const app = $("app");
-  const views = {home:$("homeView"), prepare:$("prepareView"), scan:$("scanView"), results:$("resultsView"), preview:$("previewView"), review:$("reviewView"), completed:$("completedView")};
-  const navButtons = {home:$("navHome"), prepare:$("navRepair"), library:$("navLibrary")};
+  const views = {
+    home:$("homeView"),
+    smartImport:$("smartImportView"),
+    smartAnalysis:$("smartAnalysisView"),
+    smartFiles:$("smartFilesView"),
+    smartComplete:$("smartCompleteView"),
+    djSet:$("djSetView"),
+    djSetEvent:$("djSetEventView"),
+    djSetPlan:$("djSetPlanView"),
+    prepare:$("prepareView"),
+    scan:$("scanView"),
+    results:$("resultsView"),
+    preview:$("previewView"),
+    review:$("reviewView"),
+    completed:$("completedView")
+  };
+  const navButtons = {home:$("navHome"), prepare:$("navRepair"), organize:$("navOrganize"), library:$("navLibrary")};
   const toast = $("toast");
   const modal = $("modal");
   const updateBanner = $("updateBanner");
@@ -68,6 +288,19 @@
   let trackEls = [];
   let preflightInfo = null;
   let selectedSoftwareId = null;
+  let smartPreflightInfo = null;
+  let smartImportPlan = null;
+  let smartImportResult = null;
+  let smartGroupStates = new Map();
+  let smartExpandedGroupId = null;
+  let smartSourceDir = null;
+  let smartDestinationRoot = null;
+  let smartDestinationManual = false;
+  let smartDestinationMode = "existing";
+  let smartApplySelectedIds = [];
+  let djSetPlan = null;
+  let djSetGroupStates = new Map();
+  let djSetExpandedGroupId = null;
   try{ selectedSoftwareId = localStorage.getItem("lt_preferred_software") || null; }catch(error){}
 
   function esc(value){ return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char])); }
@@ -79,10 +312,16 @@
     try{
       const info = await API.getAppInfo();
       if(info?.version) $("appVersionLabel").textContent = `v${info.version}`;
+      return info;
     }catch(error){}
+    return null;
   }
 
-  function hideUpdateBanner(){
+  async function hideUpdateBanner(){
+    if(updateInfo?.type === "whatsNew"){
+      try{ await API.acknowledgeLaunchState(); }catch(error){}
+    }
+    updateInfo = null;
     updateBanner.hidden = true;
     updateBanner.classList.remove("is-open","is-mandatory");
     document.querySelector(".main").classList.remove("has-banner");
@@ -96,7 +335,11 @@
     $("updateTitle").textContent = info.mandatory ? `Mise à jour requise : LostTrackr ${latest}` : `LostTrackr ${latest} est disponible`;
     $("updateSummary").textContent = info.summary ? `${info.summary} Version actuelle : ${current}.` : `Tu utilises la version ${current}. Cette mise à jour peut être installée directement depuis LostTrackr.`;
     $("updateLater").hidden = Boolean(info.mandatory);
+    $("updateLater").textContent = "Plus tard";
     $("updateNotes").disabled = !info.notesUrl;
+    $("updateNotes").textContent = "Nouveautés";
+    $("updateNow").hidden = false;
+    $("updateNow").textContent = "Mettre à jour";
     updateBanner.hidden = false;
     updateBanner.classList.toggle("is-mandatory", Boolean(info.mandatory));
     requestAnimationFrame(() => {
@@ -105,7 +348,28 @@
     });
   }
 
+  function renderWhatsNewBanner(state){
+    const notes = state?.releaseNotes || [];
+    if(!state?.showWhatsNew || !notes.length) return;
+    updateInfo = {type:"whatsNew", ...state};
+    $("updateTitle").textContent = `Nouveautés LostTrackr ${state.currentVersion || ""}`.trim();
+    $("updateSummary").textContent = notes.slice(0, 2).join(" ");
+    $("updateLater").hidden = false;
+    $("updateLater").textContent = "Plus tard";
+    $("updateNotes").disabled = false;
+    $("updateNotes").textContent = "Détails";
+    $("updateNow").hidden = false;
+    $("updateNow").textContent = "Compris";
+    updateBanner.hidden = false;
+    updateBanner.classList.remove("is-mandatory");
+    requestAnimationFrame(() => {
+      updateBanner.classList.add("is-open");
+      document.querySelector(".main").classList.add("has-banner");
+    });
+  }
+
   async function checkForAppUpdate(){
+    if(updateInfo?.type === "whatsNew") return;
     try{
       const info = await API.checkUpdate();
       if(info?.updateAvailable) renderUpdateBanner(info);
@@ -115,6 +379,11 @@
   }
 
   async function installAvailableUpdate(){
+    if(updateInfo?.type === "whatsNew"){
+      await hideUpdateBanner();
+      showToast("Nouveautés marquées comme vues.");
+      return;
+    }
     const button = $("updateNow");
     const previous = button.textContent;
     button.disabled = true;
@@ -138,6 +407,10 @@
   }
 
   async function openUpdateNotes(){
+    if(updateInfo?.type === "whatsNew"){
+      showToast((updateInfo.releaseNotes || []).join(" · "));
+      return;
+    }
     if(!updateInfo?.notesUrl) return;
     try{ await API.openExternalUrl(updateInfo.notesUrl); }
     catch(error){ showToast("Impossible d’ouvrir les notes de version."); }
@@ -146,18 +419,794 @@
   function setNav(active){
     Object.values(navButtons).forEach(btn => btn.classList.remove("is-active"));
     if(active === "home") navButtons.home.classList.add("is-active");
+    else if(active === "organize") navButtons.organize.classList.add("is-active");
     else if(active === "library") navButtons.library.classList.add("is-active");
     else navButtons.prepare.classList.add("is-active");
   }
   function showView(name){
     Object.entries(views).forEach(([key, view]) => view.classList.toggle("is-active", key === name));
     app.dataset.view = name;
-    setNav(name === "home" ? "home" : name === "library" ? "library" : "prepare");
+    setNav(name === "home" ? "home" : name.startsWith("djSet") ? "library" : name.startsWith("smart") ? "organize" : "prepare");
   }
   function showScreen(name){ showView(name); }
 
   function goHome(){ setState("idle"); showView("home"); }
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
+  function goDjSet(){ setState("dj-set"); showView("djSet"); }
+  function goDjSetEvent(){ setState("dj-set-event"); showView("djSetEvent"); }
+
+  function smartDisplay(path, fallback = "À définir"){ return path || fallback; }
+  function smartLibraryRoots(info = smartPreflightInfo){ return info?.libraryRoots || []; }
+  function smartLibraryDisplays(info = smartPreflightInfo){ return info?.libraryRootDisplays || smartLibraryRoots(info); }
+  function currentSmartDestinationRoot(){
+    if(smartDestinationRoot) return smartDestinationRoot;
+    return smartLibraryRoots()[0] || null;
+  }
+  function currentSmartDestinationDisplay(){
+    if(smartDestinationRoot) return smartDestinationRoot;
+    return smartLibraryDisplays()[0] || "Dossier racine à sélectionner";
+  }
+  function smartConfidenceLabel(value){
+    if(value === "high") return "Très probable";
+    if(value === "medium") return "Bonne suggestion";
+    return "À vérifier";
+  }
+  function smartConfidenceClass(value){
+    return value === "review" ? "low" : (value || "low");
+  }
+  function smartTrackLabel(item){
+    const artist = item?.artist ? `${item.artist} — ` : "";
+    return `${artist}${item?.title || item?.file || "Titre"}`;
+  }
+  function renderSmartPreflight(info){
+    smartPreflightInfo = info || {};
+    if(!smartSourceDir) smartSourceDir = info?.defaultSourceDir || "~/Downloads";
+    if(!smartDestinationRoot && smartLibraryRoots(info).length){
+      smartDestinationRoot = smartLibraryRoots(info)[0];
+      smartDestinationManual = false;
+    }
+    $("smartSourcePath").textContent = smartDisplay(info?.defaultSourceDisplay || smartSourceDir);
+    $("smartSourceLabel").textContent = smartSourceDir === info?.defaultSourceDir ? "Dossier Téléchargements" : "Dossier sélectionné";
+    $("smartSourceStatus").textContent = info?.sourceExists ? "Adapté à ton système" : "À choisir manuellement";
+    $("smartDestinationPath").textContent = currentSmartDestinationDisplay();
+    $("smartDestinationLabel").textContent = currentSmartDestinationRoot()
+      ? (smartDestinationManual ? "Dossier racine sélectionné" : "Dossier probable détecté")
+      : "Dossier à sélectionner";
+    const displays = smartLibraryDisplays(info);
+    $("smartLibraryRoots").textContent = displays.length
+      ? "LostTrackr détectera et analysera automatiquement tous les sous-dossiers"
+      : "Sélectionne le dossier principal de ta bibliothèque. LostTrackr analysera ensuite ses sous-dossiers";
+    $("smartAnalyze").disabled = !smartSourceDir || !currentSmartDestinationRoot();
+  }
+  async function refreshSmartPreflight(){
+    try{
+      const info = await API.smartImportPreflight();
+      renderSmartPreflight(info);
+    }catch(error){
+      showToast(error?.message || "Impossible de préparer Smart Import.");
+    }
+  }
+  async function goSmartImport(){
+    setState("smart-import");
+    showView("smartImport");
+    await refreshSmartPreflight();
+  }
+  async function chooseSmartFolder(kind){
+    const title = kind === "source" ? "Choisir le dossier qui contient les nouveaux sons" : "Choisir le dossier racine de rangement";
+    try{
+      const result = await API.chooseFolder(title);
+      if(!result?.path) return;
+      if(kind === "source"){
+        smartSourceDir = result.path;
+        $("smartSourceLabel").textContent = "Dossier sélectionné";
+        $("smartSourcePath").textContent = result.path;
+        $("smartSourceStatus").textContent = "Source personnalisée";
+      }else{
+        smartDestinationRoot = result.path;
+        smartDestinationManual = true;
+        smartDestinationMode = "existing";
+        $("smartDestinationPath").textContent = result.path;
+        $("smartDestinationLabel").textContent = "Dossier racine sélectionné";
+        $("smartLibraryRoots").textContent = "LostTrackr détectera et analysera automatiquement tous les sous-dossiers";
+      }
+      $("smartAnalyze").disabled = !smartSourceDir || !currentSmartDestinationRoot();
+    }catch(error){
+      showToast("Impossible d’ouvrir le sélecteur de dossier.");
+    }
+  }
+  function resetSmartSource(){
+    smartSourceDir = smartPreflightInfo?.defaultSourceDir || "~/Downloads";
+    $("smartSourceLabel").textContent = "Dossier Téléchargements";
+    $("smartSourcePath").textContent = smartPreflightInfo?.defaultSourceDisplay || smartSourceDir;
+    $("smartSourceStatus").textContent = smartPreflightInfo?.sourceExists ? "Adapté à ton système" : "À vérifier";
+    $("smartAnalyze").disabled = !smartSourceDir || !currentSmartDestinationRoot();
+  }
+  function setSmartAnalyzeButton(busy = false){
+    $("smartAnalyze").innerHTML = busy
+      ? `<span class="smart-cta-icon" aria-hidden="true">⌁</span><span><b>Préparation...</b><small>Ouverture de l’analyse</small></span>`
+      : `<span class="smart-cta-icon" aria-hidden="true">→</span><span><b>Suivant</b><small>Lancer l’analyse des fichiers et des sous-dossiers</small></span>`;
+  }
+  function smartPathName(path, fallback = "Dossier"){
+    return String(path || "").split(/[\\/]/).filter(Boolean).pop() || fallback;
+  }
+  function smartEscapePath(path){
+    return String(path || "").replace(/\\/g,"/");
+  }
+  function smartUnderPath(child, parent){
+    const childPath = smartEscapePath(child).replace(/\/+$/,"");
+    const parentPath = smartEscapePath(parent).replace(/\/+$/,"");
+    return childPath === parentPath || childPath.startsWith(`${parentPath}/`);
+  }
+  function setSmartAnalysisLoading(){
+    $("smartAnalysisSourceCard").classList.add("is-loading");
+    $("smartAnalysisDestinationCard").classList.add("is-loading");
+    $("smartAnalysisSourceTitle").textContent = "Analyse du dossier source…";
+    $("smartAnalysisSourceDetail").textContent = "Détection des fichiers audio compatibles.";
+    $("smartAnalysisDestinationTitle").textContent = "Cartographie des sous-dossiers…";
+    $("smartAnalysisDestinationDetail").textContent = "Analyse des dossiers enfants et des titres déjà présents.";
+    $("smartAnalysisMapIntro").textContent = "LostTrackr lit la structure de ta bibliothèque.";
+    $("smartAnalysisStatus").textContent = "Analyse en cours";
+    $("smartAnalysisTree").innerHTML = `<div class="smart-analysis-placeholder"><i></i><i></i><i></i><span>Lecture des dossiers…</span></div>`;
+    $("smartContinueVerify").disabled = true;
+  }
+  function smartFolderSuggestionCount(folder){
+    const path = folder?.path || "";
+    return (smartImportPlan?.files || []).filter(item => smartUnderPath(item.destinationFolder || "", path)).length;
+  }
+  function smartFolderTreeRows(){
+    const root = currentSmartDestinationRoot();
+    const folders = smartImportPlan?.libraryFolders || [];
+    const childrenByTop = new Map();
+    folders.forEach(folder => {
+      const rawPath = smartEscapePath(folder.path || "");
+      const rootPath = smartEscapePath(root || "").replace(/\/+$/,"");
+      let relative = rawPath.startsWith(`${rootPath}/`) ? rawPath.slice(rootPath.length + 1) : smartPathName(rawPath);
+      relative = relative.replace(/^\/+/,"");
+      const parts = relative.split("/").filter(Boolean);
+      if(!parts.length) return;
+      const top = parts[0];
+      const childName = parts.length > 1 ? parts.slice(1).join(" / ") : top;
+      if(!childrenByTop.has(top)) childrenByTop.set(top, []);
+      childrenByTop.get(top).push({
+        name:childName,
+        count:smartFolderSuggestionCount(folder),
+        audioCount:Number(folder.audioCount || 0),
+        genres:folder.genres || []
+      });
+    });
+    if(!childrenByTop.size){
+      (smartImportPlan?.groups || []).forEach(group => {
+        const name = group.name || "À vérifier";
+        if(!childrenByTop.has(name)) childrenByTop.set(name, []);
+        childrenByTop.get(name).push({name, count:Number(group.trackCount || 0), audioCount:0, genres:[]});
+      });
+    }
+    return [...childrenByTop.entries()].slice(0,10).map(([top, children]) => {
+      const uniqueChildren = [];
+      const seen = new Set();
+      children
+        .sort((left, right) => right.count - left.count || right.audioCount - left.audioCount || left.name.localeCompare(right.name))
+        .forEach(child => {
+          if(seen.has(child.name)) return;
+          seen.add(child.name);
+          uniqueChildren.push(child);
+        });
+      const totalSuggestions = uniqueChildren.reduce((sum, child) => sum + Number(child.count || 0), 0);
+      return {top, children:uniqueChildren.slice(0,8), totalSuggestions};
+    });
+  }
+  function renderSmartAnalysisComplete(){
+    const audioCount = Number(smartImportPlan?.totals?.audio || 0);
+    const sourceLabel = smartImportPlan?.sourceDisplay || smartImportPlan?.sourceDir || "dossier source";
+    const destinationRoot = smartImportPlan?.destinationRootDisplay || smartImportPlan?.destinationRoot || currentSmartDestinationDisplay();
+    const folders = smartImportPlan?.libraryFolders || [];
+    const directChildren = new Set();
+    const rootPath = smartEscapePath(smartImportPlan?.destinationRoot || currentSmartDestinationRoot() || "").replace(/\/+$/,"");
+    folders.forEach(folder => {
+      const rawPath = smartEscapePath(folder.path || "");
+      const relative = rawPath.startsWith(`${rootPath}/`) ? rawPath.slice(rootPath.length + 1) : "";
+      const top = relative.split("/").filter(Boolean)[0];
+      if(top) directChildren.add(top);
+    });
+    const childCount = Math.max(0, folders.length - directChildren.size);
+    $("smartAnalysisSourceCard").classList.remove("is-loading");
+    $("smartAnalysisDestinationCard").classList.remove("is-loading");
+    $("smartAnalysisSourceTitle").textContent = `${fmt(audioCount, "titre détecté", "titres détectés")} dans ${sourceLabel}`;
+    $("smartAnalysisSourceDetail").textContent = smartImportPlan?.totals?.limited ? "Analyse limitée aux premiers titres compatibles." : "Tous les fichiers audio compatibles ont été pris en compte.";
+    $("smartAnalysisDestinationTitle").textContent = `${fmt(directChildren.size || folders.length, "sous-dossier", "sous-dossiers")} et ${fmt(childCount, "dossier enfant", "dossiers enfants")} détectés`;
+    $("smartAnalysisDestinationDetail").textContent = `Sous ${destinationRoot}`;
+    $("smartAnalysisMapIntro").textContent = `${fmt(directChildren.size || folders.length, "sous-dossier", "sous-dossiers")} et ${fmt(childCount, "dossier enfant", "dossiers enfants")} détectés sous ${destinationRoot}.`;
+    $("smartAnalysisStatus").textContent = "Analyse terminée";
+    const rows = smartFolderTreeRows();
+    $("smartAnalysisTree").innerHTML = rows.length ? rows.map(row => `
+      <article class="smart-analysis-branch">
+        <header><strong>${esc(row.top)}</strong><span>${esc(fmt(row.totalSuggestions, "titre suggéré", "titres suggérés"))}</span></header>
+        <div>
+          ${row.children.map(child => `
+            <p><b>${esc(child.name)}</b><span>${child.count ? esc(fmt(child.count, "titre suggéré", "titres suggérés")) : esc(fmt(child.audioCount, "titre présent", "titres présents"))}</span></p>
+          `).join("")}
+        </div>
+      </article>
+    `).join("") : `<div class="empty">Aucun sous-dossier exploitable détecté dans ce dossier racine.</div>`;
+    $("smartContinueVerify").disabled = false;
+  }
+  async function startSmartImportScan(){
+    const button = $("smartAnalyze");
+    button.disabled = true;
+    setSmartAnalyzeButton(true);
+    setState("smart-analysis");
+    showView("smartAnalysis");
+    setSmartAnalysisLoading();
+    try{
+      const destinationRoot = currentSmartDestinationRoot();
+      smartImportPlan = await API.smartImportScan({
+        sourceDir: smartSourceDir || smartPreflightInfo?.defaultSourceDir,
+        destinationMode: "existing",
+        destinationRoot,
+        libraryRoots: destinationRoot ? [destinationRoot] : []
+      });
+      smartGroupStates = new Map();
+      smartExpandedGroupId = null;
+      renderSmartAnalysisComplete();
+    }catch(error){
+      showView("smartImport");
+      showToast(error?.message || "Smart Import n’a pas pu analyser ce dossier.");
+    }finally{
+      button.disabled = false;
+      setSmartAnalyzeButton(false);
+    }
+  }
+  function continueSmartVerify(){
+    if(!smartImportPlan){ showToast("L’analyse n’est pas encore terminée."); return; }
+    renderSmartFilePlan();
+    setState("smart-files");
+    showView("smartFiles");
+  }
+  function smartGroupName(path){
+    const name = String(path || "").split(/[\\/]/).filter(Boolean).pop() || "Destination";
+    return /^a[ _-]?verifier$/i.test(name.normalize("NFD").replace(/[\u0300-\u036f]/g,"")) ? "À vérifier" : name;
+  }
+  function buildSmartGroupsFromFiles(files){
+    const grouped = new Map();
+    files.forEach(item => {
+      const folder = item.destinationFolder || item.destinationFolderDisplay || "À vérifier";
+      if(!grouped.has(folder)) grouped.set(folder, []);
+      grouped.get(folder).push(item);
+    });
+    return [...grouped.entries()].map(([folder, items], index) => {
+      const confidences = new Set(items.map(item => item.confidence || "review"));
+      const confidence = confidences.has("review") || confidences.has("low") ? "low" : (confidences.has("medium") ? "medium" : "high");
+      return {
+        id:`group-${index}-${folder}`,
+        name:smartGroupName(folder),
+        trackCount:items.length,
+        confidence,
+        confidenceLabel:smartConfidenceLabel(confidence),
+        status:confidence === "low" ? "review" : "suggested",
+        reason:items[0]?.reason || "Destination proposée",
+        reasonCode:items[0]?.reasonCode || "library_match",
+        destinationFolder:folder,
+        destinationFolderDisplay:items[0]?.destinationFolderDisplay || folder,
+        logoKey:null,
+        items:items.map(item => item.id)
+      };
+    }).sort((left, right) => (left.confidence === "low") - (right.confidence === "low") || right.trackCount - left.trackCount || left.name.localeCompare(right.name));
+  }
+  function smartGroups(){
+    const files = smartImportPlan?.files || [];
+    return (smartImportPlan?.groups?.length ? smartImportPlan.groups : buildSmartGroupsFromFiles(files)).map(group => ({
+      ...group,
+      confidence:group.confidence === "review" ? "low" : (group.confidence || "low"),
+      confidenceLabel:group.confidenceLabel || smartConfidenceLabel(group.confidence)
+    }));
+  }
+  function smartFilesById(){
+    return new Map((smartImportPlan?.files || []).map(item => [item.id, item]));
+  }
+  function smartGroupState(group){
+    if(!smartGroupStates.has(group.id)){
+      smartGroupStates.set(group.id, group.status || (group.confidence === "low" ? "review" : "suggested"));
+    }
+    return smartGroupStates.get(group.id);
+  }
+  function smartReliableGroups(groups){
+    return groups.filter(group => group.confidence === "high" || group.confidence === "medium");
+  }
+  function smartValidatedFileIds(){
+    const groups = smartGroups();
+    return groups.flatMap(group => smartGroupState(group) === "validated" ? (group.items || []) : []);
+  }
+  function updateSmartReviewControls(groups){
+    const reliableCount = groups.reduce((sum, group) => sum + ((group.confidence === "high" || group.confidence === "medium") ? Number(group.trackCount || 0) : 0), 0);
+    const reviewCount = groups.reduce((sum, group) => sum + (group.confidence === "low" ? Number(group.trackCount || 0) : 0), 0);
+    const validatedIds = smartValidatedFileIds();
+    const reliableGroups = smartReliableGroups(groups);
+    const allReliableValidated = reliableGroups.length > 0 && reliableGroups.every(group => smartGroupState(group) === "validated");
+    rollTo($("smartReliableCount"), reliableCount);
+    $("smartReviewNeedsCount").textContent = fmt(reviewCount, "morceau", "morceaux");
+    $("smartValidateReliableSub").textContent = `${fmt(reliableCount, "morceau sera prêt", "morceaux seront prêts")} à déplacer`;
+    $("smartReviewRemainingSub").textContent = `${fmt(reviewCount, "morceau nécessite", "morceaux nécessitent")} ton avis`;
+    $("smartValidateReliable").disabled = reliableCount <= 0 || allReliableValidated;
+    $("smartReviewRemaining").disabled = reviewCount <= 0;
+    $("smartMoveFiles").disabled = validatedIds.length <= 0;
+    $("smartMoveFiles").textContent = validatedIds.length
+      ? `Continuer vers Appliquer (${fmt(validatedIds.length, "morceau", "morceaux")})`
+      : "Continuer vers Appliquer";
+
+    const sourceDisplay = smartImportPlan?.sourceDisplay || smartImportPlan?.sourceDir || "À définir";
+    const destinationDisplay = smartImportPlan?.destinationRootDisplay || smartImportPlan?.destinationRoot || "À définir";
+    $("smartReviewSourcePath").textContent = sourceDisplay;
+    $("smartReviewSourcePath").title = smartImportPlan?.sourceDir || sourceDisplay;
+    $("smartReviewDestinationPath").textContent = destinationDisplay;
+    $("smartReviewDestinationPath").title = smartImportPlan?.destinationRoot || destinationDisplay;
+  }
+  function smartKnownDestinationFolders(currentPath = ""){
+    const folders = new Map();
+    (smartImportPlan?.libraryFolders || []).forEach(folder => {
+      if(!folder?.path) return;
+      folders.set(folder.path, folder);
+    });
+    if(currentPath && !folders.has(currentPath)){
+      folders.set(currentPath, {
+        path:currentPath,
+        display:currentPath,
+        name:smartGroupName(currentPath),
+        audioCount:0,
+        genres:[]
+      });
+    }
+    return [...folders.values()].sort((left, right) => {
+      const leftName = smartGroupName(left.path || left.display || left.name);
+      const rightName = smartGroupName(right.path || right.display || right.name);
+      return leftName.localeCompare(rightName);
+    });
+  }
+  function smartReviewFolder(path){
+    const normalized = smartGroupName(path);
+    return normalized === "À vérifier" || /LostTrackr Smart Import[\\/]+A verifier/i.test(String(path || ""));
+  }
+  function smartDestinationOptionLabel(folder){
+    const root = smartImportPlan?.destinationRoot || currentSmartDestinationRoot() || "";
+    const raw = smartEscapePath(folder.path || folder.display || "");
+    const rootPath = smartEscapePath(root).replace(/\/+$/,"");
+    const relative = raw.startsWith(`${rootPath}/`) ? raw.slice(rootPath.length + 1) : (folder.name || raw);
+    const count = Number(folder.audioCount || 0);
+    return `${relative || folder.name || "Dossier"}${count ? ` · ${fmt(count, "titre", "titres")}` : ""}`;
+  }
+  function renderSmartDestinationSelect(item){
+    const currentFolder = item.destinationFolder || "";
+    const currentIsReview = item.confidence === "review" || item.confidence === "low" || smartReviewFolder(currentFolder);
+    const options = smartKnownDestinationFolders(currentIsReview ? "" : currentFolder);
+    if(!options.length){
+      return `<button class="smart-track-change" type="button" data-smart-track-change="${esc(item.id || "")}">Changer</button>`;
+    }
+    return `
+      <select class="smart-track-select" data-smart-track-select="${esc(item.id || "")}" aria-label="Changer le sous-dossier de ${esc(item.file || "ce titre")}">
+        <option value="" ${currentIsReview ? "selected" : ""}>Ignorer ce titre</option>
+        ${options.map(folder => {
+          const selected = !currentIsReview && folder.path === currentFolder ? "selected" : "";
+          return `<option value="${esc(folder.path)}" ${selected}>${esc(smartDestinationOptionLabel(folder))}</option>`;
+        }).join("")}
+      </select>`;
+  }
+  function renderSmartGroupTracks(group, fileMap){
+    return (group.items || []).slice(0,8).map(id => {
+      const item = fileMap.get(id) || {};
+      return `
+        <div class="smart-group-track" title="${esc(item.destinationDisplay || item.destination || "")}">
+          <b>${esc(smartTrackLabel(item))}</b>
+          <code>${esc(item.destinationDisplay || item.destinationFolderDisplay || "")}</code>
+          ${renderSmartDestinationSelect(item)}
+        </div>`;
+    }).join("") || `<div class="empty">Aucun morceau détaillé dans ce groupe.</div>`;
+  }
+  function renderSmartFilePlan(){
+    const files = smartImportPlan?.files || [];
+    const list = $("smartSuggestionList");
+    list.innerHTML = "";
+    if(!files.length){
+      updateSmartReviewControls([]);
+      list.innerHTML = `<div class="empty">Aucun fichier audio compatible dans ce dossier.</div>`;
+      return;
+    }
+    const groups = smartGroups();
+    const fileMap = smartFilesById();
+    groups.forEach(group => {
+      const state = smartGroupState(group);
+      const confidenceClass = smartConfidenceClass(group.confidence);
+      const card = document.createElement("article");
+      card.className = `smart-suggestion-card is-${esc(state)} ${group.confidence === "low" ? "is-review" : ""} ${smartExpandedGroupId === group.id ? "is-expanded" : ""}`;
+      card.dataset.groupId = group.id;
+      const reviewActions = group.confidence === "low"
+        ? `<button class="smart-card-btn" type="button" data-smart-action="view">Choisir un dossier</button><button class="smart-card-btn warning" type="button" data-smart-action="ignore">Ignorer</button>`
+        : `<button class="smart-card-btn" type="button" data-smart-action="view">Voir les morceaux</button><button class="smart-card-btn primary" type="button" data-smart-action="validate" ${state === "validated" ? "disabled" : ""}>${state === "validated" ? "Validé" : "Valider"}</button><button class="smart-card-btn ghost" type="button" data-smart-action="change">Changer</button>`;
+      const reason = group.confidence === "low"
+        ? `${group.reason || "Score insuffisant"} · choisis un sous-dossier ou laisse ignoré.`
+        : (group.reason || "Destination proposée");
+      card.innerHTML = `
+        <div class="smart-card-handle" aria-hidden="true"></div>
+        <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>?</span></div>
+        <div class="smart-suggestion-copy">
+          <div class="smart-suggestion-top">
+            <h2>${esc(group.name || "Destination proposée")}</h2>
+            <em class="smart-confidence-badge smart-confidence-${esc(confidenceClass)}">${esc(group.confidenceLabel || smartConfidenceLabel(group.confidence))}</em>
+          </div>
+          <span class="smart-suggestion-count">${esc(fmt(Number(group.trackCount || 0), "morceau", "morceaux"))}</span>
+          <p class="smart-suggestion-reason">${esc(reason)}</p>
+        </div>
+        <div class="smart-suggestion-actions">${reviewActions}</div>
+        <div class="smart-group-tracks">${renderSmartGroupTracks(group, fileMap)}</div>`;
+      list.appendChild(card);
+    });
+    updateSmartReviewControls(groups);
+  }
+  function setSmartGroupStatus(groupId, status){
+    smartGroupStates.set(groupId, status);
+    renderSmartFilePlan();
+  }
+  async function refreshSmartPlanDestination(payload){
+    const previousExpanded = smartExpandedGroupId;
+    try{
+      const nextPlan = await API.smartImportChooseDestination(payload);
+      if(nextPlan?.files){
+        smartImportPlan = nextPlan;
+        smartGroupStates = new Map();
+        const nextGroups = smartGroups();
+        smartExpandedGroupId = nextGroups.some(group => group.id === previousExpanded)
+          ? previousExpanded
+          : nextGroups.find(group => group.confidence === "low")?.id || null;
+        renderSmartFilePlan();
+        showToast("Destination mise à jour dans le plan. Aucun fichier n’a encore été déplacé.");
+      }
+    }catch(error){
+      showToast(error?.message || "Impossible de modifier cette destination.");
+    }
+  }
+  function changeSmartGroupDestination(groupId){
+    refreshSmartPlanDestination({scope:"group", id:groupId});
+  }
+  function changeSmartTrackDestination(trackId, destinationFolder = null){
+    if(destinationFolder === ""){
+      showToast("Titre ignoré pour ce déplacement. Il reste dans son dossier source.");
+      return;
+    }
+    refreshSmartPlanDestination({scope:"track", id:trackId, destinationFolder});
+  }
+  function handleSmartDestinationSelect(event){
+    const select = event.target.closest("[data-smart-track-select]");
+    if(!select) return;
+    const trackId = select.dataset.smartTrackSelect;
+    if(trackId) changeSmartTrackDestination(trackId, select.value);
+  }
+  function handleSmartSuggestionClick(event){
+    const trackButton = event.target.closest("[data-smart-track-change]");
+    if(trackButton){
+      event.stopPropagation();
+      const trackId = trackButton.dataset.smartTrackChange;
+      if(trackId) changeSmartTrackDestination(trackId);
+      return;
+    }
+    const button = event.target.closest("[data-smart-action]");
+    if(!button) return;
+    const card = button.closest(".smart-suggestion-card");
+    const groupId = card?.dataset?.groupId;
+    if(!groupId) return;
+    const action = button.dataset.smartAction;
+    if(action === "view"){
+      smartExpandedGroupId = smartExpandedGroupId === groupId ? null : groupId;
+      renderSmartFilePlan();
+      return;
+    }
+    if(action === "validate"){
+      setSmartGroupStatus(groupId, "validated");
+      showToast("Suggestion validée. Aucun fichier n’a encore été déplacé.");
+      return;
+    }
+    if(action === "ignore"){
+      setSmartGroupStatus(groupId, "ignored");
+      showToast("Groupe ignoré pour ce déplacement.");
+      return;
+    }
+    if(action === "change"){
+      changeSmartGroupDestination(groupId);
+      return;
+    }
+    if(action === "open"){
+      smartExpandedGroupId = groupId;
+      renderSmartFilePlan();
+      showToast("Ouverture du dossier bientôt disponible. Les morceaux sont affichés ici pour vérification.");
+    }
+  }
+  function validateReliableSmartGroups(){
+    const groups = smartGroups();
+    smartReliableGroups(groups).forEach(group => {
+      if(smartGroupState(group) !== "ignored") smartGroupStates.set(group.id, "validated");
+    });
+    renderSmartFilePlan();
+    const count = smartValidatedFileIds().length;
+    showToast(`${fmt(count, "morceau fiable validé", "morceaux fiables validés")}. Lance le déplacement quand tu es prêt.`);
+  }
+  function focusSmartReviewGroups(){
+    const reviewGroup = smartGroups().find(group => group.confidence === "low" && smartGroupState(group) !== "ignored");
+    if(!reviewGroup){ showToast("Aucun groupe restant à vérifier."); return; }
+    smartExpandedGroupId = reviewGroup.id;
+    renderSmartFilePlan();
+    const card = [...document.querySelectorAll(".smart-suggestion-card")].find(element => element.dataset.groupId === reviewGroup.id);
+    card?.scrollIntoView({behavior:reduced ? "auto" : "smooth", block:"center"});
+  }
+  function renderSmartApplyList(files){
+    const list = $("smartApplyList");
+    list.innerHTML = files.length ? files.slice(0,80).map(item => `
+      <div class="smart-apply-row">
+        <b>${esc(smartTrackLabel(item))}</b>
+        <code>${esc(item.sourceDisplay || item.source || "")}</code>
+        <span>→</span>
+        <code>${esc(item.destinationDisplay || item.destination || "")}</code>
+      </div>
+    `).join("") : `<div class="empty">Aucun changement validé pour l’instant.</div>`;
+  }
+  function goSmartApplyPreview(){
+    smartApplySelectedIds = smartValidatedFileIds();
+    if(!smartApplySelectedIds.length){ showToast("Valide au moins une suggestion avant de continuer."); return; }
+    const fileMap = smartFilesById();
+    const selectedFiles = smartApplySelectedIds.map(id => fileMap.get(id)).filter(Boolean);
+    const total = Number(smartImportPlan?.totals?.audio || smartImportPlan?.files?.length || 0);
+    const pending = Math.max(0, total - selectedFiles.length);
+    $("smartCompleteTitle").textContent = "Appliquer les changements";
+    $("smartCompleteSub").textContent = "Dernier état des lieux avant déplacement. Rien n’est modifié tant que tu ne valides pas cette page.";
+    $("smartApplyReadyBadge").textContent = "À valider";
+    $("smartDoneMoved").textContent = String(selectedFiles.length);
+    $("smartDonePending").textContent = String(pending);
+    $("smartDoneManifest").textContent = "Le manifeste sera créé au moment du déplacement.";
+    $("smartFinalApply").disabled = false;
+    $("smartFinalApply").textContent = "Valider et déplacer";
+    $("smartApplyBackReview").disabled = false;
+    $("smartMetadataButton").disabled = false;
+    renderSmartApplyList(selectedFiles);
+    setState("smart-apply");
+    showView("smartComplete");
+  }
+  async function applySmartImportMoves(){
+    const selectedIds = smartApplySelectedIds.length ? smartApplySelectedIds : smartValidatedFileIds();
+    if(!selectedIds.length){ showToast("Valide au moins une suggestion avant de déplacer."); return; }
+    if(!confirm(`LostTrackr va déplacer ${fmt(selectedIds.length, "morceau validé", "morceaux validés")}. Aucune copie audio ne sera créée. Continuer ?`)) return;
+    const button = $("smartFinalApply");
+    button.disabled = true;
+    button.textContent = "Déplacement...";
+    try{
+      smartImportResult = await API.smartImportApply(selectedIds);
+      showToast(`${smartImportResult.moved || 0} fichier${(smartImportResult.moved || 0) > 1 ? "s" : ""} déplacé${(smartImportResult.moved || 0) > 1 ? "s" : ""}.`);
+      renderSmartApplyResult();
+    }catch(error){
+      showToast(error?.message || "Le déplacement a échoué. Vérifie les droits du dossier.");
+    }finally{
+      if(!smartImportResult){
+        button.disabled = false;
+        button.textContent = "Valider et déplacer";
+      }
+    }
+  }
+  function renderSmartApplyResult(){
+    const moved = Number(smartImportResult?.moved || 0);
+    const total = Number(smartImportPlan?.totals?.audio || smartImportPlan?.files?.length || 0);
+    const pending = Math.max(0, total - moved);
+    $("smartCompleteTitle").textContent = "Déplacement terminé";
+    $("smartCompleteSub").textContent = "Les fichiers validés ont été déplacés. Le manifeste permet de garder une trace de l’opération.";
+    $("smartApplyReadyBadge").textContent = "Manifeste créé";
+    rollTo($("smartDoneMoved"), moved);
+    rollTo($("smartDonePending"), pending);
+    $("smartDoneManifest").textContent = smartImportResult?.manifestDisplay
+      ? `Manifeste créé : ${smartImportResult.manifestDisplay}`
+      : "Aucun déplacement lancé depuis cet écran. Le plan reste disponible pendant la session.";
+    renderSmartApplyList((smartImportResult?.items || []).map(item => ({
+      file:item.file,
+      title:item.file,
+      sourceDisplay:item.fromDisplay,
+      destinationDisplay:item.toDisplay
+    })));
+    $("smartFinalApply").disabled = true;
+    $("smartFinalApply").textContent = "Déplacement terminé";
+    $("smartApplyBackReview").disabled = true;
+    setState("smart-complete");
+    showView("smartComplete");
+  }
+  async function enrichSmartMetadata(){
+    const files = smartImportPlan?.files || [];
+    if(!files.length){ showToast("Aucun titre à enrichir pour l’instant."); return; }
+    const button = $("smartMetadataButton");
+    button.disabled = true;
+    button.textContent = "Analyse...";
+    try{
+      const tracks = files.slice(0,80).map((item, index) => ({
+        client_track_id:`smart-${index}`,
+        title:item.title || item.file,
+        artist:item.artist || "",
+        source_app:"smart_import"
+      }));
+      const result = await API.knowledgeMatch(tracks);
+      const matched = (result?.matches || []).filter(item => item.status && item.status !== "unmatched").length;
+      showToast(`${matched} titre${matched > 1 ? "s" : ""} identifié${matched > 1 ? "s" : ""} pour les métadonnées.`);
+    }catch(error){
+      showToast("Le centre de connaissances est momentanément indisponible.");
+    }finally{
+      button.disabled = false;
+      button.textContent = "Compléter les métadonnées";
+    }
+  }
+
+  function djSetItemsById(){
+    return new Map((djSetPlan?.items || []).map(item => [item.id, item]));
+  }
+  function djSetGroups(){
+    return (djSetPlan?.groups || []).map(group => ({
+      ...group,
+      confidence:group.confidence === "low" ? "review" : (group.confidence || "review"),
+      confidenceLabel:group.confidenceLabel || smartConfidenceLabel(group.confidence)
+    }));
+  }
+  function djSetGroupState(group){
+    if(!djSetGroupStates.has(group.id)){
+      djSetGroupStates.set(group.id, group.status || (group.confidence === "review" ? "review" : "suggested"));
+    }
+    return djSetGroupStates.get(group.id);
+  }
+  function djSetReliableGroups(groups){
+    return groups.filter(group => group.confidence === "high" || group.confidence === "medium");
+  }
+  function djSetValidatedItemIds(){
+    return djSetGroups().flatMap(group => djSetGroupState(group) === "validated" ? (group.items || []) : []);
+  }
+  function djSetStartButton(mode, options = {}){
+    if(mode === "organize") return $("djSetOrganizePlaylists");
+    if(mode === "recent_imports") return $("djSetRecentImports");
+    if(options.eventType === "wedding") return $("djSetEventWedding");
+    if(options.eventType === "club") return $("djSetEventClub");
+    return $("djSetNewEvent");
+  }
+  async function startDjSetPlan(mode, options = {}){
+    const button = djSetStartButton(mode, options);
+    const previous = button.textContent;
+    button.disabled = true;
+    button.textContent = "Analyse...";
+    try{
+      djSetPlan = await API.djSetPlan({mode, ...options});
+      djSetGroupStates = new Map();
+      djSetExpandedGroupId = null;
+      renderDjSetPlan();
+      setState(`dj-set-${mode}${options.eventType ? `-${options.eventType}` : ""}`);
+      showView("djSetPlan");
+    }catch(error){
+      showToast(error?.message || "Impossible de préparer ce plan DJ Set.");
+    }finally{
+      button.disabled = false;
+      button.textContent = previous;
+    }
+  }
+  function updateDjSetControls(groups){
+    const totals = djSetPlan?.totals || {};
+    const reliableCount = Number(totals.reliableCount ?? groups.reduce((sum, group) => sum + (group.confidence === "review" ? 0 : Number(group.trackCount || 0)), 0));
+    const reviewCount = Number(totals.reviewCount ?? groups.reduce((sum, group) => sum + (group.confidence === "review" ? Number(group.trackCount || 0) : 0), 0));
+    const newTargetCount = Number(totals.newTargetCount ?? groups.filter(group => group.targetType === "new").length);
+    const reliableGroups = djSetReliableGroups(groups);
+    const allReliableValidated = reliableGroups.length > 0 && reliableGroups.every(group => djSetGroupState(group) === "validated");
+    const validatedIds = djSetValidatedItemIds();
+    rollTo($("djSetReliableCount"), reliableCount);
+    rollTo($("djSetNewTargetCount"), newTargetCount);
+    rollTo($("djSetReviewCount"), reviewCount);
+    $("djSetValidateReliableSub").textContent = `${fmt(reliableCount, "titre prêt", "titres prêts")} pour l’écriture`;
+    $("djSetReviewRemainingSub").textContent = `${fmt(reviewCount, "titre nécessite", "titres nécessitent")} ton avis`;
+    $("djSetValidateReliable").disabled = reliableCount <= 0 || allReliableValidated;
+    $("djSetReviewRemaining").disabled = reviewCount <= 0;
+    $("djSetPreviewApply").disabled = validatedIds.length <= 0;
+    $("djSetPreviewApply").textContent = validatedIds.length
+      ? `Préparer l’écriture pour ${fmt(validatedIds.length, "titre validé", "titres validés")}`
+      : "Préparer l’écriture sécurisée";
+  }
+  function renderDjSetGroupTracks(group, itemMap){
+    return (group.items || []).slice(0,8).map(id => {
+      const item = itemMap.get(id) || {};
+      return `
+        <div class="smart-group-track" title="${esc(item.sourceDisplay || "")}">
+          <b>${esc(item.trackLabel || item.file || "Titre")}</b>
+          <code>${esc(item.sourceDisplay || item.targetName || "")}</code>
+        </div>`;
+    }).join("") || `<div class="empty">Aucun titre détaillé. LostTrackr préparera cette structure comme point de départ.</div>`;
+  }
+  function renderDjSetPlan(){
+    const groups = djSetGroups();
+    const list = $("djSetPlanList");
+    const software = djSetPlan?.activeSoftware?.name || "logiciel DJ";
+    $("djSetPlanTitle").textContent = djSetPlan?.headline || "Vérifier les suggestions";
+    const safetyCopy = djSetPlan?.writeMode === "backup_required" || djSetPlan?.requiresBackup
+      ? "Écriture réelle préparée avec sauvegarde obligatoire avant modification."
+      : "Aucune crate ou playlist n’est écrite sans validation.";
+    $("djSetPlanSub").innerHTML = `${esc(djSetPlan?.modeLabel || "Préparer mon DJ Set")} pour ${esc(software)}.<br>${esc(safetyCopy)}`;
+    list.innerHTML = "";
+    if(!groups.length){
+      updateDjSetControls([]);
+      list.innerHTML = `<div class="empty">Aucune suggestion DJ Set disponible. Range quelques titres avec Smart Import ou connecte une bibliothèque DJ.</div>`;
+      return;
+    }
+    const itemMap = djSetItemsById();
+    groups.forEach(group => {
+      const state = djSetGroupState(group);
+      const confidenceClass = smartConfidenceClass(group.confidence);
+      const card = document.createElement("article");
+      card.className = `smart-suggestion-card is-${esc(state)} ${group.confidence === "review" ? "is-review" : ""} ${djSetExpandedGroupId === group.id ? "is-expanded" : ""}`;
+      card.dataset.groupId = group.id;
+      const typeLabel = group.targetType === "existing" ? `${group.containerName || "playlist"} existante` : `Nouvelle ${group.containerName || "playlist"}`;
+      const reviewActions = group.confidence === "review"
+        ? `<button class="smart-card-btn" type="button" data-djset-action="view">Voir</button><button class="smart-card-btn warning" type="button" data-djset-action="ignore">Ignorer</button>`
+        : `<button class="smart-card-btn" type="button" data-djset-action="view">Voir les titres</button><button class="smart-card-btn primary" type="button" data-djset-action="validate" ${state === "validated" ? "disabled" : ""}>${state === "validated" ? "Validé" : "Valider"}</button><button class="smart-card-btn ghost" type="button" data-djset-action="change">Changer</button>`;
+      card.innerHTML = `
+        <div class="smart-card-handle" aria-hidden="true"></div>
+        <div class="smart-crate-logo-placeholder" aria-hidden="true"><span>?</span></div>
+        <div class="smart-suggestion-copy">
+          <div class="smart-suggestion-top">
+            <h2>${esc(group.name || "Suggestion DJ")}</h2>
+            <em class="smart-confidence-badge smart-confidence-${esc(confidenceClass)}">${esc(group.confidenceLabel || smartConfidenceLabel(group.confidence))}</em>
+          </div>
+          <span class="smart-suggestion-count">${esc(fmt(Number(group.trackCount || 0), "titre", "titres"))} · ${esc(typeLabel)}</span>
+          <p class="smart-suggestion-reason">${esc(group.reason || "Suggestion LostTrackr")}</p>
+        </div>
+        <div class="smart-suggestion-actions">${reviewActions}</div>
+        <div class="smart-group-tracks">${renderDjSetGroupTracks(group, itemMap)}</div>`;
+      list.appendChild(card);
+    });
+    updateDjSetControls(groups);
+  }
+  function handleDjSetSuggestionClick(event){
+    const button = event.target.closest("[data-djset-action]");
+    if(!button) return;
+    const card = button.closest(".smart-suggestion-card");
+    const groupId = card?.dataset?.groupId;
+    if(!groupId) return;
+    const action = button.dataset.djsetAction;
+    if(action === "view"){
+      djSetExpandedGroupId = djSetExpandedGroupId === groupId ? null : groupId;
+      renderDjSetPlan();
+      return;
+    }
+    if(action === "validate"){
+      djSetGroupStates.set(groupId, "validated");
+      renderDjSetPlan();
+      showToast("Suggestion DJ Set validée en aperçu. Rien n’a été écrit.");
+      return;
+    }
+    if(action === "ignore"){
+      djSetGroupStates.set(groupId, "ignored");
+      renderDjSetPlan();
+      showToast("Groupe ignoré pour cet aperçu.");
+      return;
+    }
+    if(action === "change"){
+      djSetExpandedGroupId = groupId;
+      renderDjSetPlan();
+      showToast("Changement manuel bientôt disponible. Vérifie les titres avant de valider.");
+    }
+  }
+  function validateReliableDjSetGroups(){
+    const groups = djSetGroups();
+    djSetReliableGroups(groups).forEach(group => {
+      if(djSetGroupState(group) !== "ignored") djSetGroupStates.set(group.id, "validated");
+    });
+    renderDjSetPlan();
+    const count = djSetValidatedItemIds().length;
+    showToast(`${fmt(count, "titre validé", "titres validés")} pour l’aperçu DJ Set.`);
+  }
+  function focusDjSetReviewGroups(){
+    const reviewGroup = djSetGroups().find(group => group.confidence === "review" && djSetGroupState(group) !== "ignored");
+    if(!reviewGroup){ showToast("Aucun groupe restant à vérifier."); return; }
+    djSetExpandedGroupId = reviewGroup.id;
+    renderDjSetPlan();
+    const card = [...$("djSetPlanList").querySelectorAll(".smart-suggestion-card")].find(element => element.dataset.groupId === reviewGroup.id);
+    card?.scrollIntoView({behavior:reduced ? "auto" : "smooth", block:"center"});
+  }
+  function previewDjSetApply(){
+    const selectedCount = djSetValidatedItemIds().length;
+    if(!selectedCount){ showToast("Valide au moins une suggestion avant de préparer l’écriture."); return; }
+    showToast(`Écriture préparée pour ${fmt(selectedCount, "titre", "titres")}. Sauvegarde obligatoire avant modification du logiciel DJ.`);
+  }
 
   function detectedSoftwares(info){
     const detected = info?.softwareDetection?.softwares || [];
@@ -618,12 +1667,48 @@
   $("updateNow").addEventListener("click", installAvailableUpdate);
   $("updateNotes").addEventListener("click", openUpdateNotes);
   $("goPrepare").addEventListener("click", goPrepare);
+  $("goSmartImport").addEventListener("click", goSmartImport);
+  $("goDjSet").addEventListener("click", goDjSet);
   $("navHome").addEventListener("click", goHome);
   $("navRepair").addEventListener("click", goPrepare);
-  $("navOrganize").addEventListener("click", () => showToast("Cette fonction arrive bientôt."));
-  $("navLibrary").addEventListener("click", () => showToast("Diagnostic bientôt disponible."));
-  $("comingCard").addEventListener("click", () => showToast("Cette fonction arrive bientôt."));
-  $("healthBtn").addEventListener("click", () => showToast("Diagnostic bientôt disponible."));
+  $("navOrganize").addEventListener("click", goSmartImport);
+  $("navLibrary").addEventListener("click", goDjSet);
+  $("comingCard").addEventListener("click", event => {
+    if(event.target.closest("button")) return;
+    goSmartImport();
+  });
+  $("djSetCard").addEventListener("click", event => {
+    if(event.target.closest("button")) return;
+    goDjSet();
+  });
+  $("smartBackTop").addEventListener("click", goHome);
+  $("smartDefaultSource").addEventListener("click", resetSmartSource);
+  $("smartChooseSource").addEventListener("click", () => chooseSmartFolder("source"));
+  $("smartChooseDestination").addEventListener("click", () => chooseSmartFolder("destination"));
+  $("smartAnalyze").addEventListener("click", startSmartImportScan);
+  $("smartAnalysisBack").addEventListener("click", goSmartImport);
+  $("smartContinueVerify").addEventListener("click", continueSmartVerify);
+  $("smartFilesBack").addEventListener("click", () => showView("smartAnalysis"));
+  $("smartSuggestionList").addEventListener("click", handleSmartSuggestionClick);
+  $("smartSuggestionList").addEventListener("change", handleSmartDestinationSelect);
+  $("smartValidateReliable").addEventListener("click", validateReliableSmartGroups);
+  $("smartReviewRemaining").addEventListener("click", focusSmartReviewGroups);
+  $("smartMoveFiles").addEventListener("click", goSmartApplyPreview);
+  $("smartMetadataButton").addEventListener("click", enrichSmartMetadata);
+  $("smartApplyBackReview").addEventListener("click", () => { renderSmartFilePlan(); showView("smartFiles"); });
+  $("smartFinalApply").addEventListener("click", applySmartImportMoves);
+  $("djSetBack").addEventListener("click", goHome);
+  $("djSetNewEvent").addEventListener("click", goDjSetEvent);
+  $("djSetOrganizePlaylists").addEventListener("click", () => startDjSetPlan("organize"));
+  $("djSetRecentImports").addEventListener("click", () => startDjSetPlan("recent_imports"));
+  $("djSetEventBack").addEventListener("click", goDjSet);
+  $("djSetEventClub").addEventListener("click", () => startDjSetPlan("event", {eventType:"club"}));
+  $("djSetEventWedding").addEventListener("click", () => startDjSetPlan("event", {eventType:"wedding"}));
+  $("djSetPlanBack").addEventListener("click", goDjSet);
+  $("djSetPlanList").addEventListener("click", handleDjSetSuggestionClick);
+  $("djSetValidateReliable").addEventListener("click", validateReliableDjSetGroups);
+  $("djSetReviewRemaining").addEventListener("click", focusDjSetReviewGroups);
+  $("djSetPreviewApply").addEventListener("click", previewDjSetApply);
   $("topBack").addEventListener("click", goHome);
   $("bottomBack").addEventListener("click", goHome);
   $("reviewBack").addEventListener("click", () => scanData ? goResults() : goPrepare());
@@ -660,6 +1745,7 @@
   function closeOnboarding(startScanFlow){
     onboarding.classList.remove("is-open");
     try{ localStorage.setItem("lt_onboarded","1"); }catch(error){}
+    API.completeOnboarding().catch(() => {});
     if(startScanFlow === true) goPrepare();
     else goHome();
   }
@@ -697,12 +1783,28 @@
     else if(event.key === "ArrowLeft" && obIndex > 0) showObStep(obIndex - 1, true);
     else if(event.key === "Escape") closeOnboarding(false);
   });
-  let onboarded = false;
-  try{ onboarded = localStorage.getItem("lt_onboarded") === "1"; }catch(error){}
-  if(!onboarded){ buildObWave(); showObStep(0); onboarding.classList.add("is-open"); }
+  async function initLaunchExperience(){
+    let state = null;
+    try{ state = await API.getLaunchState(); }catch(error){}
+    let legacyOnboarded = false;
+    try{ legacyOnboarded = localStorage.getItem("lt_onboarded") === "1"; }catch(error){}
+    if(state?.showOnboarding && legacyOnboarded){
+      try{ state = await API.completeOnboarding(); }catch(error){ state = {showOnboarding:false,showWhatsNew:false}; }
+    }
+    if(state?.showOnboarding){
+      buildObWave();
+      showObStep(0);
+      onboarding.classList.add("is-open");
+      return;
+    }
+    if(state?.showWhatsNew){
+      renderWhatsNewBanner(state);
+    }
+  }
 
   buildRepairWave();
   attachCardGlow();
-  loadAppInfo();
   goHome();
-  setTimeout(checkForAppUpdate, 900);
+  loadAppInfo();
+  initLaunchExperience();
+  setTimeout(() => { if(updateInfo?.type !== "whatsNew") checkForAppUpdate(); }, 900);
