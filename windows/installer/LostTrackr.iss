@@ -3,7 +3,7 @@
 #define AppExeName "LostTrackr.exe"
 #define AppVersion GetEnv("LOSTTRACKR_VERSION")
 #if AppVersion == ""
-#define AppVersion "1.2.5"
+#define AppVersion "1.3.0"
 #endif
 #define InstallerName "LostTrackrSetup-v" + AppVersion + "-x64"
 
