@@ -652,6 +652,49 @@
   @keyframes shockwave{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.6)}}
   @keyframes victoryGlow{0%{box-shadow:inset 0 0 0 rgba(70,236,106,0)}30%{box-shadow:inset 0 0 220px rgba(70,236,106,.09)}100%{box-shadow:inset 0 0 0 rgba(70,236,106,0)}}
 
+  /* Premium Icons & Visuals */
+  .feature-visual {
+    position: relative;
+    width: 164px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 14px;
+    background: radial-gradient(circle at center, rgba(16, 36, 59, 0.5), rgba(7, 17, 29, 0.1) 70%, transparent);
+  }
+  .feature-visual::before {
+    content: "";
+    position: absolute;
+    inset: 2%;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(34, 156, 255, 0.28), rgba(34, 156, 255, 0.04) 48%, transparent 72%);
+    filter: blur(12px);
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .feature-icon-premium {
+    position: relative;
+    z-index: 1;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(0, 153, 255, 0.36)) drop-shadow(0 14px 24px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  .smart-choice-card:hover .feature-icon-premium {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 16px rgba(0, 153, 255, 0.48)) drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
+  }
+
+  @media (max-width:900px) {
+    .smart-suggestion-card .feature-visual {
+      width: 88px;
+      height: 72px;
+    }
+  }
+
   @media (max-width:1500px){
     .smart-review-layout{grid-template-columns:1fr}.smart-review-summary{position:relative;top:auto;min-height:0}.smart-suggestion-actions{min-width:0}
   }
