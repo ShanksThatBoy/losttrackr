@@ -43,7 +43,7 @@ class LaunchStateTests(unittest.TestCase):
 
         self.assertFalse(state["showOnboarding"])
         self.assertTrue(state["showWhatsNew"])
-        self.assertIn("Smart Import", " ".join(state["releaseNotes"]))
+        self.assertIn("Inspiration", " ".join(state["releaseNotes"]))
 
     def test_acknowledge_launch_state_hides_whats_new(self):
         with tempfile.TemporaryDirectory() as tmp:

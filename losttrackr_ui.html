@@ -10,7 +10,7 @@
 <div class="app" id="app" data-view="home" data-state="idle">
   <header class="titlebar" aria-label="Fenêtre LostTrackr">
     <div class="window-title">LostTrackr</div>
-    <div class="window-version" id="appVersionLabel">v1.3.0</div>
+    <div class="window-version" id="appVersionLabel">v1.4.0</div>
   </header>
 
   <div class="workspace">
@@ -77,8 +77,8 @@
 
           <article class="feature-card" id="comingCard">
             <span class="badge smart">Analyse intelligente</span>
-            <div class="feature-art">
-              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+            <div class="feature-art" style="margin-top:48px">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
             <h2>Ranger mes<br>titres</h2>
@@ -89,8 +89,8 @@
 
           <article class="feature-card" id="djSetCard">
             <span class="badge smart">Smart DJ</span>
-            <div class="feature-art" style="margin-top:48px">
-              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+            <div class="feature-art">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
             <h2>Préparer mon<br>DJ Set</h2>
@@ -359,25 +359,22 @@
         </header>
 
         <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Choix Préparer mon DJ Set">
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetNewEvent">
             <div class="smart-card-handle" aria-hidden="true"></div>
             <div class="feature-visual">
-              <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_event_prepare_v2_transparent.png" alt="Préparer un nouvel évènement">
+              <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_event_prepare_v2_transparent.png" alt="Préparer un nouveau set">
             </div>
             <div class="smart-suggestion-copy">
               <div class="smart-suggestion-top">
-                <h2>Préparer un nouvel évènement</h2>
+                <h2>Préparer un nouveau set</h2>
                 <em class="smart-confidence-badge smart-confidence-high">Crates intelligentes</em>
               </div>
-              <span class="smart-suggestion-count">Club ou mariage</span>
-              <p class="smart-suggestion-reason">Choisis un type d’évènement, personnalise la base de crates, puis LostTrackr analysera les titres pour pré-remplir les playlists.</p>
-            </div>
-            <div class="smart-suggestion-actions">
-              <button class="smart-card-btn primary" id="djSetNewEvent" type="button">Choisir</button>
+              <span class="smart-suggestion-count">Playlist simple ou évènement complet</span>
+              <p class="smart-suggestion-reason">Crée une base de set depuis un style musical, une ambiance ou une structure complète d’évènement. LostTrackr prépare les suggestions, tu gardes le contrôle avant toute écriture.</p>
             </div>
           </article>
 
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetOrganizePlaylists">
             <div class="smart-card-handle" aria-hidden="true"></div>
             <div class="feature-visual">
               <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_playlist_organizer_v2_transparent.png" alt="Organiser mes playlists">
@@ -390,12 +387,9 @@
               <span class="smart-suggestion-count">Titres, styles, artistes, BPM et tags</span>
               <p class="smart-suggestion-reason">LostTrackr détectera les titres présents, repèrera les incohérences et proposera des regroupements reliés à la base de connaissance.</p>
             </div>
-            <div class="smart-suggestion-actions">
-              <button class="smart-card-btn primary" id="djSetOrganizePlaylists" type="button">Choisir</button>
-            </div>
           </article>
 
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetRecentImports">
             <div class="smart-card-handle" aria-hidden="true"></div>
             <div class="feature-visual">
               <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_import_to_crates_v2_transparent.png" alt="Envoyer mes derniers imports dans les crates">
@@ -408,10 +402,184 @@
               <span class="smart-suggestion-count">Titres déplacés lors du dernier Smart Import</span>
               <p class="smart-suggestion-reason">LostTrackr analyse les titres récemment rangés et prépare leur placement dans les crates ou playlists appropriées.</p>
             </div>
-            <div class="smart-suggestion-actions">
-              <button class="smart-card-btn primary" id="djSetRecentImports" type="button">Choisir</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="view smart-djset-new-set-view" id="djSetNewSetView" aria-labelledby="djSetNewSetTitle">
+        <button class="back-btn smart-flow-back" id="djSetNewSetBack" type="button">← Retour</button>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetNewSetTitle">Préparer un nouveau set</h1>
+            <p class="page-sub">Choisis entre une inspiration rapide par style ou une structure complète d’évènement.</p>
+          </div>
+        </header>
+
+        <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Options Préparer un nouveau set">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetNewSetSimple">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>P</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Playlist simple</h2>
+                <em class="smart-confidence-badge smart-confidence-medium">Inspiration par style</em>
+              </div>
+              <span class="smart-suggestion-count">Styles, ambiances, Deezer, Spotify, Apple Music</span>
+              <p class="smart-suggestion-reason">LostTrackr s’appuie sur les grandes plateformes de streaming comme source d’inspiration, puis retrouve les titres déjà présents dans ta bibliothèque locale.</p>
             </div>
           </article>
+
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetNewSetEvent">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>E</span></div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Évènement complet</h2>
+                <em class="smart-confidence-badge smart-confidence-high">Structure complète</em>
+              </div>
+              <span class="smart-suggestion-count">Club, mariage, warmup, peak time, closing</span>
+              <p class="smart-suggestion-reason">LostTrackr prépare une structure complète de crates pour un évènement, puis propose le placement des titres dans chaque moment du set.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view smart-djset-style-view" id="djSetStyleInspirationView" aria-labelledby="djSetStyleTitle">
+        <button class="back-btn smart-flow-back" id="djSetStyleBack" type="button">← Retour</button>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetStyleTitle">Inspiration par genre</h1>
+            <p class="page-sub">Choisis un genre et un service de sourcing. LostTrackr proposera une base de titres puis indiquera ceux qui sont déjà présents dans ta bibliothèque.</p>
+          </div>
+        </header>
+
+        <div class="style-form-container">
+          <div class="style-form-grid">
+            <div class="style-option-card">
+              <label for="styleGenre">Genre musical</label>
+              <select id="styleGenre" class="style-select">
+                <option value="Afro House" selected>Afro House</option>
+                <option value="Amapiano">Amapiano</option>
+                <option value="Reggaeton">Reggaeton</option>
+                <option value="Baile Funk">Baile Funk</option>
+                <option value="Latino">Latino</option>
+                <option value="Tech House">Tech House</option>
+                <option value="Rap FR">Rap FR</option>
+                <option value="R&B">R&B</option>
+                <option value="Afrobeats">Afrobeats</option>
+                <option value="Hardtech">Hardtech</option>
+                <option value="Techno">Techno</option>
+                <option value="Rock">Rock</option>
+                <option value="Métal">Métal</option>
+                <option value="Soul">Soul</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Disco">Disco</option>
+                <option value="Pop">Pop</option>
+                <option value="Electro">Electro</option>
+                <option value="Dubstep">Dubstep</option>
+                <option value="Drum & Bass">Drum & Bass</option>
+                <option value="Généraliste">Généraliste</option>
+              </select>
+            </div>
+
+            <div class="style-option-card">
+              <label>Service de sourcing</label>
+              <div class="style-source-group">
+                <button type="button" class="style-source-pill is-active" data-source="deezer">
+                  <span>Deezer</span>
+                  <small>Prévu · source principale</small>
+                </button>
+                <button type="button" class="style-source-pill is-preview" data-source="spotify">
+                  <span>Spotify</span>
+                  <small>Prévu</small>
+                </button>
+                <button type="button" class="style-source-pill is-preview" data-source="apple_music">
+                  <span>Apple Music</span>
+                  <small>Prévu</small>
+                </button>
+              </div>
+            </div>
+
+            <div class="style-option-card">
+              <label for="styleLimit">Taille de la proposition</label>
+              <select id="styleLimit" class="style-select">
+                <option value="20">20 titres</option>
+                <option value="40" selected>40 titres</option>
+                <option value="60">60 titres</option>
+                <option value="100">100 titres</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="style-preview-info-card">
+            <span class="info-icon">ℹ</span>
+            <p><b>Mode aperçu :</b> les suggestions sont générées localement pour tester l’expérience. Les connexions Deezer, Spotify et Apple Music seront branchées plus tard.</p>
+          </div>
+
+          <div class="style-local-toggle-container">
+            <label class="style-local-toggle">
+              <input type="checkbox" id="styleLocalOnly">
+              <span class="toggle-box"></span>
+              <div class="toggle-label-group">
+                <span class="toggle-title">Utiliser uniquement les morceaux que j’ai déjà localement</span>
+                <span class="toggle-help">Si cette option est activée, LostTrackr masque les titres absents de ta bibliothèque. Sinon, ils apparaissent grisés en bas de liste.</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="style-action-bar">
+            <button class="smart-apply-final" id="styleGenerateBtn" type="button">Générer l’inspiration</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view smart-djset-style-results-view" id="djSetStyleResultsView" aria-labelledby="djSetStyleResultsTitle">
+        <button class="back-btn smart-flow-back" id="djSetStyleResultsBack" type="button">← Retour</button>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetStyleResultsTitle">Inspiration générée</h1>
+            <p class="page-sub" id="djSetStyleResultsSub">Base Afro House · Club · Deezer · 40 titres</p>
+          </div>
+        </header>
+
+        <div class="smart-flow-stats" id="djSetStyleResultsStats" aria-label="Statistiques de l’inspiration" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+          <div><strong id="styleStatLocal">0</strong><span>Titres présents dans la bibliothèque</span></div>
+          <div><strong id="styleStatMissing">0</strong><span>Titres absents de la bibliothèque</span></div>
+          <div><strong id="styleStatSource">Deezer</strong><span>Plateforme de sourcing</span></div>
+        </div>
+
+        <div class="style-local-only-warning" id="styleLocalOnlyWarning" style="display: none;">
+          <span class="warning-icon">⚠</span>
+          <span id="styleLocalOnlyWarningText">X titres absents ont été masqués car l’option local uniquement est activée.</span>
+        </div>
+
+        <div class="style-results-columns-container" id="styleResultsColumns">
+          <div class="style-results-column present-column">
+            <div class="column-header">
+              <h3>Titres présents <span class="badge-count" id="stylePresentBadgeCount">0</span></h3>
+            </div>
+            <div class="style-results-list" id="stylePresentList" aria-live="polite"></div>
+          </div>
+          <div class="style-results-column absent-column" id="styleAbsentColumn">
+            <div class="column-header">
+              <h3>Titres absents <span class="badge-count" id="styleAbsentBadgeCount">0</span></h3>
+            </div>
+            <div class="style-results-list" id="styleAbsentList" aria-live="polite"></div>
+          </div>
+        </div>
+
+        <div class="smart-review-cta-bar smart-flow-cta-bar">
+          <button class="smart-review-cta smart-review-cta-blue" id="styleValidateBtn" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">✓</span>
+            <span><b>Valider les titres présents</b><small id="styleValidateSubText">0 titre prêt pour une future crate</small></span>
+          </button>
+          <button class="smart-review-cta smart-review-cta-orange" id="styleExportMissingBtn" type="button">
+            <span class="smart-cta-icon" aria-hidden="true">⌕</span>
+            <span><b>Exporter la liste des absents</b><small>Télécharger un résumé CSV</small></span>
+          </button>
         </div>
       </section>
 
@@ -426,7 +594,7 @@
         </header>
 
         <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Type d’évènement DJ Set">
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetEventClub">
             <div class="smart-card-handle" aria-hidden="true"></div>
             <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>C</span></div>
             <div class="smart-suggestion-copy">
@@ -437,12 +605,9 @@
               <span class="smart-suggestion-count">Warmup, Groove, Peak Time, Closing</span>
               <p class="smart-suggestion-reason">Une structure simple pour organiser un set club, inspirée d’une crate principale et affinée par style, artiste et cohérence musicale.</p>
             </div>
-            <div class="smart-suggestion-actions">
-              <button class="smart-card-btn primary" id="djSetEventClub" type="button">Analyser</button>
-            </div>
           </article>
 
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card">
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetEventWedding">
             <div class="smart-card-handle" aria-hidden="true"></div>
             <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>M</span></div>
             <div class="smart-suggestion-copy">
@@ -452,9 +617,6 @@
               </div>
               <span class="smart-suggestion-count">Cocktail, Dîner, Ouverture, Dancefloor, Fin</span>
               <p class="smart-suggestion-reason">Une base prête à personnaliser pour les temps forts d’un mariage, avec suggestions de titres dans chaque crate.</p>
-            </div>
-            <div class="smart-suggestion-actions">
-              <button class="smart-card-btn primary" id="djSetEventWedding" type="button">Analyser</button>
             </div>
           </article>
         </div>

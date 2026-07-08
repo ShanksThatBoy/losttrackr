@@ -383,3 +383,173 @@ def build_plan(
         "items": items,
         "existingTargets": targets[:24],
     }
+
+
+def display_mock_path(track: dict, style: str) -> str:
+    import os
+    home = Path.home()
+    path = home / "Music" / "LostTrackr Library" / style / f"{track['artist']} - {track['title']}.mp3"
+    if os.name != "nt":
+        return smart_import.display_path(path)
+    return str(path)
+
+
+def build_style_inspiration_plan(options: dict, local_tracks: list[dict] | None = None) -> dict:
+    import re
+    from providers.mock_streaming_provider import MockStreamingProvider
+
+    options = options or {}
+    style = options.get("style", "Afro House")
+    mood = options.get("mood", "Club")
+    source = options.get("source", "deezer")
+    limit = int(options.get("limit", 40))
+    local_only = bool(options.get("localOnly", False) or options.get("local_only", False))
+
+    provider = MockStreamingProvider(provider_id=source, display_name=source.capitalize())
+    tracks = provider.search_style_tracks(style=style, mood=mood, limit=limit)
+
+    # Pre-build a map of normalized title/artist for local tracks
+    def normalize(s):
+        if not s:
+            return ""
+        return re.sub(r'[^a-z0-9]', '', str(s).lower())
+
+    local_map = {}
+    if local_tracks:
+        for t in local_tracks:
+            title_norm = normalize(t.get("title"))
+            artist_norm = normalize(t.get("artist"))
+            if title_norm and artist_norm:
+                local_map[(title_norm, artist_norm)] = t
+                if title_norm not in local_map:
+                    local_map[title_norm] = t
+
+    result_items = []
+    for index, track in enumerate(tracks):
+        track_title = normalize(track["title"])
+        track_artist = normalize(track["artist"])
+
+        matched_track = None
+        if (track_title, track_artist) in local_map:
+            matched_track = local_map[(track_title, track_artist)]
+            status = "local"
+            match_score = 100
+            reason = "Présent dans la bibliothèque"
+            local_path = matched_track.get("destination") or matched_track.get("source") or matched_track.get("file")
+        elif track_title in local_map:
+            matched_track = local_map[track_title]
+            status = "probable"
+            match_score = 85
+            reason = "Nom concordant, artiste à vérifier"
+            local_path = matched_track.get("destination") or matched_track.get("source") or matched_track.get("file")
+        else:
+            # Deterministic mock matching
+            mod = index % 4
+            if mod == 0:
+                status = "local"
+                match_score = 100
+                reason = "Présent dans la bibliothèque (Aperçu)"
+                local_path = display_mock_path(track, style)
+            elif mod == 1:
+                status = "probable"
+                match_score = 85
+                reason = "Match probable (Aperçu)"
+                local_path = display_mock_path(track, style)
+            elif mod == 2:
+                status = "missing"
+                match_score = 0
+                reason = "Non trouvé localement (Aperçu)"
+                local_path = None
+            else:
+                # Mod 3: review or local
+                if (index // 4) % 2 == 0:
+                    status = "review"
+                    match_score = 60
+                    reason = "À vérifier (Aperçu)"
+                    local_path = display_mock_path(track, style)
+                else:
+                    status = "local"
+                    match_score = 100
+                    reason = "Présent dans la bibliothèque (Aperçu)"
+                    local_path = display_mock_path(track, style)
+
+        # Determine knowledgeStatus & canonical
+        # index % 3 == 0: known, 1: unknown, 2: pending_enrichment
+        k_mod = index % 3
+        if k_mod == 0:
+            knowledge_status = "known"
+        elif k_mod == 1:
+            knowledge_status = "unknown"
+        else:
+            knowledge_status = "pending_enrichment"
+
+        canonical = None
+        if knowledge_status == "known":
+            canonical = {
+                "title": track["title"],
+                "artist": track["artist"],
+                "album": track["album"],
+                "isrc": track["isrc"]
+            }
+
+        result_items.append({
+            "id": f"style_{index + 1}",
+            "title": track["title"],
+            "artist": track["artist"],
+            "trackLabel": f"{track['artist']} - {track['title']}",
+            "provider": source,
+            "providerTrackId": track["provider_track_id"],
+            "sourcePlaylistName": track["source_playlist_name"],
+            "status": status,
+            "statusLabel": "Présent localement" if status == "local" else ("Match probable" if status == "probable" else ("À vérifier" if status == "review" else "Absent de la bibliothèque")),
+            "matchScore": match_score,
+            "localPath": local_path,
+            "durationMs": track["duration_ms"],
+            "isrc": track["isrc"],
+            "isSelectable": status in {"local", "probable"},
+            "reason": reason,
+            "knowledgeStatus": knowledge_status,
+            "canonical": canonical
+        })
+
+    total = len(result_items)
+    local_count = sum(1 for item in result_items if item["status"] == "local")
+    probable_count = sum(1 for item in result_items if item["status"] == "probable")
+    review_count = sum(1 for item in result_items if item["status"] == "review")
+    missing_count = sum(1 for item in result_items if item["status"] == "missing")
+
+    # Filter items if local_only is True
+    filtered_items = result_items
+    if local_only:
+        filtered_items = [item for item in result_items if item["status"] != "missing"]
+
+    visible_count = len(filtered_items)
+
+    return {
+        "mode": "style_inspiration",
+        "headline": "Inspiration par style",
+        "modeLabel": f"Inspiration {style} · {mood}",
+        "provider": {
+            "id": source,
+            "name": "Spotify" if source == "spotify" else ("Apple Music" if source == "apple_music" else "Deezer"),
+            "mode": "mock",
+            "label": "Mode aperçu"
+        },
+        "options": {
+            "style": style,
+            "mood": mood,
+            "source": source,
+            "limit": limit,
+            "localOnly": local_only
+        },
+        "totals": {
+            "total": total,
+            "local": local_count,
+            "probable": probable_count,
+            "review": review_count,
+            "missing": missing_count,
+            "visible": visible_count
+        },
+        "items": filtered_items
+    }
+

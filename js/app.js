@@ -88,11 +88,11 @@
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
     async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; },
-    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.3.0",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}}; },
-    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}; },
-    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}; },
-    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.0",releaseNotes:[]}; },
-    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.3.0",updateAvailable:false}; },
+    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.4.0",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}}; },
+    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}; },
+    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}; },
+    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}; },
+    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.4.0",updateAvailable:false}; },
     async installUpdate(){ if(window.pywebview?.api?.installUpdate) return window.pywebview.api.installUpdate(); await wait(120); return {launched:false,message:"Mode aperçu : aucune mise à jour."}; },
     async smartImportPreflight(){ if(window.pywebview?.api?.smartImportPreflight) return window.pywebview.api.smartImportPreflight(); await wait(120); return MOCK.smartImport.preflight; },
     async smartImportScan(options){
@@ -170,6 +170,200 @@
           {id:"club",label:"Club"},
           {id:"wedding",label:"Mariage"}
         ]
+      };
+    },
+    async djSetStyleInspirationPlan(options) {
+      if(window.pywebview?.api?.djSetStyleInspirationPlan) return window.pywebview.api.djSetStyleInspirationPlan(options || {});
+      await wait(500);
+      
+      const style = options?.style || "Afro House";
+      const mood = options?.mood || "Club";
+      const source = options?.source || "deezer";
+      const limit = options?.limit || 40;
+      const localOnly = options?.localOnly || false;
+      
+      const tracks = {
+        "Afro House": [
+          { artist: "Adam Port, Stryv, Keinemusik", title: "Move" },
+          { artist: "Rampa", title: "Les Gout" },
+          { artist: "Black Coffee", title: "Drive" },
+          { artist: "&ME", title: "The Rapture Pt.III" },
+          { artist: "Francis Mercier", title: "Premier Gaou" },
+          { artist: "MoBlack", title: "Yamore" }
+        ],
+        "Amapiano": [
+          { artist: "Uncle Waffles", title: "Tanzania" },
+          { artist: "Tyler ICU", title: "Mnike" },
+          { artist: "Kabza De Small", title: "Imithandazo" },
+          { artist: "Focalistic", title: "Ke Star" }
+        ],
+        "Reggaeton": [
+          { artist: "Daddy Yankee", title: "Gasolina" },
+          { artist: "Bad Bunny", title: "Tití Me Preguntó" },
+          { artist: "Karol G", title: "Provenza" },
+          { artist: "Feid", title: "Luna" }
+        ],
+        "Baile Funk": [
+          { artist: "MC Fioti", title: "Bum Bum Tam Tam" },
+          { artist: "DJ GBR", title: "Let’s Go 4" },
+          { artist: "Anitta", title: "Envolver" },
+          { artist: "DENNIS", title: "Tá OK" }
+        ],
+        "Latino": [
+          { artist: "Elvis Crespo", title: "Suavemente" },
+          { artist: "Marc Anthony", title: "Vivir Mi Vida" },
+          { artist: "Shakira", title: "Hips Don’t Lie" },
+          { artist: "Don Omar", title: "Danza Kuduro" }
+        ],
+        "Tech House": [
+          { artist: "Fisher", title: "Losing It" },
+          { artist: "John Summit", title: "Where You Are" },
+          { artist: "Chris Lake", title: "Turn Off The Lights" },
+          { artist: "Mau P", title: "Drugs From Amsterdam" }
+        ],
+        "Rap FR": [
+          { artist: "Ninho", title: "Jefe" },
+          { artist: "Gazo", title: "Die" },
+          { artist: "Damso", title: "Macarena" },
+          { artist: "Tiakola", title: "Meuda" }
+        ],
+        "R&B": [
+          { artist: "Usher", title: "Yeah!" },
+          { artist: "Chris Brown", title: "Under The Influence" },
+          { artist: "SZA", title: "Snooze" },
+          { artist: "The Weeknd", title: "Earned It" }
+        ],
+        "Afrobeats": [
+          { artist: "Burna Boy", title: "City Boys" },
+          { artist: "Rema", title: "Calm Down" },
+          { artist: "Wizkid", title: "Essence" },
+          { artist: "Tyla", title: "Water" }
+        ],
+        "Généraliste": [
+          { artist: "Dua Lipa", title: "Houdini" },
+          { artist: "David Guetta", title: "Titanium" },
+          { artist: "Rihanna", title: "We Found Love" },
+          { artist: "Beyoncé", title: "Crazy In Love" }
+        ]
+      };
+      
+      const baseTracks = tracks[style] || [];
+      const generalTracks = tracks["Généraliste"] || [];
+      let combined = [...baseTracks];
+      
+      Object.keys(tracks).forEach(k => {
+        if (k !== style && k !== "Généraliste") {
+          combined = combined.concat(tracks[k]);
+        }
+      });
+      combined = combined.concat(generalTracks);
+      
+      const resultItems = [];
+      const prefixes = ["", " (Extended Mix)", " (Remix)", " (Radio Edit)", " (Club Mix)", " (Dub Mix)", " (VIP Edit)"];
+      
+      for (let i = 0; i < limit; i++) {
+        const baseTrack = combined[i % combined.length];
+        const prefixIndex = Math.floor(i / combined.length) % prefixes.length;
+        const suffix = prefixes[prefixIndex];
+        const title = baseTrack.title + suffix;
+        const artist = baseTrack.artist;
+        
+        const mod = i % 4;
+        let status = "local";
+        let statusLabel = "Présent localement";
+        let matchScore = 100;
+        let isSelectable = true;
+        let reason = "Présent dans la bibliothèque";
+        let knowledgeStatus = "known";
+        
+        if (mod === 0) {
+          status = "local";
+          statusLabel = "Présent localement";
+          matchScore = 100;
+          isSelectable = true;
+          reason = "Présent dans la bibliothèque";
+          knowledgeStatus = "known";
+        } else if (mod === 1) {
+          status = "probable";
+          statusLabel = "Match probable";
+          matchScore = 85;
+          isSelectable = true;
+          reason = "Nom et artiste concordent";
+          knowledgeStatus = "known";
+        } else if (mod === 2) {
+          status = "missing";
+          statusLabel = "Absent de la bibliothèque";
+          matchScore = 0;
+          isSelectable = false;
+          reason = "Non trouvé localement";
+          knowledgeStatus = "unknown";
+        } else if (mod === 3) {
+          status = "review";
+          statusLabel = "À vérifier";
+          matchScore = 60;
+          isSelectable = false;
+          reason = "Artiste similaire, titre différent";
+          knowledgeStatus = "unknown";
+        }
+        
+        const localPath = status === "missing" ? null : `~/Music/LostTrackr Library/${style}/${artist} - ${title}.mp3`;
+        
+        resultItems.push({
+          id: `style_${i + 1}`,
+          title: title,
+          artist: artist,
+          trackLabel: artist ? `${artist} - ${title}` : title,
+          provider: source,
+          providerTrackId: `track_${source}_${1000 + i}`,
+          sourcePlaylistName: `Mock ${style} ${mood}`,
+          status,
+          statusLabel,
+          matchScore,
+          localPath,
+          durationMs: 180000 + (i * 2000),
+          isrc: `FRMOCK${1000000 + i}`,
+          isSelectable,
+          reason,
+          knowledgeStatus,
+          canonical: knowledgeStatus === "known" ? { title, artist, album: `Album de ${artist}`, isrc: `FRMOCK${1000000 + i}` } : null
+        });
+      }
+      
+      const total = limit;
+      const localCount = resultItems.filter(item => item.status === "local").length;
+      const probableCount = resultItems.filter(item => item.status === "probable").length;
+      const reviewCount = resultItems.filter(item => item.status === "review").length;
+      const missingCount = resultItems.filter(item => item.status === "missing").length;
+      
+      const filteredItems = localOnly ? resultItems.filter(item => item.status !== "missing") : resultItems;
+      const visibleCount = filteredItems.length;
+      
+      return {
+        mode: "style_inspiration",
+        headline: "Inspiration par style",
+        modeLabel: `Inspiration ${style} · ${mood}`,
+        provider: {
+          id: source,
+          name: source === "spotify" ? "Spotify" : source === "apple_music" ? "Apple Music" : "Deezer",
+          mode: "mock",
+          label: "Mode aperçu"
+        },
+        options: {
+          style,
+          mood,
+          source,
+          limit,
+          localOnly
+        },
+        totals: {
+          total,
+          local: localCount,
+          probable: probableCount,
+          review: reviewCount,
+          missing: missingCount,
+          visible: visibleCount
+        },
+        items: filteredItems
       };
     },
     async djSetPlan(options){
@@ -264,6 +458,9 @@
     smartFiles:$("smartFilesView"),
     smartComplete:$("smartCompleteView"),
     djSet:$("djSetView"),
+    djSetNewSet:$("djSetNewSetView"),
+    djSetStyleInspiration:$("djSetStyleInspirationView"),
+    djSetStyleResults:$("djSetStyleResultsView"),
     djSetEvent:$("djSetEventView"),
     djSetPlan:$("djSetPlanView"),
     prepare:$("prepareView"),
@@ -434,6 +631,8 @@
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
   function goDjSet(){ setState("dj-set"); showView("djSet"); }
   function goDjSetEvent(){ setState("dj-set-event"); showView("djSetEvent"); }
+  function goDjSetNewSet(){ setState("dj-set-new-set"); showView("djSetNewSet"); }
+  function goDjSetStyleInspiration(){ setState("dj-set-style-inspiration"); showView("djSetStyleInspiration"); updateDjSetStyleControls(); }
 
   function smartDisplay(path, fallback = "À définir"){ return path || fallback; }
   function smartLibraryRoots(info = smartPreflightInfo){ return info?.libraryRoots || []; }
@@ -1065,9 +1264,19 @@
   }
   async function startDjSetPlan(mode, options = {}){
     const button = djSetStartButton(mode, options);
-    const previous = button.textContent;
-    button.disabled = true;
-    button.textContent = "Analyse...";
+    const isCard = button && button.tagName.toLowerCase() === "article";
+    const previous = isCard ? null : button.textContent;
+    
+    if (button) {
+      if (isCard) {
+        button.style.pointerEvents = "none";
+        button.style.opacity = "0.6";
+      } else {
+        button.disabled = true;
+        button.textContent = "Analyse...";
+      }
+    }
+    
     try{
       djSetPlan = await API.djSetPlan({mode, ...options});
       djSetGroupStates = new Map();
@@ -1078,9 +1287,160 @@
     }catch(error){
       showToast(error?.message || "Impossible de préparer ce plan DJ Set.");
     }finally{
-      button.disabled = false;
-      button.textContent = previous;
+      if (button) {
+        if (isCard) {
+          button.style.pointerEvents = "";
+          button.style.opacity = "";
+        } else {
+          button.disabled = false;
+          button.textContent = previous;
+        }
+      }
     }
+  }
+  let selectedSource = "deezer";
+  function updateDjSetStyleControls(){
+    selectedSource = "deezer";
+    const pills = document.querySelectorAll("#djSetStyleInspirationView .style-source-pill");
+    pills.forEach(pill => {
+      const src = pill.dataset.source;
+      pill.classList.toggle("is-active", src === selectedSource);
+    });
+    $("styleGenre").value = "Afro House";
+    $("styleLimit").value = "40";
+    $("styleLocalOnly").checked = false;
+  }
+  function styleInspirationSelectedOptions(){
+    return {
+      style: $("styleGenre").value,
+      source: selectedSource,
+      limit: parseInt($("styleLimit").value, 10),
+      localOnly: $("styleLocalOnly").checked
+    };
+  }
+  async function startDjSetStyleInspiration(){
+    const btn = $("styleGenerateBtn");
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Génération...";
+    try {
+      const options = styleInspirationSelectedOptions();
+      const plan = await API.djSetStyleInspirationPlan(options);
+      renderDjSetStyleResults(plan);
+      setState("dj-set-style-results");
+      showView("djSetStyleResults");
+    } catch(err) {
+      console.error(err);
+      showToast("Erreur lors de la génération de l'inspiration.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  }
+  let currentStylePlan = null;
+  function renderDjSetStyleResults(plan){
+    currentStylePlan = plan;
+    const style = plan.options?.style || "Afro House";
+    const source = plan.provider?.name || "Deezer";
+    const limit = plan.options?.limit || 40;
+    $("djSetStyleResultsSub").textContent = `Base ${style} · ${source} · ${limit} titres`;
+    
+    const totals = plan.totals || {};
+    const presentCount = (totals.local || 0) + (totals.probable || 0);
+    const absentCount = (totals.missing || 0);
+    
+    rollTo($("styleStatLocal"), presentCount);
+    rollTo($("styleStatMissing"), absentCount);
+    
+    const sourceLabel = plan.provider?.label || "Mode aperçu";
+    $("styleStatSource").textContent = `${source}, ${sourceLabel}`;
+    
+    const warning = $("styleLocalOnlyWarning");
+    if(plan.options?.localOnly && absentCount > 0) {
+      $("styleLocalOnlyWarningText").textContent = `${absentCount} ${absentCount > 1 ? "titres absents ont été masqués" : "titre absent a été masqué"} car l’option local uniquement est activée.`;
+      warning.style.display = "grid";
+    } else {
+      warning.style.display = "none";
+    }
+    
+    const presentList = $("stylePresentList");
+    const absentList = $("styleAbsentList");
+    const columnsContainer = $("styleResultsColumns");
+    const absentColumn = $("styleAbsentColumn");
+    
+    presentList.innerHTML = "";
+    absentList.innerHTML = "";
+    
+    $("stylePresentBadgeCount").textContent = presentCount;
+    $("styleAbsentBadgeCount").textContent = absentCount;
+    
+    if(plan.options?.localOnly) {
+      columnsContainer.classList.add("local-only");
+      absentColumn.style.display = "none";
+    } else {
+      columnsContainer.classList.remove("local-only");
+      absentColumn.style.display = "flex";
+    }
+    
+    const items = plan.items || [];
+    const presentItems = items.filter(item => item.status !== "missing");
+    const absentItems = items.filter(item => item.status === "missing");
+    
+    if(presentItems.length === 0) {
+      presentList.innerHTML = `<div class="smart-analysis-placeholder">Aucun titre présent.</div>`;
+    } else {
+      presentItems.forEach(item => {
+        const row = createTrackRow(item);
+        presentList.appendChild(row);
+      });
+    }
+    
+    if(absentItems.length === 0) {
+      absentList.innerHTML = `<div class="smart-analysis-placeholder">Aucun titre absent.</div>`;
+    } else {
+      absentItems.forEach(item => {
+        const row = createTrackRow(item);
+        absentList.appendChild(row);
+      });
+    }
+    
+    const valBtn = $("styleValidateBtn");
+    valBtn.disabled = presentCount <= 0;
+    
+    const textSpan = valBtn.querySelector("span");
+    if (textSpan) {
+      textSpan.innerHTML = `<b>Valider les titres présents</b><small id="styleValidateSubText">${presentCount} ${presentCount > 1 ? "titres prêts" : "titre prêt"} pour la future crate</small>`;
+    }
+  }
+  function createTrackRow(item) {
+    const row = document.createElement("div");
+    row.className = `style-track-row is-${item.status}`;
+    
+    let pathHtml = "";
+    if(item.localPath) {
+      pathHtml = `<div class="style-track-path" title="${item.localPath}">${item.localPath}</div>`;
+    }
+    
+    let metadataHelp = "";
+    if(item.knowledgeStatus === "unknown") {
+      metadataHelp = `<div class="style-track-metadata-help">Métadonnées à enrichir plus tard</div>`;
+    }
+    
+    row.innerHTML = `
+      <div class="style-track-info">
+        <div class="style-track-title">${item.title}</div>
+        <div class="style-track-artist">${item.artist}</div>
+        ${pathHtml}
+        ${metadataHelp}
+      </div>
+      <div class="style-status-badge is-${item.status}">${item.statusLabel}</div>
+    `;
+    return row;
+  }
+  function validateStylePresentTracks(){
+    const totals = currentStylePlan?.totals || {};
+    const valCount = (totals.local || 0) + (totals.probable || 0);
+    showToast(`${valCount} titres présents prêts pour une future crate. L’écriture réelle sera branchée après validation du flux.`);
   }
   function updateDjSetControls(groups){
     const totals = djSetPlan?.totals || {};
@@ -1698,10 +2058,31 @@
   $("smartApplyBackReview").addEventListener("click", () => { renderSmartFilePlan(); showView("smartFiles"); });
   $("smartFinalApply").addEventListener("click", applySmartImportMoves);
   $("djSetBack").addEventListener("click", goHome);
-  $("djSetNewEvent").addEventListener("click", goDjSetEvent);
+  $("djSetNewEvent").addEventListener("click", goDjSetNewSet);
   $("djSetOrganizePlaylists").addEventListener("click", () => startDjSetPlan("organize"));
   $("djSetRecentImports").addEventListener("click", () => startDjSetPlan("recent_imports"));
-  $("djSetEventBack").addEventListener("click", goDjSet);
+  
+  // New Set views listeners
+  $("djSetNewSetBack").addEventListener("click", goDjSet);
+  $("djSetNewSetSimple").addEventListener("click", goDjSetStyleInspiration);
+  $("djSetNewSetEvent").addEventListener("click", goDjSetEvent);
+  $("djSetStyleBack").addEventListener("click", goDjSetNewSet);
+  
+  document.querySelectorAll("#djSetStyleInspirationView .style-source-pill").forEach(pill => {
+    pill.addEventListener("click", () => {
+      selectedSource = pill.dataset.source;
+      document.querySelectorAll("#djSetStyleInspirationView .style-source-pill").forEach(p => {
+        p.classList.toggle("is-active", p.dataset.source === selectedSource);
+      });
+    });
+  });
+
+  $("styleGenerateBtn").addEventListener("click", startDjSetStyleInspiration);
+  $("djSetStyleResultsBack").addEventListener("click", goDjSetStyleInspiration);
+  $("styleValidateBtn").addEventListener("click", validateStylePresentTracks);
+  $("styleExportMissingBtn").addEventListener("click", () => showToast("Export CSV bientôt disponible"));
+
+  $("djSetEventBack").addEventListener("click", goDjSetNewSet);
   $("djSetEventClub").addEventListener("click", () => startDjSetPlan("event", {eventType:"club"}));
   $("djSetEventWedding").addEventListener("click", () => startDjSetPlan("event", {eventType:"wedding"}));
   $("djSetPlanBack").addEventListener("click", goDjSet);

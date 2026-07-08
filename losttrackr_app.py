@@ -32,6 +32,13 @@ APP_NAME = "LostTrackr"
 APP_VERSION = update_manager.APP_VERSION
 
 RELEASE_NOTES = {
+    "1.4.0": [
+        "Inspiration de style DJ Set disponible pour générer de nouvelles idées de sets.",
+        "Sourcing de titres automatisé basé sur Deezer (suggestions intelligentes).",
+        "Comparaison avec la bibliothèque locale (morceaux présents vs absents).",
+        "Export CSV des morceaux absents pour faciliter les recherches extérieures.",
+        "Améliorations esthétiques et fluidité accrue dans l'espace DJ Set.",
+    ],
     "1.3.0": [
         "Smart Import devient disponible dans Ranger mes titres.",
         "Aperçu obligatoire avant déplacement des nouveaux sons.",
@@ -776,6 +783,18 @@ class LostTrackrApi:
 
     def djSetPlan(self, options=None):
         return self.dj_set_plan(options)
+
+    def dj_set_style_inspiration_plan(self, options=None):
+        options = options or {}
+        preflight = self.dj_set_preflight()
+        recent_files = self.dj_set_recent_files(require_moved=False)
+        return dj_set.build_style_inspiration_plan(
+            options=options,
+            local_tracks=recent_files
+        )
+
+    def djSetStyleInspirationPlan(self, options=None):
+        return self.dj_set_style_inspiration_plan(options)
 
     def choose_folder(self, title="Choisir un dossier"):
         try:

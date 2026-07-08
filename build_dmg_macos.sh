@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="LostTrackr"
-APP_VERSION="1.3.0"
-APP_BUILD="1.3.0"
+APP_VERSION="1.4.0"
+APP_BUILD="1.4.0"
 BUNDLE_ID="com.djshanks.losttrackr"
 VOL_NAME="${APP_NAME} ${APP_VERSION}"
 DMG_NAME="${1:-${APP_NAME}-v${APP_BUILD}.dmg}"

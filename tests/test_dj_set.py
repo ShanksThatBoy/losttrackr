@@ -103,5 +103,37 @@ class DjSetPlanTests(unittest.TestCase):
         self.assertEqual(plan["groups"][0]["targetType"], "existing")
 
 
+    def test_build_style_inspiration_plan(self):
+        options = {
+            "style": "Afro House",
+            "mood": "Club",
+            "source": "deezer",
+            "limit": 40,
+            "localOnly": False
+        }
+        plan = dj_set.build_style_inspiration_plan(options)
+        self.assertEqual(plan["mode"], "style_inspiration")
+        self.assertEqual(plan["provider"]["id"], "deezer")
+        self.assertEqual(plan["totals"]["total"], 40)
+        self.assertEqual(len(plan["items"]), 40)
+        
+        # Verify deterministic statuses are set
+        statuses = {item["status"] for item in plan["items"]}
+        self.assertIn("local", statuses)
+        self.assertIn("probable", statuses)
+        self.assertIn("review", statuses)
+        self.assertIn("missing", statuses)
+        
+        # Test localOnly = True
+        options_local = dict(options)
+        options_local["localOnly"] = True
+        plan_local = dj_set.build_style_inspiration_plan(options_local)
+        self.assertEqual(plan_local["totals"]["total"], 40)
+        self.assertLess(len(plan_local["items"]), 40)
+        self.assertEqual(plan_local["totals"]["visible"], len(plan_local["items"]))
+        for item in plan_local["items"]:
+            self.assertNotEqual(item["status"], "missing")
+
+
 if __name__ == "__main__":
     unittest.main()
