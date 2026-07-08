@@ -32,7 +32,7 @@ APP_NAME = "LostTrackr"
 APP_VERSION = update_manager.APP_VERSION
 
 RELEASE_NOTES = {
-    "1.4.0": [
+    "1.3.1": [
         "Inspiration de style DJ Set disponible pour générer de nouvelles idées de sets.",
         "Sourcing de titres automatisé basé sur Deezer (suggestions intelligentes).",
         "Comparaison avec la bibliothèque locale (morceaux présents vs absents).",

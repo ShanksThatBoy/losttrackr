@@ -1,4 +1,4 @@
-# LostTrackr v1.4.0
+# LostTrackr v1.3.1
 
 Inspiration de style DJ Set et interfaçage avec la bibliothèque locale.
 

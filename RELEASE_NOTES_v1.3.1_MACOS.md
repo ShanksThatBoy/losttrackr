@@ -1,4 +1,4 @@
-# LostTrackr v1.4.0 - macOS
+# LostTrackr v1.3.1 - macOS
 
 - Ajout de la zone `Inspiration de style` dans l’espace DJ Set : propositions automatiques de titres par genre et ambiance (sourcing Deezer).
 - Comparaison automatique avec ta bibliothèque locale pour repérer les morceaux présents et absents.
