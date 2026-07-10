@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Client du LostTrackr Knowledge API (knowledge.losttrackr.com).
 
 Réservé aux métadonnées nettoyées : jamais de chemins de fichiers, de noms de
@@ -79,3 +78,25 @@ def match_tracks(tracks):
         response = _request("/catalog/match", {"tracks": chunk})
         results.extend(response.get("matches", []))
     return {"matches": results}
+
+
+# lt-intelligence — identification par empreinte acoustique.
+# L'empreinte Chromaprint est dérivée du signal audio (pas un chemin/nom) : privacy-safe.
+ALLOWED_FINGERPRINT_FIELDS = {"client_track_id", "fingerprint", "duration"}
+
+
+def resolve_fingerprints(tracks):
+    """Identifie des morceaux par empreinte Chromaprint (artiste/titre/année via AcoustID)."""
+    cleaned = [
+        {k: v for k, v in dict(t or {}).items() if k in ALLOWED_FINGERPRINT_FIELDS}
+        for t in tracks
+        if t and t.get("fingerprint")
+    ]
+    if not cleaned:
+        return {"results": []}
+    results = []
+    for start in range(0, len(cleaned), 100):
+        chunk = cleaned[start:start + 100]
+        response = _request("/intelligence/resolve", {"tracks": chunk})
+        results.extend(response.get("results", []))
+    return {"results": results}

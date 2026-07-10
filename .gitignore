@@ -27,3 +27,10 @@ _Serato_REPLACED_*/
 updates/private/
 *.pem.key
 *.part
+
+# Secrets locaux (clés API, etc.)
+.env
+
+# Outillage local Claude Code
+.claude/
+.agents/

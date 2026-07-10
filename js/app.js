@@ -88,11 +88,11 @@
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
     async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; },
-    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.3.1",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.1",releaseNotes:[]}}; },
-    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.1",releaseNotes:[]}; },
-    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.1",releaseNotes:[]}; },
-    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.1",releaseNotes:[]}; },
-    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.3.1",updateAvailable:false}; },
+    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.3.5",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}}; },
+    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}; },
+    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}; },
+    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}; },
+    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.3.5",updateAvailable:false}; },
     async installUpdate(){ if(window.pywebview?.api?.installUpdate) return window.pywebview.api.installUpdate(); await wait(120); return {launched:false,message:"Mode aperçu : aucune mise à jour."}; },
     async smartImportPreflight(){ if(window.pywebview?.api?.smartImportPreflight) return window.pywebview.api.smartImportPreflight(); await wait(120); return MOCK.smartImport.preflight; },
     async smartImportScan(options){
@@ -151,6 +151,19 @@
         "Djadja":{status:"matched",confidence:.95,canonical:{title:"Djadja",artist:"Aya Nakamura",bpm:100,camelot_key:"8A",genre:"Afropop"}}
       };
       return {ok:true, matches:(tracks||[]).map(t => ({client_track_id:t.client_track_id, status:"unmatched", ...demo[t.title]}))};
+    },
+    async analyzeFolderMetadata(folderPath, options){
+      if(window.pywebview?.api?.analyzeFolderMetadata) return window.pywebview.api.analyzeFolderMetadata(folderPath, options || {});
+      await wait(1500);
+      return {
+        ok: true,
+        tracks: [
+          {id: "1", file: "Adam Port - Move.mp3", path: folderPath + "/Adam Port - Move.mp3", artist: "Adam Port, Stryv, Keinemusik", title: "Move", bpm: 120.0, camelot_key: "8A", genre: "Afro House", status: "complete", source: "Base de connaissances"},
+          {id: "2", file: "Suavemente.mp3", path: folderPath + "/Suavemente.mp3", artist: "Elvis Crespo", title: "Suavemente", bpm: 127.0, camelot_key: "4B", genre: "Latino", status: "complete", source: "Base de connaissances"},
+          {id: "3", file: "Losing It.wav", path: folderPath + "/Losing It.wav", artist: "Fisher", title: "Losing It", bpm: 126.0, camelot_key: "5A", genre: "Tech House", status: "enriched_sourcing", source: "Sourcing (" + (options?.provider || "deezer").toUpperCase() + ")"},
+          {id: "4", file: "Inconnu - Titre.mp3", path: folderPath + "/Inconnu - Titre.mp3", artist: "Inconnu", title: "Titre", bpm: null, camelot_key: null, genre: "A verifier", status: "incomplete", source: "Non identifié"}
+        ]
+      };
     },
     async djSetPreflight(){
       if(window.pywebview?.api?.djSetPreflight) return window.pywebview.api.djSetPreflight();
@@ -463,6 +476,7 @@
     djSetStyleResults:$("djSetStyleResultsView"),
     djSetEvent:$("djSetEventView"),
     djSetPlan:$("djSetPlanView"),
+    djSetMetadata:$("djSetMetadataView"),
     prepare:$("prepareView"),
     scan:$("scanView"),
     results:$("resultsView"),
@@ -498,6 +512,7 @@
   let djSetPlan = null;
   let djSetGroupStates = new Map();
   let djSetExpandedGroupId = null;
+  let djSetMetadataFolder = "";
   try{ selectedSoftwareId = localStorage.getItem("lt_preferred_software") || null; }catch(error){}
 
   function esc(value){ return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char])); }
@@ -630,6 +645,7 @@
   function goHome(){ setState("idle"); showView("home"); }
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
   function goDjSet(){ setState("dj-set"); showView("djSet"); }
+  function goDjSetMetadata(){ setState("dj-set-metadata"); $("djSetMetadataFolder").value = djSetMetadataFolder; $("djSetMetadataStartBtn").disabled = !djSetMetadataFolder; $("djSetMetadataLoader").style.display = "none"; $("djSetMetadataResultsSection").style.display = "none"; showView("djSetMetadata"); }
   function goDjSetEvent(){ setState("dj-set-event"); showView("djSetEvent"); }
   function goDjSetNewSet(){ setState("dj-set-new-set"); showView("djSetNewSet"); }
   function goDjSetStyleInspiration(){ setState("dj-set-style-inspiration"); showView("djSetStyleInspiration"); updateDjSetStyleControls(); }
@@ -992,7 +1008,7 @@
     return (group.items || []).slice(0,8).map(id => {
       const item = fileMap.get(id) || {};
       return `
-        <div class="smart-group-track" title="${esc(item.destinationDisplay || item.destination || "")}">
+        <div class="smart-group-track" data-tooltip="${esc(item.destinationDisplay || item.destination || "")}">
           <b>${esc(smartTrackLabel(item))}</b>
           <code>${esc(item.destinationDisplay || item.destinationFolderDisplay || "")}</code>
           ${renderSmartDestinationSelect(item)}
@@ -1310,6 +1326,107 @@
     $("styleLimit").value = "40";
     $("styleLocalOnly").checked = false;
   }
+  async function chooseDjSetMetadataFolder() {
+    try {
+      const result = await API.chooseFolder("Choisir le dossier à analyser");
+      if (!result?.path) return;
+      djSetMetadataFolder = result.path;
+      $("djSetMetadataFolder").value = result.path;
+      $("djSetMetadataStartBtn").disabled = false;
+    } catch(error) {
+      showToast("Impossible d’ouvrir le sélecteur de dossier.");
+    }
+  }
+
+  async function startDjSetMetadataAnalysis() {
+    if (!djSetMetadataFolder) return;
+    
+    $("djSetMetadataStartBtn").disabled = true;
+    $("djSetMetadataChooseFolder").disabled = true;
+    $("djSetMetadataResultsSection").style.display = "none";
+    $("djSetMetadataLoader").style.display = "flex";
+    
+    try {
+      const result = await API.analyzeFolderMetadata(djSetMetadataFolder);
+      $("djSetMetadataLoader").style.display = "none";
+      $("djSetMetadataChooseFolder").disabled = false;
+      $("djSetMetadataStartBtn").disabled = false;
+      
+      if (!result || !result.ok) {
+        showToast(result?.error || "Une erreur est survenue lors de l'analyse.");
+        return;
+      }
+      
+      renderDjSetMetadataResults(result.tracks);
+    } catch(error) {
+      $("djSetMetadataLoader").style.display = "none";
+      $("djSetMetadataChooseFolder").disabled = false;
+      $("djSetMetadataStartBtn").disabled = false;
+      showToast("Une erreur critique est survenue lors de l'analyse.");
+    }
+  }
+
+  function renderDjSetMetadataResults(tracks) {
+    const tbody = $("djSetMetadataTableBody");
+    tbody.innerHTML = "";
+    
+    let completeCount = 0;
+    let suggestionCount = 0;
+    let incompleteCount = 0;
+    
+    if (!tracks || tracks.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #adb8c9;">Aucun titre trouvé dans ce dossier.</td></tr>`;
+      $("djSetMetadataTotalCount").textContent = "0";
+      $("djSetMetadataCompleteCount").textContent = "0";
+      $("djSetMetadataSuggestionCount").textContent = "0";
+      $("djSetMetadataIncompleteCount").textContent = "0";
+      $("djSetMetadataResultsSection").style.display = "block";
+      return;
+    }
+    
+    tracks.forEach(track => {
+      let badgeClass = "";
+      let statusText = "";
+      
+      if (track.status === "complete") {
+        completeCount++;
+        badgeClass = "status-complete";
+        statusText = "Base de connaissances";
+      } else if (track.status === "probable_suggestion" || track.status === "enriched_sourcing") {
+        suggestionCount++;
+        badgeClass = "status-suggestion";
+        statusText = "Suggestion KB";
+      } else {
+        incompleteCount++;
+        badgeClass = "status-incomplete";
+        statusText = "Incomplet";
+      }
+      
+      const bpmText = track.bpm ? parseFloat(track.bpm).toFixed(1) : '<span style="color: #f87171;">--</span>';
+      const keyText = track.camelot_key ? track.camelot_key : '<span style="color: #f87171;">--</span>';
+      const artistTitle = track.artist ? `${track.artist} - ${track.title}` : track.title;
+      
+      const row = document.createElement("tr");
+      row.className = "metadata-table-row";
+      row.innerHTML = `
+        <td style="word-break: break-all;" title="${esc(track.path || '')}">${esc(track.file || '')}</td>
+        <td><strong>${esc(artistTitle || 'Inconnu')}</strong></td>
+        <td style="text-align: center; font-family: monospace;">${bpmText}</td>
+        <td style="text-align: center; font-family: monospace; font-weight: 600;">${keyText}</td>
+        <td>${esc(track.genre || 'Inconnu')}</td>
+        <td style="text-align: center;"><span class="status-badge ${badgeClass}">${statusText}</span></td>
+      `;
+      tbody.appendChild(row);
+    });
+    
+    $("djSetMetadataTotalCount").textContent = tracks.length;
+    $("djSetMetadataCompleteCount").textContent = completeCount;
+    $("djSetMetadataSuggestionCount").textContent = suggestionCount;
+    $("djSetMetadataIncompleteCount").textContent = incompleteCount;
+    
+    $("djSetMetadataResultsSection").style.display = "block";
+  }
+
   function styleInspirationSelectedOptions(){
     return {
       style: $("styleGenre").value,
@@ -1418,7 +1535,7 @@
     
     let pathHtml = "";
     if(item.localPath) {
-      pathHtml = `<div class="style-track-path" title="${item.localPath}">${item.localPath}</div>`;
+      pathHtml = `<div class="style-track-path" data-tooltip="${item.localPath}">${item.localPath}</div>`;
     }
     
     let metadataHelp = "";
@@ -1450,9 +1567,21 @@
     const reliableGroups = djSetReliableGroups(groups);
     const allReliableValidated = reliableGroups.length > 0 && reliableGroups.every(group => djSetGroupState(group) === "validated");
     const validatedIds = djSetValidatedItemIds();
-    rollTo($("djSetReliableCount"), reliableCount);
-    rollTo($("djSetNewTargetCount"), newTargetCount);
-    rollTo($("djSetReviewCount"), reviewCount);
+    const reliableCountEl = $("djSetReliableCount");
+    rollTo(reliableCountEl, reliableCount);
+    if (reliableCountEl.nextElementSibling) {
+      reliableCountEl.nextElementSibling.textContent = reliableCount > 1 ? "titres fiables" : "titre fiable";
+    }
+    const newTargetCountEl = $("djSetNewTargetCount");
+    rollTo(newTargetCountEl, newTargetCount);
+    if (newTargetCountEl.nextElementSibling) {
+      newTargetCountEl.nextElementSibling.textContent = newTargetCount > 1 ? "nouvelles destinations" : "nouvelle destination";
+    }
+    const reviewCountEl = $("djSetReviewCount");
+    rollTo(reviewCountEl, reviewCount);
+    if (reviewCountEl.nextElementSibling) {
+      reviewCountEl.nextElementSibling.textContent = reviewCount > 1 ? "à vérifier" : "à vérifier";
+    }
     $("djSetValidateReliableSub").textContent = `${fmt(reliableCount, "titre prêt", "titres prêts")} pour l’écriture`;
     $("djSetReviewRemainingSub").textContent = `${fmt(reviewCount, "titre nécessite", "titres nécessitent")} ton avis`;
     $("djSetValidateReliable").disabled = reliableCount <= 0 || allReliableValidated;
@@ -1466,7 +1595,7 @@
     return (group.items || []).slice(0,8).map(id => {
       const item = itemMap.get(id) || {};
       return `
-        <div class="smart-group-track" title="${esc(item.sourceDisplay || "")}">
+        <div class="smart-group-track" data-tooltip="${esc(item.sourceDisplay || "")}">
           <b>${esc(item.trackLabel || item.file || "Titre")}</b>
           <code>${esc(item.sourceDisplay || item.targetName || "")}</code>
         </div>`;
@@ -2061,6 +2190,10 @@
   $("djSetNewEvent").addEventListener("click", goDjSetNewSet);
   $("djSetOrganizePlaylists").addEventListener("click", () => startDjSetPlan("organize"));
   $("djSetRecentImports").addEventListener("click", () => startDjSetPlan("recent_imports"));
+  $("djSetMetadataAnalysis").addEventListener("click", goDjSetMetadata);
+  $("djSetMetadataBack").addEventListener("click", goDjSet);
+  $("djSetMetadataChooseFolder").addEventListener("click", chooseDjSetMetadataFolder);
+  $("djSetMetadataStartBtn").addEventListener("click", startDjSetMetadataAnalysis);
   
   // New Set views listeners
   $("djSetNewSetBack").addEventListener("click", goDjSet);
@@ -2182,6 +2315,43 @@
       renderWhatsNewBanner(state);
     }
   }
+
+  // Custom styled tooltip system to replace buggy/basic native tooltips
+  let currentTooltip = null;
+  document.addEventListener("mouseenter", function(e) {
+    const el = e.target.closest("[data-tooltip]");
+    if (!el) return;
+    const text = el.getAttribute("data-tooltip");
+    if (!text) return;
+    if (currentTooltip) {
+      currentTooltip.remove();
+    }
+    currentTooltip = document.createElement("div");
+    currentTooltip.className = "custom-tooltip";
+    currentTooltip.textContent = text;
+    document.body.appendChild(currentTooltip);
+    const rect = el.getBoundingClientRect();
+    const tooltipWidth = currentTooltip.offsetWidth;
+    const tooltipHeight = currentTooltip.offsetHeight;
+    const left = rect.left + (rect.width - tooltipWidth) / 2;
+    const top = rect.top - tooltipHeight - 8;
+    const finalLeft = Math.max(12, Math.min(left, window.innerWidth - tooltipWidth - 12));
+    const finalTop = Math.max(12, top);
+    currentTooltip.style.left = `${finalLeft}px`;
+    currentTooltip.style.top = `${finalTop}px`;
+    currentTooltip.classList.add("is-visible");
+  }, true);
+  function removeTooltip() {
+    if (currentTooltip) {
+      currentTooltip.remove();
+      currentTooltip = null;
+    }
+  }
+  document.addEventListener("mouseleave", function(e) {
+    const el = e.target.closest("[data-tooltip]");
+    if (el) removeTooltip();
+  }, true);
+  document.addEventListener("scroll", removeTooltip, true);
 
   buildRepairWave();
   attachCardGlow();

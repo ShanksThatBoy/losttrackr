@@ -1,11 +1,11 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 # Construit LostTrackr.app puis empaquette un .dmg propre pour macOS.
 set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="LostTrackr"
-APP_VERSION="1.3.1"
-APP_BUILD="1.3.1"
+APP_VERSION="1.3.5"
+APP_BUILD="1.3.5"
 BUNDLE_ID="com.djshanks.losttrackr"
 VOL_NAME="${APP_NAME} ${APP_VERSION}"
 DMG_NAME="${1:-${APP_NAME}-v${APP_BUILD}.dmg}"

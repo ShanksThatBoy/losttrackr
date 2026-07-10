@@ -1,10 +1,10 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 # Construit un installateur .pkg macOS pour LostTrackr.
 set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="LostTrackr"
-APP_VERSION="1.3.1"
+APP_VERSION="1.3.5"
 BUNDLE_ID="com.djshanks.losttrackr"
 APP_PATH="dist/${APP_NAME}.app"
 PKG_NAME="${1:-${APP_NAME}-v${APP_VERSION}-macos.pkg}"

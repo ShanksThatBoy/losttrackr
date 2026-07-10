@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 serato_relocate.py — Répare les chemins cassés de la bibliothèque Serato DJ Pro.
 
@@ -33,7 +32,6 @@ Usage :
 import argparse
 import os
 import shutil
-import subprocess
 import sys
 import unicodedata
 from collections import defaultdict

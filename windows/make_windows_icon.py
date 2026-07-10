@@ -7,7 +7,6 @@ from pathlib import Path
 
 from PIL import Image
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "assets" / "LostTrackr_Icon.png"
 OUTPUT = ROOT / "windows" / "generated" / "LostTrackr.ico"

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """DJ set planning for LostTrackr."""
 
 from __future__ import annotations
@@ -7,7 +6,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import smart_import
-
 
 CONFIDENCE_LABELS = smart_import.CONFIDENCE_LABELS
 EVENT_TEMPLATES = {
@@ -396,6 +394,7 @@ def display_mock_path(track: dict, style: str) -> str:
 
 def build_style_inspiration_plan(options: dict, local_tracks: list[dict] | None = None) -> dict:
     import re
+
     from providers.mock_streaming_provider import MockStreamingProvider
 
     options = options or {}

@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -30,8 +30,8 @@ rm -rf build dist
 
 PLIST="dist/LostTrackr.app/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName LostTrackr" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleDisplayName string LostTrackr" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.3.1" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string 1.3.1" "$PLIST"
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion 1.3.1" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string 1.3.1" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 1.3.5" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleShortVersionString string 1.3.5" "$PLIST"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion 1.3.5" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string 1.3.5" "$PLIST"
 /usr/libexec/PlistBuddy -c "Set :LSApplicationCategoryType public.app-category.music" "$PLIST" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :LSApplicationCategoryType string public.app-category.music" "$PLIST"
 
 codesign --force --deep --sign - "dist/LostTrackr.app"

@@ -10,7 +10,7 @@
 <div class="app" id="app" data-view="home" data-state="idle">
   <header class="titlebar" aria-label="Fenêtre LostTrackr">
     <div class="window-title">LostTrackr</div>
-    <div class="window-version" id="appVersionLabel">v1.3.1</div>
+    <div class="window-version" id="appVersionLabel">v1.3.5</div>
   </header>
 
   <div class="workspace">
@@ -72,19 +72,23 @@
             </div>
             <h2>Retrouver mes<br>sons perdus</h2>
             <p>Scanne tes disques et dossiers<br>pour retrouver les fichiers manquants,<br>déplacés ou introuvables.</p>
-            <button class="action-btn" id="goPrepare" type="button">Lancer un scan</button>
+            <div class="feature-card-footer">
+              <button class="action-btn" id="goPrepare" type="button">Lancer un scan</button>
+            </div>
           </article>
 
           <article class="feature-card" id="comingCard">
             <span class="badge smart">Analyse intelligente</span>
-            <div class="feature-art" style="margin-top:48px">
+            <div class="feature-art">
               <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
             <h2>Ranger mes<br>titres</h2>
             <p>Analyse tes fichiers audio,<br>trouve les dossiers cohérents<br>et déplace après validation.</p>
-            <button class="action-btn" id="goSmartImport" type="button">Ranger mes titres</button>
-            <div class="coming-note">Déplacement contrôlé · aperçu obligatoire</div>
+            <div class="feature-card-footer">
+              <div class="coming-note">Déplacement contrôlé · aperçu obligatoire</div>
+              <button class="action-btn" id="goSmartImport" type="button">Ranger mes titres</button>
+            </div>
           </article>
 
           <article class="feature-card" id="djSetCard">
@@ -95,7 +99,9 @@
             </div>
             <h2>Préparer mon<br>DJ Set</h2>
             <p>Crée des crates, sous-crates<br>ou playlists cohérentes<br>pour tes prochains sets.</p>
-            <button class="action-btn" id="goDjSet" type="button">Préparer un set</button>
+            <div class="feature-card-footer">
+              <button class="action-btn" id="goDjSet" type="button">Préparer un set</button>
+            </div>
           </article>
         </div>
 
@@ -400,7 +406,22 @@
                 <em class="smart-confidence-badge smart-confidence-high">Dernier Smart Import</em>
               </div>
               <span class="smart-suggestion-count">Titres déplacés lors du dernier Smart Import</span>
-              <p class="smart-suggestion-reason">LostTrackr analyse les titres récemment rangés et prépare leur placement dans les crates ou playlists appropriées.</p>
+              <p class="smart-suggestion-reason">LostTrackr analyse les titres récemment rangés et préapar leur placement dans les crates ou playlists appropriées.</p>
+            </div>
+          </article>
+
+          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetMetadataAnalysis">
+            <div class="smart-card-handle" aria-hidden="true"></div>
+            <div class="feature-visual">
+              <img class="feature-icon-premium" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="Analyser les métadonnées de titres">
+            </div>
+            <div class="smart-suggestion-copy">
+              <div class="smart-suggestion-top">
+                <h2>Analyser les métadonnées de titres</h2>
+                <em class="smart-confidence-badge smart-confidence-high" style="border-color: rgba(34,143,255,.55); background: rgba(7,43,93,.35); color: #2ea2ff;">Sourcing automatique</em>
+              </div>
+              <span class="smart-suggestion-count">BPM, clés, genres et corrections</span>
+              <p class="smart-suggestion-reason">Scanne un dossier pour trouver les données manquantes. LostTrackr interroge d'abord la base de connaissances locale, puis recherche sur tes plateformes favorites.</p>
             </div>
           </article>
         </div>
@@ -656,6 +677,114 @@
             <span><b>Vérifier les groupes restants</b><small id="djSetReviewRemainingSub">0 titre nécessite ton avis</small></span>
           </button>
           <button class="smart-apply-final" id="djSetPreviewApply" type="button">Préparer l’écriture sécurisée</button>
+        </div>
+      </section>
+
+      <section class="view smart-djset-metadata-view" id="djSetMetadataView" aria-labelledby="djSetMetadataTitle">
+        <button class="back-btn smart-flow-back" id="djSetMetadataBack" type="button">← Retour</button>
+        <header class="smart-review-hero smart-flow-hero">
+          <span class="smart-spark" aria-hidden="true">✦</span>
+          <div>
+            <h1 class="page-title" id="djSetMetadataTitle">Analyser les métadonnées</h1>
+            <p class="page-sub">Identifie les données manquantes de tes titres et enrichis-les via la Base de connaissances LostTrackr.</p>
+          </div>
+        </header>
+
+        <div class="mdx-wrap">
+          <!-- Guidage : ce que fait l'analyse -->
+          <div class="mdx-steps" aria-hidden="true">
+            <div class="mdx-step">
+              <span class="mdx-step-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg></span>
+              <span class="mdx-step-tx"><b>1 · Scanne</b><small>Lit les fichiers du dossier choisi</small></span>
+              <span class="mdx-step-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+            </div>
+            <div class="mdx-step">
+              <span class="mdx-step-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"></path><circle cx="12" cy="12" r="4"></circle></svg></span>
+              <span class="mdx-step-tx"><b>2 · Identifie</b><small>Croise avec ta base locale</small></span>
+              <span class="mdx-step-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span>
+            </div>
+            <div class="mdx-step">
+              <span class="mdx-step-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 4.9L19.5 9l-3.75 3.4.9 5.1L12 15.9 7.35 17.5l.9-5.1L4.5 9l5.3-1.1z"></path></svg></span>
+              <span class="mdx-step-tx"><b>3 · Enrichit</b><small>BPM, clé, genre, artiste…</small></span>
+              <span class="mdx-step-arrow"></span>
+            </div>
+          </div>
+
+          <!-- Console de configuration -->
+          <div class="mdx-console">
+            <div>
+              <div class="mdx-field-label"><span class="mdx-num">1</span>Dossier à analyser</div>
+              <div class="mdx-drop">
+                <span class="mdx-drop-ic">
+                  <svg class="ic-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                  <svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                </span>
+                <div class="mdx-drop-body">
+                  <input type="text" id="djSetMetadataFolder" readonly placeholder="Aucun dossier sélectionné…" aria-label="Dossier à analyser">
+                  <span class="mdx-drop-hint">Clique sur « Choisir un dossier » pour sélectionner un emplacement.</span>
+                </div>
+                <button class="mdx-btn-ghost" id="djSetMetadataChooseFolder" type="button">Choisir un dossier</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="mdx-field-label"><span class="mdx-num">2</span>Service de référence</div>
+              <div class="mdx-source">
+                <span class="mdx-source-logo"><img src="assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png" alt="" aria-hidden="true"></span>
+                <div class="mdx-source-body">
+                  <b>Base de connaissances LostTrackr</b>
+                  <small>Si la recherche en base est infructueuse, le service interroge automatiquement les sources externes (MusicBrainz, etc.).</small>
+                </div>
+                <span class="state-pill">Actif</span>
+              </div>
+            </div>
+
+            <div class="mdx-launch">
+              <button class="action-btn mdx-cta" id="djSetMetadataStartBtn" type="button" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9l-3.4 3 .8 4.6L12 14.4 8.1 16.6l.8-4.6L5.5 9l4.6-1.4z"></path></svg>
+                Lancer l'analyse
+              </button>
+              <p class="mdx-cta-hint">
+                <span class="mdx-hint-idle">Sélectionne d'abord un dossier pour lancer l'analyse.</span>
+                <span class="mdx-hint-ready">Prêt à analyser — recherche en base locale, puis sources externes si besoin.</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div id="djSetMetadataLoader" class="mdx-loader mdx-wrap" style="display: none; flex-direction: column;">
+          <div class="loader-spinner"></div>
+          <p id="djSetMetadataLoaderText">Scan et analyse des fichiers en cours…</p>
+          <div class="mdx-scanbar" aria-hidden="true"><i></i></div>
+        </div>
+
+        <div id="djSetMetadataResultsSection" class="mdx-wrap" style="display: none;">
+          <div class="mdx-stats">
+            <div class="mdx-stat" style="--accent:#eef3fb;"><strong id="djSetMetadataTotalCount">0</strong><span>titres scannés</span></div>
+            <div class="mdx-stat" style="--accent:#4ade80;"><strong id="djSetMetadataCompleteCount">0</strong><span>base de connaissances</span></div>
+            <div class="mdx-stat" style="--accent:#ff9b2a;"><strong id="djSetMetadataSuggestionCount">0</strong><span>suggestions probables</span></div>
+            <div class="mdx-stat" style="--accent:#f87171;"><strong id="djSetMetadataIncompleteCount">0</strong><span>non identifiés</span></div>
+          </div>
+
+          <div style="background: rgba(9, 18, 30, 0.45); border: 1px solid rgba(127, 176, 236, 0.12); border-radius: 16px; overflow: hidden; margin-bottom: 30px;">
+            <div style="max-height: 400px; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14.5px;">
+                <thead>
+                  <tr style="border-bottom: 1px solid rgba(127, 176, 236, 0.15); background: rgba(16, 28, 44, 0.6); color: #adb8c9; font-weight: 600;">
+                    <th style="padding: 14px 18px; width: 25%;">Nom de fichier</th>
+                    <th style="padding: 14px 18px; width: 30%;">Artiste / Titre</th>
+                    <th style="padding: 14px 18px; text-align: center; width: 10%;">BPM</th>
+                    <th style="padding: 14px 18px; text-align: center; width: 10%;">Clé</th>
+                    <th style="padding: 14px 18px; width: 12%;">Genre</th>
+                    <th style="padding: 14px 18px; text-align: center; width: 13%;">Statut / Source</th>
+                  </tr>
+                </thead>
+                <tbody id="djSetMetadataTableBody" style="color: #fff;">
+                  <!-- Lines will be dynamically generated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 

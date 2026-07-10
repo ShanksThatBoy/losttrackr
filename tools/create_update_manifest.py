@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Create a LostTrackr update manifest from release artifacts."""
 
 from __future__ import annotations

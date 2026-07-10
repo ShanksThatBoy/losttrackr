@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Secure update checks for LostTrackr.
 
 The updater is intentionally installer-driven: it detects, downloads, verifies,
@@ -22,8 +21,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-
-APP_VERSION = "1.3.1"
+APP_VERSION = "1.3.5"
 DEFAULT_CHANNEL = os.environ.get("LOSTTRACKR_UPDATE_CHANNEL", "beta")
 DEFAULT_MANIFEST_URL = os.environ.get(
     "LOSTTRACKR_UPDATE_MANIFEST_URL",

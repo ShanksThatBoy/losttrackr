@@ -116,14 +116,14 @@ class DjSetPlanTests(unittest.TestCase):
         self.assertEqual(plan["provider"]["id"], "deezer")
         self.assertEqual(plan["totals"]["total"], 40)
         self.assertEqual(len(plan["items"]), 40)
-        
+
         # Verify deterministic statuses are set
         statuses = {item["status"] for item in plan["items"]}
         self.assertIn("local", statuses)
         self.assertIn("probable", statuses)
         self.assertIn("review", statuses)
         self.assertIn("missing", statuses)
-        
+
         # Test localOnly = True
         options_local = dict(options)
         options_local["localOnly"] = True
@@ -133,6 +133,54 @@ class DjSetPlanTests(unittest.TestCase):
         self.assertEqual(plan_local["totals"]["visible"], len(plan_local["items"]))
         for item in plan_local["items"]:
             self.assertNotEqual(item["status"], "missing")
+
+    def test_analyze_folder_metadata_matches_knowledge_and_sourcing(self):
+        from unittest.mock import patch
+        from losttrackr_app import LostTrackrApi
+
+        api = LostTrackrApi()
+
+        mock_files = [
+            {
+                "id": "file1",
+                "file": "Suavemente.mp3",
+                "source": "/path/to/Suavemente.mp3",
+                "artist": "",
+                "title": "Suavemente",
+                "genre": "Latino",
+            },
+            {
+                "id": "file2",
+                "file": "All The Small Things.mp3",
+                "source": "/path/to/All The Small Things.mp3",
+                "artist": "",
+                "title": "All The Small Things",
+                "genre": "A verifier",
+            }
+        ]
+
+        with patch("smart_import.scan_audio_files", return_value=mock_files):
+            result = api.analyze_folder_metadata("/path/to/folder")
+            
+            self.assertTrue(result["ok"])
+            tracks = result["tracks"]
+            self.assertEqual(len(tracks), 2)
+            
+            t1 = tracks[0]
+            self.assertEqual(t1["title"], "Suavemente")
+            self.assertEqual(t1["artist"], "Elvis Crespo")
+            self.assertEqual(t1["bpm"], 127.0)
+            self.assertEqual(t1["camelot_key"], "4B")
+            self.assertEqual(t1["status"], "complete")
+            self.assertEqual(t1["source"], "Base de connaissances")
+            
+            t2 = tracks[1]
+            self.assertEqual(t2["title"], "All The Small Things")
+            self.assertEqual(t2["artist"], "Blink 182")
+            self.assertEqual(t2["bpm"], 76.0)
+            self.assertEqual(t2["camelot_key"], "10B")
+            self.assertEqual(t2["status"], "probable_suggestion")
+            self.assertEqual(t2["source"], "Suggestion KB")
 
 
 if __name__ == "__main__":

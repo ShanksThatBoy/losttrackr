@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """DJ software detection profiles for LostTrackr."""
 
 from __future__ import annotations

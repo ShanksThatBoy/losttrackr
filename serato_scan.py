@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 serato_scan.py — Scanner READ-ONLY de la bibliothèque Serato DJ Pro.
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Smart Import planning and move execution for LostTrackr."""
 
 from __future__ import annotations
@@ -14,7 +13,6 @@ from datetime import datetime
 from pathlib import Path
 
 import losttrackr_platform as platform
-
 
 AUDIO_EXTENSIONS = {
     ".aac",
@@ -186,7 +184,7 @@ def transit_folder_penalty(path: str | Path, name: str = "") -> int:
     return 0
 
 
-def clean_name(value: str, fallback: str = "A verifier") -> str:
+def clean_name(value: str | None, fallback: str = "A verifier") -> str:
     text = re.sub(r"[\\/:*?\"<>|]+", " ", str(value or "")).strip(" .")
     text = re.sub(r"\s+", " ", text)
     return text[:96] or fallback

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Platform helpers for LostTrackr macOS and Windows builds."""
 
 from __future__ import annotations
@@ -11,7 +10,6 @@ import string
 import subprocess
 import sys
 from pathlib import Path, PureWindowsPath
-
 
 WINDOWS_SERATO_PROCESS_PREFIXES = ("serato dj", "seratodj")
 

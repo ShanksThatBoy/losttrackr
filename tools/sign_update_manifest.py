@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """Sign a LostTrackr update manifest with the local Ed25519 private key."""
 
 from __future__ import annotations
