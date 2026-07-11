@@ -159,7 +159,37 @@ class DjSetPlanTests(unittest.TestCase):
             }
         ]
 
-        with patch("smart_import.scan_audio_files", return_value=mock_files):
+        mock_resolve_results = {
+            "results": [
+                {
+                    "client_track_id": "0",
+                    "status": "matched",
+                    "canonical": {
+                        "artist": "Elvis Crespo",
+                        "title": "Suavemente",
+                        "bpm": 127.0,
+                        "camelot_key": "4B",
+                        "genre": "Latino"
+                    }
+                },
+                {
+                    "client_track_id": "1",
+                    "status": "probable",
+                    "canonical": {
+                        "artist": "Blink 182",
+                        "title": "All The Small Things",
+                        "bpm": 76.0,
+                        "camelot_key": "10B",
+                        "genre": "Rock"
+                    }
+                }
+            ]
+        }
+
+        with patch("smart_import.scan_audio_files", return_value=mock_files), \
+             patch("knowledge_client.resolve_fingerprints", return_value=mock_resolve_results), \
+             patch("losttrackr_app.compute_audio_fingerprint", return_value=None), \
+             patch("losttrackr_app.read_audio_tags", return_value={"artist": "", "title": "", "album": "", "year": None, "genre": ""}):
             result = api.analyze_folder_metadata("/path/to/folder")
             
             self.assertTrue(result["ok"])

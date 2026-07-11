@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="LostTrackr"
-APP_VERSION="1.3.5"
+APP_VERSION="1.4.0"
 BUNDLE_ID="com.djshanks.losttrackr"
 APP_PATH="dist/${APP_NAME}.app"
 PKG_NAME="${1:-${APP_NAME}-v${APP_VERSION}-macos.pkg}"

@@ -2,7 +2,7 @@
 from PyInstaller.utils.hooks import collect_all
 
 datas = [('losttrackr_ui.html', '.'), ('assets', 'assets'), ('css', 'css'), ('js', 'js')]
-binaries = []
+binaries = [('bin/fpcalc', 'bin')]
 hiddenimports = []
 tmp_ret = collect_all('webview')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]

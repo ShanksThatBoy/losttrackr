@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LostTrackr — Design System v1.0.1</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #02060b;
+  color: #f4f7fb;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+  padding: 32px 28px;
+  min-height: 100vh;
+}
+
+/* NAV */
+.tab-nav { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid rgba(123,170,255,.18); padding-bottom: 0; }
+.tab { padding: 9px 18px; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 600; cursor: pointer; color: #617085; background: transparent; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s, border-color .15s; }
+.tab:hover { color: #c5cfdd; }
+.tab.active { color: #1598ff; border-bottom-color: #1598ff; background: rgba(21,152,255,.06); }
+
+/* SECTIONS */
+.section { display: none; }
+.section.active { display: block; }
+
+/* PRINT SECTION HEADER */
+.print-section-header { display: none; }
+
+/* COMMON */
+.section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #617085; margin-bottom: 16px; margin-top: 28px; padding-bottom: 6px; border-bottom: 1px solid rgba(123,170,255,.12); }
+.section-title:first-child { margin-top: 0; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+label { font-size: 10px; color: #617085; display: block; margin-top: 4px; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: #8794a7; }
+
+/* COULEURS */
+.swatch-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.swatch { border-radius: 8px; overflow: hidden; width: 100px; flex: 0 0 auto; }
+.swatch-color { height: 52px; width: 100%; }
+.swatch-info { padding: 6px 8px; background: rgba(12,22,34,.82); border: 1px solid rgba(123,170,255,.14); border-top: none; border-radius: 0 0 8px 8px; }
+.swatch-name { font-size: 10px; font-weight: 700; color: #c5cfdd; }
+.swatch-hex { font-size: 9px; color: #617085; font-family: monospace; margin-top: 1px; }
+.swatch-var { font-size: 9px; color: #1598ff; margin-top: 1px; }
+
+/* TYPO */
+.type-row { display: flex; align-items: baseline; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(123,170,255,.08); }
+.type-spec { min-width: 180px; flex: 0 0 180px; }
+.type-spec code { display: block; }
+.type-preview { flex: 1; color: #f4f7fb; }
+
+/* RADIUS */
+.radius-row { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 8px; }
+.radius-box { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.radius-demo { background: rgba(21,152,255,.15); border: 1.5px solid rgba(21,152,255,.5); }
+
+/* SPACING */
+.space-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.space-box { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.space-demo { background: rgba(21,152,255,.25); height: 4px; }
+
+/* COMPOSANTS */
+.comp-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; margin-top: 10px; }
+
+/* Boutons */
+.btn-primary { height: 54px; padding: 0 22px; border-radius: 14px; color: #fff; font-weight: 800; font-size: 15px; cursor: default; background: linear-gradient(180deg,#138cff,#0756d6); box-shadow: 0 16px 34px rgba(0,83,220,.28),inset 0 1px 0 rgba(255,255,255,.24); border: none; display: inline-flex; align-items: center; }
+.btn-secondary { height: 54px; padding: 0 22px; border-radius: 14px; color: #c6d2e1; font-weight: 700; font-size: 15px; cursor: default; background: rgba(10,20,33,.78); border: 1px solid rgba(119,166,225,.16); display: inline-flex; align-items: center; }
+.btn-tertiary { height: 54px; padding: 0 22px; border-radius: 14px; color: #8fa1b7; font-weight: 700; font-size: 15px; cursor: default; background: transparent; border: 1px solid rgba(119,166,225,.12); display: inline-flex; align-items: center; }
+.btn-action { height: 56px; padding: 0 22px; border-radius: 12px; color: #fff; font-weight: 800; font-size: 17px; cursor: default; background: linear-gradient(180deg,#1179ff,#064ec6); box-shadow: 0 14px 32px rgba(0,79,209,.30),inset 0 1px 0 rgba(255,255,255,.25); border: none; display: inline-flex; align-items: center; }
+.btn-back { height: 40px; padding: 0 16px; border-radius: 12px; color: #9fb2ca; font-weight: 650; font-size: 13px; cursor: default; background: rgba(12,23,36,.72); border: 1px solid rgba(125,171,231,.17); display: inline-flex; align-items: center; }
+.btn-disabled { height: 54px; padding: 0 22px; border-radius: 14px; color: #b7a995; font-weight: 800; font-size: 15px; background: linear-gradient(180deg,rgba(133,79,28,.64),rgba(79,46,21,.78)); border: none; opacity: .82; display: inline-flex; align-items: center; }
+
+/* Pills */
+.pill { border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; display: inline-flex; }
+.pill-green { border: 1px solid rgba(70,236,106,.35); color: #6ff584; background: rgba(34,147,59,.10); }
+.pill-blue  { border: 1px solid rgba(37,148,255,.36); color: #42aaff; background: rgba(15,94,178,.15); }
+.pill-orange{ border: 1px solid rgba(255,133,14,.38); color: #ff9b2a; background: rgba(104,58,12,.18); }
+
+/* Badge */
+.badge { border-radius: 999px; border: 1px solid rgba(21,137,255,.55); background: rgba(7,43,93,.35); color: #2ea2ff; font-size: 13px; font-weight: 600; padding: 4px 14px; display: inline-flex; }
+.badge-soon { border-color: rgba(255,133,14,.42); background: rgba(88,47,8,.22); color: #ff9b2a; }
+
+/* Cards */
+.card-demo { border-radius: 20px; border: 1px solid rgba(123,170,255,.16); background: linear-gradient(180deg,rgba(15,28,44,.88),rgba(7,15,25,.90)); padding: 20px; box-shadow: 0 30px 90px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.05); }
+.card-side  { border-radius: 14px; border: 1px solid rgba(117,164,221,.14); background: rgba(9,18,30,.72); padding: 14px; }
+.card-notice{ display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; padding: 14px; border-radius: 14px; border: 1px solid rgba(117,164,221,.14); background: rgba(9,18,30,.72); }
+.notice-icon { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; border: 1px solid rgba(36,157,255,.32); background: rgba(13,83,148,.18); color: #2fa6ff; font-size: 18px; }
+
+/* Nav btn */
+.nav-demo { height: 54px; width: 200px; display: flex; align-items: center; gap: 16px; padding: 0 16px; border-radius: 14px; color: #aab6c7; border: 1px solid transparent; font-size: 16px; font-weight: 500; }
+.nav-active { color: #2ea2ff; background: linear-gradient(90deg,rgba(17,110,232,.30),rgba(14,59,115,.34)); border-color: rgba(41,139,255,.55); box-shadow: inset 0 1px 0 rgba(255,255,255,.08),0 0 28px rgba(0,102,255,.10); }
+.nav-idle { background: rgba(20,42,66,.22); }
+
+/* Confidence */
+.conf-good { border: 1.5px solid rgba(70,236,106,.28); border-radius: 16px; padding: 16px; background: linear-gradient(180deg,rgba(15,28,44,.88),rgba(7,15,25,.90)); }
+.conf-warn { border: 1.5px solid rgba(255,133,14,.30); border-radius: 16px; padding: 16px; background: linear-gradient(180deg,rgba(15,28,44,.88),rgba(7,15,25,.90)); }
+.conf-bad  { border: 1.5px solid rgba(255,106,85,.28); border-radius: 16px; padding: 16px; background: linear-gradient(180deg,rgba(15,28,44,.88),rgba(7,15,25,.90)); }
+.conf-num { font-size: 32px; font-weight: 800; color: #fff; display: block; margin-top: 6px; }
+.conf-label { font-size: 11px; color: #8794a7; margin-top: 4px; }
+
+/* Toast */
+.toast-demo { border-radius: 14px; border: 1px solid rgba(125,171,231,.18); border-left: 3px solid #1598ff; background: rgba(9,18,30,.96); color: #d8e3f1; padding: 12px 14px; font-size: 13px; max-width: 320px; }
+
+/* Path rows */
+.path-row { border-radius: 12px; background: rgba(9,18,30,.72); border: 1px solid rgba(117,164,221,.10); padding: 10px 12px; }
+.path-row code { color: #b8c6d8; }
+.path-broken code { color: #ff9a8b; }
+.path-fixed code { color: #6ff584; }
+
+/* MOTION cards */
+.anim-card { background: rgba(12,22,34,.82); border: 1px solid rgba(123,170,255,.14); border-radius: 14px; padding: 14px 16px; }
+.anim-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.anim-detail { font-size: 11px; color: #617085; }
+.anim-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-top: 6px; background: rgba(21,152,255,.15); border: 1px solid rgba(21,152,255,.3); color: #42aaff; }
+
+/* RULES */
+.rule-card { background: rgba(12,22,34,.7); border: 1px solid rgba(123,170,255,.14); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+.rule-title { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.rule-body { font-size: 12px; color: #8794a7; line-height: 1.55; }
+.do { border-left: 3px solid #46ec6a; }
+.dont { border-left: 3px solid #ff6a55; }
+.do .rule-title::before { content: "✅  "; }
+.dont .rule-title::before { content: "❌  "; }
+.tip { border-left: 3px solid #1598ff; }
+.tip .rule-title::before { content: "💡  "; }
+
+/* Gradients */
+.grad-block { border-radius: 10px; height: 52px; width: 100%; }
+.grad-info { padding: 6px 0; }
+.grad-name { font-size: 10px; font-weight: 700; color: #c5cfdd; }
+.grad-val  { font-size: 9px; color: #617085; font-family: monospace; margin-top: 1px; }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  body { background: #02060b !important; padding: 20px 24px; }
+
+  .tab-nav { display: none !important; }
+
+  .section { display: block !important; }
+
+  .print-section-header {
+    display: block;
+    font-size: 18px;
+    font-weight: 800;
+    color: #1598ff;
+    margin: 32px 0 16px;
+    padding: 10px 0 10px;
+    border-bottom: 2px solid rgba(21,152,255,.35);
+    border-top: none;
+  }
+
+  .section-title { margin-top: 20px; }
+
+  .swatch-row { flex-wrap: wrap; gap: 6px; }
+  .swatch { width: 88px; }
+
+  .type-spec { min-width: 150px; flex: 0 0 150px; }
+
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .radius-row { flex-wrap: wrap; }
+
+  .comp-row { flex-wrap: wrap; }
+
+  .card-demo, .card-side, .anim-card, .rule-card {
+    break-inside: avoid;
+  }
+
+  h1.doc-title { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div style="margin-bottom:24px">
+  <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px" class="doc-title">LostTrackr — Design System</div>
+  <div style="font-size:13px;color:#617085">Charte graphique extraite du CSS de production &middot; v1.0.1 &middot; Juin 2026</div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab active" onclick="show('couleurs',this)">Couleurs</button>
+  <button class="tab" onclick="show('typo',this)">Typographie</button>
+  <button class="tab" onclick="show('espacements',this)">Espacements</button>
+  <button class="tab" onclick="show('composants',this)">Composants</button>
+  <button class="tab" onclick="show('motion',this)">Motion</button>
+  <button class="tab" onclick="show('regles',this)">Règles</button>
+</div>
+
+<!-- ===== COULEURS ===== -->
+<div class="section active" id="sec-couleurs">
+  <div class="print-section-header">1. Couleurs</div>
+
+  <div class="section-title">Arrière-plans</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-color" style="background:#02060b;border:1px solid #1a2030"></div><div class="swatch-info"><div class="swatch-name">Body</div><div class="swatch-hex">#02060b</div><div class="swatch-var">background body</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#030910"></div><div class="swatch-info"><div class="swatch-name">BG</div><div class="swatch-hex">#030910</div><div class="swatch-var">--bg</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#06101a"></div><div class="swatch-info"><div class="swatch-name">BG 2</div><div class="swatch-hex">#06101a</div><div class="swatch-var">--bg-2</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#07111d"></div><div class="swatch-info"><div class="swatch-name">Sidebar</div><div class="swatch-hex">#07111d</div><div class="swatch-var">--sidebar</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#0b1624"></div><div class="swatch-info"><div class="swatch-name">Sidebar 2</div><div class="swatch-hex">#0b1624</div><div class="swatch-var">--sidebar-2</div></div></div>
+  </div>
+
+  <div class="section-title">Panels (avec transparence)</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-color" style="background:rgba(12,22,34,.78)"></div><div class="swatch-info"><div class="swatch-name">Panel</div><div class="swatch-hex">rgba(12,22,34,.78)</div><div class="swatch-var">--panel</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:rgba(8,17,28,.86)"></div><div class="swatch-info"><div class="swatch-name">Panel 2</div><div class="swatch-hex">rgba(8,17,28,.86)</div><div class="swatch-var">--panel-2</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:rgba(14,25,39,.92)"></div><div class="swatch-info"><div class="swatch-name">Panel 3</div><div class="swatch-hex">rgba(14,25,39,.92)</div><div class="swatch-var">--panel-3</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:rgba(9,18,30,.72)"></div><div class="swatch-info"><div class="swatch-name">Card BG</div><div class="swatch-hex">rgba(9,18,30,.72)</div><div class="swatch-var">card-side</div></div></div>
+  </div>
+
+  <div class="section-title">Texte</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-color" style="background:#f4f7fb"></div><div class="swatch-info"><div class="swatch-name">Text</div><div class="swatch-hex">#f4f7fb</div><div class="swatch-var">--text</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#c5cfdd"></div><div class="swatch-info"><div class="swatch-name">Soft</div><div class="swatch-hex">#c5cfdd</div><div class="swatch-var">--soft</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#8794a7"></div><div class="swatch-info"><div class="swatch-name">Muted</div><div class="swatch-hex">#8794a7</div><div class="swatch-var">--muted</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#617085"></div><div class="swatch-info"><div class="swatch-name">Quiet</div><div class="swatch-hex">#617085</div><div class="swatch-var">--quiet</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#b8c6d8"></div><div class="swatch-info"><div class="swatch-name">Code</div><div class="swatch-hex">#b8c6d8</div><div class="swatch-var">monospace</div></div></div>
+  </div>
+
+  <div class="section-title">Accent — Bleu (couleur principale)</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-color" style="background:#1598ff"></div><div class="swatch-info"><div class="swatch-name">Blue</div><div class="swatch-hex">#1598ff</div><div class="swatch-var">--blue · CTA</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#075fe8"></div><div class="swatch-info"><div class="swatch-name">Blue 2</div><div class="swatch-hex">#075fe8</div><div class="swatch-var">--blue-2</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#052e77"></div><div class="swatch-info"><div class="swatch-name">Blue 3</div><div class="swatch-hex">#052e77</div><div class="swatch-var">--blue-3</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#138cff"></div><div class="swatch-info"><div class="swatch-name">Btn top</div><div class="swatch-hex">#138cff</div><div class="swatch-var">primary top</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#0756d6"></div><div class="swatch-info"><div class="swatch-name">Btn btm</div><div class="swatch-hex">#0756d6</div><div class="swatch-var">primary bottom</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#42aaff"></div><div class="swatch-info"><div class="swatch-name">Pill blue</div><div class="swatch-hex">#42aaff</div><div class="swatch-var">state-pill</div></div></div>
+  </div>
+
+  <div class="section-title">États sémantiques</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-color" style="background:#46ec6a"></div><div class="swatch-info"><div class="swatch-name">Green</div><div class="swatch-hex">#46ec6a</div><div class="swatch-var">--green · succès</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#6ff584"></div><div class="swatch-info"><div class="swatch-name">Green soft</div><div class="swatch-hex">#6ff584</div><div class="swatch-var">pill / fixed</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#ff850e"></div><div class="swatch-info"><div class="swatch-name">Orange</div><div class="swatch-hex">#ff850e</div><div class="swatch-var">--orange · warn</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#ff9b2a"></div><div class="swatch-info"><div class="swatch-name">Orng soft</div><div class="swatch-hex">#ff9b2a</div><div class="swatch-var">pill text</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#ff6a55"></div><div class="swatch-info"><div class="swatch-name">Danger</div><div class="swatch-hex">#ff6a55</div><div class="swatch-var">--danger · err</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:#ff9a8b"></div><div class="swatch-info"><div class="swatch-name">Broken</div><div class="swatch-hex">#ff9a8b</div><div class="swatch-var">chemin cassé</div></div></div>
+  </div>
+
+  <div class="section-title">Bordures (opacités fixes)</div>
+  <div class="swatch-row">
+    <div class="swatch"><div class="swatch-color" style="background:rgba(132,178,255,.16)"></div><div class="swatch-info"><div class="swatch-name">Line</div><div class="swatch-hex">rgba(132,178,255,.16)</div><div class="swatch-var">--line</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:rgba(123,170,255,.28)"></div><div class="swatch-info"><div class="swatch-name">Line+</div><div class="swatch-hex">rgba(123,170,255,.28)</div><div class="swatch-var">--line-strong</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:rgba(117,164,221,.14)"></div><div class="swatch-info"><div class="swatch-name">Card</div><div class="swatch-hex">rgba(117,164,221,.14)</div><div class="swatch-var">card border</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:rgba(41,139,255,.55)"></div><div class="swatch-info"><div class="swatch-name">Nav actif</div><div class="swatch-hex">rgba(41,139,255,.55)</div><div class="swatch-var">nav active</div></div></div>
+  </div>
+
+  <div class="section-title">Gradients de référence</div>
+  <div class="grid-3">
+    <div><div class="grad-block" style="background:linear-gradient(180deg,#0d1722,#07101a)"></div><div class="grad-info"><div class="grad-name">Titlebar</div><div class="grad-val">#0d1722 → #07101a</div></div></div>
+    <div><div class="grad-block" style="background:linear-gradient(180deg,rgba(16,28,44,.82),rgba(7,15,25,.82))"></div><div class="grad-info"><div class="grad-name">Feature card</div><div class="grad-val">rgba(16,28,44,.82) → rgba(7,15,25,.82)</div></div></div>
+    <div><div class="grad-block" style="background:linear-gradient(180deg,rgba(15,28,44,.88),rgba(7,15,25,.90))"></div><div class="grad-info"><div class="grad-name">Cards principales</div><div class="grad-val">rgba(15,28,44,.88) → rgba(7,15,25,.90)</div></div></div>
+    <div><div class="grad-block" style="background:linear-gradient(180deg,#138cff,#0756d6)"></div><div class="grad-info"><div class="grad-name">Bouton primary</div><div class="grad-val">#138cff → #0756d6</div></div></div>
+    <div><div class="grad-block" style="background:linear-gradient(180deg,#1179ff,#064ec6)"></div><div class="grad-info"><div class="grad-name">Bouton action</div><div class="grad-val">#1179ff → #064ec6</div></div></div>
+    <div><div class="grad-block" style="background:linear-gradient(90deg,rgba(17,110,232,.30),rgba(14,59,115,.34))"></div><div class="grad-info"><div class="grad-name">Nav actif</div><div class="grad-val">→ rgba(14,59,115,.34)</div></div></div>
+  </div>
+</div>
+
+<!-- ===== TYPOGRAPHIE ===== -->
+<div class="section" id="sec-typo">
+  <div class="print-section-header">2. Typographie</div>
+
+  <div class="section-title">Police système</div>
+  <div class="card-demo" style="margin-bottom:20px">
+    <div style="font-size:13px;color:#617085;margin-bottom:10px">Font stack <code style="color:#1598ff">--font</code> (variable CSS)</div>
+    <code style="color:#c5cfdd;font-size:12px;line-height:1.8">-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif</code>
+    <div style="margin-top:14px;font-size:13px;color:#617085">Police code / chemins système</div>
+    <code style="color:#c5cfdd;font-size:12px">ui-monospace, SFMono-Regular, Menlo, Consolas, monospace</code>
+  </div>
+
+  <div class="section-title">Échelle typographique</div>
+  <div class="type-row">
+    <div class="type-spec"><code>clamp(42px,4vw,57px) / 800</code><label>Hero Title · accueil</label></div>
+    <div class="type-preview" style="font-size:clamp(26px,3vw,38px);font-weight:800;line-height:1.05">Que veux-tu faire ?</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>49px / 800</code><label>Page Title</label></div>
+    <div class="type-preview" style="font-size:32px;font-weight:800;line-height:1.04">Préparer le scan</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>42px / 850</code><label>Mission Title · radar</label></div>
+    <div class="type-preview" style="font-size:28px;font-weight:850;line-height:1.04">Recovery Radar</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>32px / 700</code><label>Radar Card h2</label></div>
+    <div class="type-preview" style="font-size:22px;font-weight:700;color:#fff">Prêt à retrouver tes sons</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>28px / 800</code><label>Feature Card h2</label></div>
+    <div class="type-preview" style="font-size:20px;font-weight:800">Retrouver mes sons perdus</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>28px / 700</code><label>Brand Name</label></div>
+    <div class="type-preview" style="font-size:20px;font-weight:700;color:#eff6ff">LostTrackr</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>22px / 400</code><label>Hero Sub / Page Sub</label></div>
+    <div class="type-preview" style="font-size:15px;font-weight:400;color:#adb8c9;line-height:1.34">LostTrackr t'aide à retrouver ta musique.</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>19px / 500</code><label>Nav Btn / Action Btn</label></div>
+    <div class="type-preview" style="font-size:14px;font-weight:500;color:#aab6c7">Réparer · Scanner · Accueil</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>18px / 400</code><label>Body / Descriptions</label></div>
+    <div class="type-preview" style="font-size:13px;font-weight:400;color:#b5c0cf;line-height:1.43">Scanne tes disques et dossiers pour retrouver les fichiers manquants.</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>17px / 600</code><label>Profile Name / Notice</label></div>
+    <div class="type-preview" style="font-size:13px;font-weight:600;color:#eef4fb">DJ Cipher — <span style="color:#ff850e;font-weight:700">Pro</span></div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>15px / 700</code><label>Track name</label></div>
+    <div class="type-preview" style="font-size:12px;font-weight:700;color:#fff">Wedding March Vs EoO Bad Bunny.mp3</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>13px / 700</code><label>Pills · Badges</label></div>
+    <div class="type-preview" style="font-size:12px;font-weight:700;color:#6ff584">OK · Inclus · À vérifier</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>12px / mono</code><label>Chemins système</label></div>
+    <div class="type-preview" style="font-family:ui-monospace,monospace;font-size:11px;color:#b8c6d8">/Users/DJ/Music/Latino/Suavemente.mp3</div>
+  </div>
+  <div class="type-row">
+    <div class="type-spec"><code>11px / 700 uppercase</code><label>Section labels</label></div>
+    <div class="type-preview" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#617085">Arrière-plans</div>
+  </div>
+</div>
+
+<!-- ===== ESPACEMENTS ===== -->
+<div class="section" id="sec-espacements">
+  <div class="print-section-header">3. Espacements &amp; Dimensions</div>
+
+  <div class="section-title">Système de border-radius</div>
+  <div class="radius-row">
+    <div class="radius-box"><div class="radius-demo" style="width:32px;height:32px;border-radius:4px"></div><label>4px<br>tiny</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:40px;height:40px;border-radius:8px"></div><label>8px<br>chip / tab</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:50px;height:44px;border-radius:12px"></div><label>12px<br>back btn</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:60px;height:44px;border-radius:14px"></div><label>14px<br>nav / primary</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:68px;height:44px;border-radius:16px"></div><label>16px<br>metric / step</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:74px;height:44px;border-radius:18px"></div><label>18px<br>step item</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:80px;height:44px;border-radius:20px"></div><label>20px<br>summary card</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:88px;height:44px;border-radius:22px"></div><label>22px<br>feature card</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:96px;height:44px;border-radius:24px"></div><label>24px<br>main cards</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:104px;height:44px;border-radius:28px"></div><label>28px<br>scan panel</label></div>
+    <div class="radius-box"><div class="radius-demo" style="width:112px;height:44px;border-radius:999px"></div><label>999px<br>pills / badges</label></div>
+  </div>
+
+  <div class="section-title">Hauteurs de composants</div>
+  <div style="display:grid;gap:8px;max-width:480px">
+    <div style="display:flex;align-items:center;gap:14px"><div style="width:220px;height:40px;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.3);border-radius:4px"></div><div style="font-size:12px;color:#8794a7">40px — back button</div></div>
+    <div style="display:flex;align-items:center;gap:14px"><div style="width:220px;height:42px;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.3);border-radius:4px"></div><div style="font-size:12px;color:#8794a7">42px — advanced toggle</div></div>
+    <div style="display:flex;align-items:center;gap:14px"><div style="width:220px;height:54px;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.3);border-radius:4px"></div><div style="font-size:12px;color:#8794a7">54px — titlebar · btn primary · btn secondary</div></div>
+    <div style="display:flex;align-items:center;gap:14px"><div style="width:220px;height:56px;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.3);border-radius:4px"></div><div style="font-size:12px;color:#8794a7">56px — action-btn (pleine largeur)</div></div>
+    <div style="display:flex;align-items:center;gap:14px"><div style="width:220px;height:62px;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.3);border-radius:4px"></div><div style="font-size:12px;color:#8794a7">62px — nav button</div></div>
+    <div style="display:flex;align-items:center;gap:14px"><div style="width:220px;height:76px;background:rgba(21,152,255,.15);border:1px solid rgba(21,152,255,.3);border-radius:4px"></div><div style="font-size:12px;color:#8794a7">76px — status strip</div></div>
+  </div>
+
+  <div class="section-title">Gaps (système de grille)</div>
+  <div class="space-row">
+    <div class="space-box"><div class="space-demo" style="width:10px"></div><label>10</label></div>
+    <div class="space-box"><div class="space-demo" style="width:12px"></div><label>12</label></div>
+    <div class="space-box"><div class="space-demo" style="width:14px"></div><label>14</label></div>
+    <div class="space-box"><div class="space-demo" style="width:16px"></div><label>16</label></div>
+    <div class="space-box"><div class="space-demo" style="width:18px"></div><label>18</label></div>
+    <div class="space-box"><div class="space-demo" style="width:20px"></div><label>20</label></div>
+    <div class="space-box"><div class="space-demo" style="width:22px"></div><label>22</label></div>
+    <div class="space-box"><div class="space-demo" style="width:24px"></div><label>24</label></div>
+    <div class="space-box"><div class="space-demo" style="width:28px"></div><label>28</label></div>
+    <div class="space-box"><div class="space-demo" style="width:32px"></div><label>32</label></div>
+    <div class="space-box"><div class="space-demo" style="width:34px"></div><label>34</label></div>
+    <div class="space-box"><div class="space-demo" style="width:48px"></div><label>48</label></div>
+  </div>
+
+  <div class="section-title">Layout global</div>
+  <div class="card-demo" style="max-width:420px;font-size:12px;line-height:2.2;color:#8794a7">
+    Largeur sidebar : <code>clamp(236px, 16vw, 270px)</code><br>
+    Padding sidebar : <code>30px 20px 66px</code><br>
+    Padding vue principale : <code>0 clamp(28px, 5.5vw, 92px) 34px</code><br>
+    Fenêtre minimale : <code>1180 × 720px</code><br>
+    Fenêtre par défaut : <code>1672 × 941px</code>
+  </div>
+</div>
+
+<!-- ===== COMPOSANTS ===== -->
+<div class="section" id="sec-composants">
+  <div class="print-section-header">4. Composants</div>
+
+  <div class="section-title">Boutons</div>
+  <div class="comp-row">
+    <div><div class="btn-primary">Réparer</div><label>primary · h:54 · r:14 · w:800</label></div>
+    <div><div class="btn-secondary">Retour</div><label>secondary · h:54 · r:14 · w:700</label></div>
+    <div><div class="btn-tertiary">Quitter</div><label>tertiary · h:54 · r:14 · w:700</label></div>
+  </div>
+  <div class="comp-row" style="margin-top:16px">
+    <div><div class="btn-action">Lancer un scan</div><label>action-btn · h:56 · r:12 · w:800 · full width</label></div>
+    <div><div class="btn-back">← Retour</div><label>back-btn · h:40 · r:12</label></div>
+    <div><div class="btn-disabled">Bientôt disponible</div><label>disabled · opacity .82</label></div>
+  </div>
+
+  <div class="section-title">Nav buttons</div>
+  <div class="comp-row">
+    <div><div class="nav-demo nav-active"><span style="color:#2ea2ff;font-size:18px">⚡</span> Réparer</div><label>état actif (is-active)</label></div>
+    <div><div class="nav-demo nav-idle"><span style="color:#617085;font-size:18px">🏠</span> Accueil</div><label>état inactif</label></div>
+  </div>
+
+  <div class="section-title">Pills d'état &amp; Badges</div>
+  <div class="comp-row">
+    <div><span class="pill pill-green">OK</span><label>succès</label></div>
+    <div><span class="pill pill-blue">Inclus</span><label>info</label></div>
+    <div><span class="pill pill-orange">À vérifier</span><label>warning</label></div>
+    <div style="margin-left:16px"><span class="badge">Gratuit</span><label>badge bleu</label></div>
+    <div><span class="badge badge-soon">À venir</span><label>badge orange</label></div>
+  </div>
+
+  <div class="section-title">Cards</div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card-demo">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Main Card</div>
+      <div style="font-size:12px;color:#8794a7;line-height:1.6">r:24px · gradient 180deg · box-shadow --shadow<br>inset 0 1px 0 rgba(255,255,255,.05)</div>
+    </div>
+    <div class="card-side">
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:6px">Side Card</div>
+      <div style="font-size:12px;color:#8794a7;line-height:1.6">r:14px · rgba(9,18,30,.72)<br>border rgba(117,164,221,.14)</div>
+    </div>
+  </div>
+
+  <div class="section-title">Carte Notice (icon + texte)</div>
+  <div class="card-notice" style="max-width:420px;margin-bottom:16px">
+    <div class="notice-icon">💡</div>
+    <div><div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px">Conseil avant scan</div><div style="font-size:12px;color:#a7b4c5;line-height:1.4">Ferme Serato DJ Pro avant de lancer le scan pour éviter les conflits.</div></div>
+  </div>
+
+  <div class="section-title">Cartes de confiance</div>
+  <div class="grid-3" style="max-width:500px;margin-bottom:16px">
+    <div class="conf-good"><span style="font-size:11px;color:#8794a7">Très fiable</span><span class="conf-num">588</span><div class="conf-label">résultats</div></div>
+    <div class="conf-warn"><span style="font-size:11px;color:#8794a7">À vérifier</span><span class="conf-num">12</span><div class="conf-label">morceaux</div></div>
+    <div class="conf-bad"><span style="font-size:11px;color:#8794a7">Introuvables</span><span class="conf-num">2</span><div class="conf-label">fichiers</div></div>
+  </div>
+
+  <div class="section-title">Path rows (avant / après réparation)</div>
+  <div style="display:grid;gap:8px;max-width:520px;margin-bottom:16px">
+    <div class="path-row path-broken"><code>/Musiques Remy/DL2026/Wedding March.mp3</code><div style="font-size:11px;color:#ff9a8b;margin-top:4px;font-weight:800">Introuvable</div></div>
+    <div class="path-row path-fixed"><code>/DJ Shanks/DL2026/Wedding March.mp3</code><div style="font-size:11px;color:#6ff584;margin-top:4px;font-weight:800">Très fiable</div></div>
+  </div>
+
+  <div class="section-title">Toast notification</div>
+  <div class="toast-demo">Serato DJ Pro semble ouvert — ferme-le avant de scanner.</div>
+</div>
+
+<!-- ===== MOTION ===== -->
+<div class="section" id="sec-motion">
+  <div class="print-section-header">5. Motion &amp; Animations</div>
+
+  <div class="section-title">Animations déclarées</div>
+  <div class="grid-2">
+    <div class="anim-card"><div class="anim-name">radarSweep</div><div class="anim-detail">Bras tournant du radar principal (scan view)</div><span class="anim-tag">5s · linear · infinite</span></div>
+    <div class="anim-card"><div class="anim-name">softPulse</div><div class="anim-detail">Pulse scale + opacity sur les cercles Recovery Radar</div><span class="anim-tag">4.8s · ease-in-out · infinite</span></div>
+    <div class="anim-card"><div class="anim-name">orbitSlow</div><div class="anim-detail">Rotation lente du cercle interne du Recovery Radar</div><span class="anim-tag">8s · linear · infinite</span></div>
+    <div class="anim-card"><div class="anim-name">scanSweep</div><div class="anim-detail">Ligne de scan horizontale (radar-sweep)</div><span class="anim-tag">3.8s · linear · infinite</span></div>
+    <div class="anim-card"><div class="anim-name">float</div><div class="anim-detail">Mouvement vertical des 3 dots de détection</div><span class="anim-tag">5.8s · ease-in-out · infinite</span></div>
+    <div class="anim-card"><div class="anim-name">waveformIdle</div><div class="anim-detail">Translation de la waveform décorative en bas</div><span class="anim-tag">9s · ease-in-out · infinite</span></div>
+    <div class="anim-card"><div class="anim-name">fadeIn</div><div class="anim-detail">Apparition toast (opacity + translateY)</div><span class="anim-tag">0.16s · ease-out</span></div>
+  </div>
+
+  <div class="section-title">Transitions UI</div>
+  <div class="grid-2">
+    <div class="anim-card"><div class="anim-name">Nav / Cards hover</div><div class="anim-detail">background, border-color, color, box-shadow</div><span class="anim-tag">0.18s</span></div>
+    <div class="anim-card"><div class="anim-name">Boutons hover</div><div class="anim-detail">transform: translateY(-1px) + filter brightness</div><span class="anim-tag">0.16s</span></div>
+    <div class="anim-card"><div class="anim-name">Barre de progression</div><div class="anim-detail">width (scan progress bar)</div><span class="anim-tag">0.2s</span></div>
+    <div class="anim-card" style="border-left:3px solid #ff6a55"><div class="anim-name" style="color:#ff9a8b">prefers-reduced-motion</div><div class="anim-detail">Toutes les animations ET transitions sont désactivées. Règle obligatoire pour toute nouvelle animation.</div><span class="anim-tag" style="background:rgba(255,106,85,.15);border-color:rgba(255,106,85,.3);color:#ff9a8b">obligatoire · @media</span></div>
+  </div>
+
+  <div class="section-title">Effets décoratifs (statiques)</div>
+  <div class="grid-2">
+    <div class="anim-card"><div class="anim-name">Radial glow</div><div class="anim-detail"><code>radial-gradient(…, rgba(20,130,255,.10), transparent 70%)</code> — glow ambiant bleu en background de chaque vue</div></div>
+    <div class="anim-card"><div class="anim-name">Grille de fond</div><div class="anim-detail">linear-gradient croisé 70×70px + mask radial — visible sur .main, discret</div></div>
+    <div class="anim-card"><div class="anim-name">Inset white line</div><div class="anim-detail"><code>inset 0 1px 0 rgba(255,255,255,.05~.08)</code> — highlight en haut de toutes les cards</div></div>
+    <div class="anim-card"><div class="anim-name">Box shadow profonde</div><div class="anim-detail"><code>0 30px 90px rgba(0,0,0,.42)</code> = <code>--shadow</code> — appliquée sur les cards principales</div></div>
+  </div>
+</div>
+
+<!-- ===== RÈGLES ===== -->
+<div class="section" id="sec-regles">
+  <div class="print-section-header">6. Règles &amp; Conventions</div>
+
+  <div class="section-title">Couleurs</div>
+  <div class="rule-card do"><div class="rule-title">Utiliser les variables CSS</div><div class="rule-body">Toujours référencer <code>var(--blue)</code>, <code>var(--text)</code>, <code>var(--green)</code>… Ne jamais répéter la valeur hex directement dans une nouvelle règle CSS.</div></div>
+  <div class="rule-card dont"><div class="rule-title">Inventer de nouvelles couleurs</div><div class="rule-body">L'app est entièrement dark. Pas de blanc pur, pas de gris clair, pas de fond clair. Toute nouvelle couleur doit appartenir à la famille bleue nuit ou aux accents existants.</div></div>
+  <div class="rule-card tip"><div class="rule-title">Opacité basse sur les bordures</div><div class="rule-body">Les bordures sont en <code>rgba()</code> avec opacité 0.12 à 0.28 maximum. Les bordures opaques cassent la profondeur visuelle de l'app.</div></div>
+  <div class="rule-card dont"><div class="rule-title">Ne pas intervertir les couleurs sémantiques</div><div class="rule-body"><code>--green</code> = succès confirmé uniquement. <code>--orange</code> = attention / à vérifier. <code>--danger</code> = erreur critique / action destructive. Usage strict.</div></div>
+
+  <div class="section-title">Typographie</div>
+  <div class="rule-card do"><div class="rule-title">Respecter l'échelle définie</div><div class="rule-body">Titres de page : 49px / 800. Titres de cards : 28-32px / 700-800. Corps : 18-22px / 400. Labels section : 11px uppercase. Ne pas créer de taille intermédiaire non listée.</div></div>
+  <div class="rule-card do"><div class="rule-title">Chemins de fichiers en monospace</div><div class="rule-body">Tout texte représentant un chemin système : balise <code>&lt;code&gt;</code> avec font-family monospace et couleur <code>#b8c6d8</code>.</div></div>
+  <div class="rule-card dont"><div class="rule-title">Pas de text-transform uppercase sur les titres</div><div class="rule-body">Uppercase réservé aux labels de section (10-11px, letter-spacing .1em). Pas sur les titres de page, de card ou de bouton.</div></div>
+
+  <div class="section-title">Composants</div>
+  <div class="rule-card do"><div class="rule-title">Toujours inset white-line sur les cards</div><div class="rule-body">Toute nouvelle card : <code>box-shadow: inset 0 1px 0 rgba(255,255,255,.05)</code> pour simuler un reflet en haut et renforcer la profondeur.</div></div>
+  <div class="rule-card do"><div class="rule-title">Pills pour les états, boutons pour les actions</div><div class="rule-body">Les <code>state-pill</code> décrivent un état (OK, Inclus, À vérifier). Pour déclencher une action, utiliser les boutons primary / secondary / tertiary.</div></div>
+  <div class="rule-card dont"><div class="rule-title">Pas de backdrop-filter sur de nouveaux éléments</div><div class="rule-body">Le modal et l'onboarding utilisent <code>backdrop-filter: blur(16px)</code>. Ne pas ajouter ce filtre ailleurs — trop coûteux en perf sur les vieilles machines des DJs.</div></div>
+  <div class="rule-card tip"><div class="rule-title">Radial glow pour chaque nouvelle vue</div><div class="rule-body">Chaque grande section a un radial-gradient de glow bleu en arrière-plan. Pour une nouvelle vue : <code>radial-gradient(Xpx Ypx at 50% 26%, rgba(10,76,145,.11), transparent 70%)</code>.</div></div>
+
+  <div class="section-title">Motion</div>
+  <div class="rule-card do"><div class="rule-title">Toujours respecter prefers-reduced-motion</div><div class="rule-body">La règle <code>@media (prefers-reduced-motion: reduce)</code> désactive tout. Chaque nouvelle animation doit automatiquement en faire partie — pas d'exception.</div></div>
+  <div class="rule-card dont"><div class="rule-title">Pas d'animation sur les éléments de données</div><div class="rule-body">Les paths, noms de fichiers, compteurs — pas d'animation (sauf rollTo sur les chiffres déjà en place). Animer uniquement les éléments décoratifs et les transitions de vue.</div></div>
+  <div class="rule-card tip"><div class="rule-title">Durées : micro 0.16s · UI 0.18s · décoratif 3.8s+</div><div class="rule-body">Micro-interactions (boutons, hover) : 0.16-0.18s. Transitions de vue : 0.2-0.3s. Animations radar / idle : 3.8 secondes minimum.</div></div>
+</div>
+
+<script>
+function show(id, tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (tab) tab.classList.add('active');
+}
+</script>
+</body>
+</html>

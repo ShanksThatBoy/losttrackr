@@ -473,6 +473,67 @@
   .mdx-scanbar i{display:block;width:38%;height:100%;border-radius:inherit;background:linear-gradient(90deg,transparent,#20b8ff,transparent);animation:mdxScan 1.15s ease-in-out infinite}
   @keyframes mdxScan{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
 
+  /* Animation de scan WebGL (onde chromatique) + pipeline lt-intelligence */
+  .mdx-scan-canvas{width:clamp(230px,32vh,360px);height:clamp(230px,32vh,360px);display:block;margin:0 auto}
+  .mdx-loader p{color:var(--text);font-size:16px;font-weight:600;margin:2px 0 0;letter-spacing:.01em}
+  .mdx-pipeline{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px;margin-top:12px}
+  .mdx-pl-step{position:relative;color:var(--muted);font-size:12.5px;font-weight:650;padding:6px 14px;border-radius:999px;transition:color .4s,background .4s,text-shadow .4s}
+  .mdx-pl-step:not(:last-child)::after{content:"›";position:absolute;right:-7px;top:50%;transform:translateY(-50%);color:var(--quiet);font-weight:400}
+  .mdx-pl-step.is-active{color:#8fd0ff;background:rgba(21,152,255,.12);text-shadow:0 0 14px rgba(33,158,255,.6)}
+  .mdx-pl-step.is-done{color:#5cf07d}
+
+  /* Waveform Progress Bar */
+  .waveform-progress-container{display:flex;flex-direction:column;align-items:center;margin-top:28px;width:100%;max-width:440px}
+  .waveform-bar-wrapper{display:flex;align-items:center;justify-content:space-between;gap:4px;width:100%;height:45px}
+  .waveform-bar{flex:1;background:rgba(127,176,236,.12);border-radius:2px;transition:background .25s ease,box-shadow .25s ease,transform .25s ease}
+  .waveform-bar.is-active{background:linear-gradient(180deg,#20b8ff,#9c42ff);box-shadow:0 0 7px rgba(32,184,255,.45)}
+  .waveform-progress-text{margin-top:10px;font-family:monospace;font-size:15px;font-weight:700;color:#20b8ff;text-shadow:0 0 8px rgba(32,184,255,.3)}
+
+  @media (prefers-reduced-motion:reduce){.mdx-scan-canvas{display:none}}
+
+  /* ===== Drawer d'affinage manuel (corriger → rechercher → valider) ===== */
+  .mdx-refine-overlay{position:fixed;inset:0;z-index:1000;background:rgba(2,7,13,.55);backdrop-filter:blur(3px);display:flex;justify-content:flex-end}
+  .mdx-refine-overlay[hidden]{display:none}
+  .mdx-refine{width:min(480px,92vw);height:100%;display:flex;flex-direction:column;background:linear-gradient(180deg,#0c1a2b,#081221);border-left:1px solid var(--line-strong);box-shadow:-30px 0 80px rgba(0,0,0,.5);animation:mdxSlideIn .24s ease-out}
+  @keyframes mdxSlideIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+  @media (prefers-reduced-motion:reduce){.mdx-refine{animation:none}}
+
+  .mdx-refine-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 24px 16px;border-bottom:1px solid var(--line)}
+  .mdx-refine-head h2{margin:0;font-family:var(--font-display);font-size:24px;font-weight:800;color:#fff;letter-spacing:-.01em}
+  .mdx-refine-file{display:block;margin-top:6px;color:var(--muted);font-size:12px;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .mdx-refine-close{flex:0 0 auto;width:40px;height:40px;border-radius:11px;display:grid;place-items:center;color:#9fb2ca;background:rgba(20,38,60,.7);border:1px solid rgba(125,171,231,.24);cursor:pointer;transition:color .16s,border-color .16s}
+  .mdx-refine-close:hover{color:#fff;border-color:rgba(43,150,255,.55)}
+
+  .mdx-refine-body{flex:1 1 auto;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px}
+  .mdx-refine-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .mdx-field{display:flex;flex-direction:column;gap:7px;grid-column:span 2}
+  .mdx-field-s{grid-column:span 1}
+  .mdx-field span{color:var(--soft);font-size:12.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}
+  .mdx-field input,.mdx-field select{height:46px;padding:0 14px;border-radius:11px;color:var(--text);font-size:15px;background:rgba(8,16,27,.7);border:1px solid var(--line-strong);transition:border-color .16s,box-shadow .16s}
+  .mdx-field input:focus,.mdx-field select:focus{outline:none;border-color:rgba(43,150,255,.65);box-shadow:0 0 0 3px rgba(21,152,255,.18)}
+  .mdx-field input::placeholder{color:var(--quiet)}
+  .mdx-field select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' stroke='%238794a7' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 14px center}
+
+  .mdx-refine-search{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px}
+  .mdx-refine-search.is-loading{opacity:.6;pointer-events:none}
+
+  .mdx-refine-proposal{border:1px solid rgba(37,148,255,.3);background:rgba(15,40,70,.35);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .mdx-refine-proposal[hidden]{display:none}
+  .mdx-refine-proposal-head{color:#63b6ff;font-size:12.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+  .mdx-refine-proposal-body{color:var(--text);font-size:14.5px;line-height:1.5}
+  .mdx-refine-proposal-body b{font-size:16px}
+  .mdx-refine-proposal-body .mdx-chip{display:inline-block;margin:6px 6px 0 0;padding:4px 10px;border-radius:999px;font-size:12.5px;font-weight:700;color:#9fd3ff;background:rgba(21,152,255,.12);border:1px solid rgba(37,148,255,.28)}
+
+  .mdx-refine-foot{padding:18px 24px 22px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+  .mdx-refine-validate{height:52px;font-size:16.5px;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+  .mdx-refine-hint{margin:0;color:var(--muted);font-size:12.5px;line-height:1.4;text-align:center}
+
+  /* Lignes du tableau cliquables (affordance d'édition) */
+  .metadata-table-row{cursor:pointer}
+  .metadata-table-row:focus-visible{outline:2px solid rgba(43,150,255,.65);outline-offset:-2px}
+  .mdx-row-edit{opacity:.45;margin-left:8px;vertical-align:-2px;transition:opacity .15s}
+  .metadata-table-row:hover .mdx-row-edit{opacity:1}
+
   /* Stat cards résultats */
   .mdx-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
   .mdx-stat{position:relative;overflow:hidden;padding:18px;border-radius:14px;background:rgba(9,18,30,.55);border:1px solid var(--line);text-align:left}

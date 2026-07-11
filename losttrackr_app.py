@@ -22,6 +22,158 @@ import dj_set
 import dj_software
 import knowledge_client
 import losttrackr_platform as platform
+
+# lt-intelligence helpers for audio tagging and fingerprinting
+def get_fpcalc_path() -> str:
+    import sys
+    from pathlib import Path
+    
+    if hasattr(sys, "_MEIPASS"):
+        base_path = Path(sys._MEIPASS)
+    else:
+        base_path = Path(__file__).resolve().parent
+
+    binary_name = "fpcalc.exe" if platform.is_windows() else "fpcalc"
+    bundled_path = base_path / "bin" / binary_name
+    if bundled_path.exists():
+        return str(bundled_path)
+    
+    local_path = Path(__file__).resolve().parent / "bin" / binary_name
+    if local_path.exists():
+        return str(local_path)
+        
+    return binary_name
+
+def compute_audio_fingerprint(file_path: Path) -> dict | None:
+    import subprocess
+    import json
+    
+    fpcalc_path = get_fpcalc_path()
+    try:
+        res = subprocess.run(
+            [fpcalc_path, "-json", "-length", "120", str(file_path)],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10
+        )
+        data = json.loads(res.stdout)
+        return {
+            "fingerprint": data.get("fingerprint"),
+            "duration": int(data.get("duration") or 0)
+        }
+    except Exception:
+        return None
+
+def read_audio_tags(file_path: Path) -> dict:
+    from mutagen import File as MutagenFile
+    
+    tags = {
+        "artist": "",
+        "title": "",
+        "album": "",
+        "year": None,
+        "genre": ""
+    }
+    
+    try:
+        audio = MutagenFile(file_path, easy=True)
+        if audio is not None and audio.tags:
+            tags["artist"] = audio.tags.get("artist", [""])[0]
+            tags["title"] = audio.tags.get("title", [""])[0]
+            tags["album"] = audio.tags.get("album", [""])[0]
+            tags["genre"] = audio.tags.get("genre", [""])[0]
+            
+            date_val = audio.tags.get("date", [""])[0] or audio.tags.get("year", [""])[0]
+            if date_val:
+                import re
+                match = re.search(r"\b(19\d\d|20\d\d)\b", date_val)
+                if match:
+                    tags["year"] = int(match.group(1))
+    except Exception:
+        pass
+        
+    return tags
+
+def write_audio_tags(file_path: Path, tags: dict):
+    ext = file_path.suffix.casefold()
+    if ext == ".mp3":
+        from mutagen.id3 import ID3, TPE1, TIT2, TALB, TDRC, TCON, TBPM, TKEY
+        try:
+            try:
+                audio = ID3(str(file_path))
+            except Exception:
+                audio = ID3()
+            
+            if tags.get("artist"):
+                audio.add(TPE1(encoding=3, text=[tags["artist"]]))
+            if tags.get("title"):
+                audio.add(TIT2(encoding=3, text=[tags["title"]]))
+            if tags.get("album"):
+                audio.add(TALB(encoding=3, text=[tags["album"]]))
+            if tags.get("year"):
+                audio.add(TDRC(encoding=3, text=[str(tags["year"])]))
+            if tags.get("genre"):
+                audio.add(TCON(encoding=3, text=[tags["genre"]]))
+            if tags.get("bpm"):
+                audio.add(TBPM(encoding=3, text=[str(tags["bpm"])]))
+            if tags.get("camelot_key"):
+                audio.add(TKEY(encoding=3, text=[tags["camelot_key"]]))
+            
+            audio.save(str(file_path))
+        except Exception as e:
+            print(f"Error writing MP3 tags: {e}")
+            raise
+            
+    elif ext == ".flac":
+        from mutagen.flac import FLAC
+        try:
+            audio = FLAC(str(file_path))
+            if tags.get("artist"):
+                audio["artist"] = tags["artist"]
+            if tags.get("title"):
+                audio["title"] = tags["title"]
+            if tags.get("album"):
+                audio["album"] = tags["album"]
+            if tags.get("year"):
+                audio["date"] = str(tags["year"])
+            if tags.get("genre"):
+                audio["genre"] = tags["genre"]
+            if tags.get("bpm"):
+                audio["bpm"] = str(tags["bpm"])
+            if tags.get("camelot_key"):
+                audio["key"] = tags["camelot_key"]
+            audio.save()
+        except Exception as e:
+            print(f"Error writing FLAC tags: {e}")
+            raise
+            
+    elif ext in (".m4a", ".mp4"):
+        from mutagen.mp4 import MP4
+        try:
+            audio = MP4(str(file_path))
+            if tags.get("artist"):
+                audio["\xa9ART"] = [tags["artist"]]
+            if tags.get("title"):
+                audio["\xa9nam"] = [tags["title"]]
+            if tags.get("album"):
+                audio["\xa9alb"] = [tags["album"]]
+            if tags.get("year"):
+                audio["\xa9day"] = [str(tags["year"])]
+            if tags.get("genre"):
+                audio["\xa9gen"] = [tags["genre"]]
+            if tags.get("bpm"):
+                try:
+                    audio["tmpo"] = [int(float(tags["bpm"]))]
+                except ValueError:
+                    pass
+            if tags.get("camelot_key"):
+                audio["----:com.apple.iTunes:initialkey"] = [tags["camelot_key"].encode("utf-8")]
+            audio.save()
+        except Exception as e:
+            print(f"Error writing M4A tags: {e}")
+            raise
+
 import serato_relocate as serato
 import smart_import
 import update_manager
@@ -30,6 +182,12 @@ APP_NAME = "LostTrackr"
 APP_VERSION = update_manager.APP_VERSION
 
 RELEASE_NOTES = {
+    "1.4.0": [
+        "Nouveau drawer d'affinage manuel pour corriger ou relancer la recherche d'un titre.",
+        "Écriture des métadonnées (BPM, clé, etc.) directement dans les fichiers physiques.",
+        "Barre de progression visuelle en temps réel (Pipeline visual) avec animation Waveform.",
+        "Robustesse accrue : tolérance aux pannes réseau par lots (chunking).",
+    ],
     "1.3.5": [
         "Nouvelle page « Analyser les métadonnées » dans l'espace DJ Set.",
         "Détection des données manquantes : artiste, titre, BPM, clé Camelot, genre.",
@@ -420,6 +578,13 @@ class LostTrackrApi:
         self.last_smart_import_plan = None
         self.last_smart_import_result = None
         self.selected_software_id = None
+        self.window = None
+
+    def set_window(self, window):
+        self.window = window
+
+    def setWindow(self, window):
+        self.set_window(window)
 
     def volume_roots(self):
         return platform.library_roots()
@@ -1343,101 +1508,179 @@ class LostTrackrApi:
 
         tracks = []
         for f in files:
+            file_path = Path(f.get("source"))
+            
+            # Read real tags with mutagen
+            tags = read_audio_tags(file_path)
+            
+            # Merge with inferred metadata from filename
+            artist = tags["artist"].strip() or f.get("artist") or ""
+            title = tags["title"].strip() or f.get("title") or ""
+            year = tags["year"] or f.get("year")
+            genre = tags["genre"].strip() or f.get("genre") or "A verifier"
+            
             track_meta = {
                 "id": f.get("id"),
                 "file": f.get("file"),
-                "path": f.get("source"),
-                "artist": f.get("artist") or "",
-                "title": f.get("title") or "",
-                "year": f.get("year"),
+                "path": str(file_path),
+                "artist": artist,
+                "title": title,
+                "year": year,
                 "bpm": None,
                 "camelot_key": None,
-                "genre": f.get("genre") or "A verifier",
+                "genre": genre,
                 "status": "incomplete",
-                "source": "Fichier"
+                "source": "Fichier",
+                "version": f.get("version") or "",
+                "is_edit_detected": False,
+                "duration_ms": None
             }
             tracks.append(track_meta)
 
-        def normalize(s):
-            if not s:
-                return ""
-            return re.sub(r'[^a-z0-9]', '', str(s).lower())
+        # 1. Empreinte + tags par fichier → une seule requête batch lt-intelligence.
+        #    Le serveur cascade lui-même : cache → AcoustID → texte MusicBrainz,
+        #    et renvoie le canonique consolidé (bpm/clé/genre/année/drapeaux).
+        resolve_reqs = []
+        total_tracks = len(tracks)
+        for i, t in enumerate(tracks):
+            fp_data = compute_audio_fingerprint(Path(t["path"]))
+            req = {"client_track_id": str(i)}
+            if t["title"]:
+                req["title"] = t["title"]
+            if t["artist"]:
+                req["artist"] = t["artist"]
+            if fp_data and fp_data.get("fingerprint") and fp_data.get("duration"):
+                req["fingerprint"] = fp_data["fingerprint"]
+                req["duration"] = fp_data["duration"]
+                t["duration_ms"] = fp_data["duration"] * 1000
+            resolve_reqs.append(req)
 
-        REAL_METADATA_DATABASE = {
-            "suavemente": {
-                "artist": "Elvis Crespo", "title": "Suavemente", "bpm": 127.0, "camelot_key": "4B", "genre": "Latino",
-                "status": "complete", "source": "Base de connaissances"
-            },
-            "gasolina": {
-                "artist": "Daddy Yankee", "title": "Gasolina", "bpm": 96.0, "camelot_key": "11B", "genre": "Reggaeton",
-                "status": "complete", "source": "Base de connaissances"
-            },
-            "djadja": {
-                "artist": "Aya Nakamura", "title": "Djadja", "bpm": 100.0, "camelot_key": "8A", "genre": "Afropop",
-                "status": "complete", "source": "Base de connaissances"
-            },
-            "move": {
-                "artist": "Adam Port, Stryv, Keinemusik", "title": "Move", "bpm": 120.0, "camelot_key": "8A", "genre": "Afro House",
-                "status": "complete", "source": "Base de connaissances"
-            },
-            "lesgout": {
-                "artist": "Rampa", "title": "Les Gout", "bpm": 120.0, "camelot_key": "12A", "genre": "Afro House",
-                "status": "complete", "source": "Base de connaissances"
-            },
-            "backinblack": {
-                "artist": "AC/DC", "title": "Back In Black", "bpm": 93.0, "camelot_key": "9A", "genre": "Rock",
-                "status": "complete", "source": "Base de connaissances"
-            },
-            "allthesmallthings": {
-                "artist": "Blink 182", "title": "All The Small Things", "bpm": 76.0, "camelot_key": "10B", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            },
-            "americanidiot": {
-                "artist": "Green Day", "title": "American Idiot", "bpm": 93.0, "camelot_key": "12B", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            },
-            "areyougonnabemygirl": {
-                "artist": "Jet", "title": "Are You Gonna Be My Girl", "bpm": 105.0, "camelot_key": "9B", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            },
-            "badtothebone": {
-                "artist": "George Thorogood", "title": "Bad To The Bone", "bpm": 132.0, "camelot_key": "5B", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            },
-            "blackbetty": {
-                "artist": "Ram Jam", "title": "Black Betty", "bpm": 118.0, "camelot_key": "10A", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            },
-            "boulevardofbrokendreams": {
-                "artist": "Green Day", "title": "Boulevard of Broken Dreams", "bpm": 83.0, "camelot_key": "8A", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            },
-            "cantstop": {
-                "artist": "Red Hot Chili Peppers", "title": "Cant Stop", "bpm": 91.0, "camelot_key": "9A", "genre": "Rock",
-                "status": "probable_suggestion", "source": "Suggestion KB"
-            }
-        }
+            # Progression (0% → 75% : calcul des empreintes)
+            if self.window:
+                progress = int((i + 1) / total_tracks * 75)
+                self.window.evaluate_js(f"if (window.updateMetadataProgress) window.updateMetadataProgress({progress});")
 
-        for t in tracks:
-            normalized_title = normalize(t["title"])
-            match = REAL_METADATA_DATABASE.get(normalized_title)
-            
-            if match:
-                t["artist"] = match["artist"]
-                t["title"] = match["title"]
-                t["bpm"] = match["bpm"]
-                t["camelot_key"] = match["camelot_key"]
-                t["genre"] = match["genre"]
-                t["status"] = match["status"]
-                t["source"] = match["source"]
+        def _resolve_progress(done, total):
+            # 75% → 95% : résolution par lots côté serveur
+            if self.window and total:
+                progress = 75 + int(done / total * 20)
+                self.window.evaluate_js(f"if (window.updateMetadataProgress) window.updateMetadataProgress({progress});")
+
+        results_by_idx = {}
+        try:
+            res = knowledge_client.resolve_fingerprints(resolve_reqs, on_progress=_resolve_progress)
+            for r in res.get("results", []):
+                results_by_idx[int(r["client_track_id"])] = r
+        except Exception as e:
+            print(f"Error resolving tracks: {e}")
+
+        # 2. Application : identité + canonique. Un "matched" marqué needs_review
+        #    par le consensus est rétrogradé en "À vérifier" (jamais de fausse
+        #    certitude affichée).
+        EDIT_WORDS = ("edit", "remix", "bootleg", "extended", "mix", "mashup", "vip", "intro")
+        for i, t in enumerate(tracks):
+            r = results_by_idx.get(i)
+            status = (r or {}).get("status")
+            canonical = (r or {}).get("canonical") or {}
+            recording = (r or {}).get("recording") or {}
+
+            if status in ("matched", "probable"):
+                t["artist"] = canonical.get("artist") or recording.get("artist") or t["artist"]
+                t["title"] = canonical.get("title") or recording.get("title") or t["title"]
+                t["bpm"] = canonical.get("bpm")
+                t["camelot_key"] = canonical.get("camelot_key")
+                t["genre"] = canonical.get("genre") or t["genre"]
+                t["year"] = canonical.get("year") or recording.get("year") or t["year"]
+                if status == "matched" and not canonical.get("needs_review"):
+                    t["status"] = "complete"
+                    t["source"] = "Base de connaissances"
+                else:
+                    t["status"] = "probable_suggestion"
+                    t["source"] = "Suggestion KB"
             else:
                 t["status"] = "incomplete"
                 t["source"] = "Non identifié"
+
+            version = (t["version"] or "").lower()
+            t["is_edit_detected"] = bool(canonical.get("version_mismatch")) or any(
+                w in version for w in EDIT_WORDS)
+
+        # Send progress (100%)
+        if self.window:
+            self.window.evaluate_js("if (window.updateMetadataProgress) window.updateMetadataProgress(100);")
 
         return {"ok": True, "tracks": tracks}
 
     def analyzeFolderMetadata(self, folder_path, options=None):
         return self.analyze_folder_metadata(folder_path, options)
+
+    def refine_track_metadata(self, path=None, title=None, artist=None):
+        """Re-résout UN titre avec les infos corrigées par l'utilisateur.
+
+        Volontairement SANS empreinte : si l'utilisateur corrige, c'est que
+        l'identification acoustique s'est trompée — la re-inclure resservirait
+        la même erreur. Le texte corrigé fait autorité.
+        """
+        title = str(title or "").strip()
+        artist = str(artist or "").strip()
+        if not title:
+            return {"ok": False, "error": "Un titre est nécessaire pour relancer la recherche."}
+        req = {"client_track_id": "manual-refine", "title": title}
+        if artist:
+            req["artist"] = artist
+        try:
+            res = knowledge_client.resolve_fingerprints([req])
+            results = res.get("results", [])
+        except Exception:
+            return {"ok": False, "error": "Le centre de connaissances est injoignable."}
+        if not results or results[0].get("status") not in ("matched", "probable"):
+            return {"ok": True, "status": "unmatched"}
+        r = results[0]
+        return {
+            "ok": True,
+            "status": r.get("status"),
+            "method": r.get("method"),
+            "recording": r.get("recording") or {},
+            "canonical": r.get("canonical") or {},
+        }
+
+    def refineTrackMetadata(self, path=None, title=None, artist=None):
+        return self.refine_track_metadata(path, title, artist)
+
+    def save_tracks_metadata(self, tracks):
+        from pathlib import Path
+        
+        saved_count = 0
+        errors = []
+        
+        for t in tracks or []:
+            if t.get("status") not in ("complete", "probable_suggestion"):
+                continue
+                
+            file_path = Path(t["path"])
+            if not file_path.exists():
+                errors.append(f"Fichier introuvable : {t['file']}")
+                continue
+                
+            try:
+                write_audio_tags(file_path, {
+                    "artist": t.get("artist"),
+                    "title": t.get("title"),
+                    "year": t.get("year"),
+                    "genre": t.get("genre"),
+                    "bpm": t.get("bpm"),
+                    "camelot_key": t.get("camelot_key"),
+                })
+                saved_count += 1
+            except Exception as e:
+                errors.append(f"Erreur d'ecriture pour {t['file']} : {str(e)}")
+                
+        if errors:
+            return {"ok": False, "saved_count": saved_count, "error": "\n".join(errors[:5])}
+        return {"ok": True, "saved_count": saved_count}
+
+    def saveTracksMetadata(self, tracks):
+        return self.save_tracks_metadata(tracks)
 
     def open_external_url(self, url):
         parsed = str(url or "")
@@ -1468,7 +1711,7 @@ def run():
 
     html_path = resource_path("losttrackr_ui.html")
     api = LostTrackrApi()
-    webview.create_window(
+    window = webview.create_window(
         APP_NAME,
         str(html_path),
         js_api=api,
@@ -1479,6 +1722,7 @@ def run():
         maximized=platform.is_windows(),
         text_select=True,
     )
+    api.set_window(window)
     webview.start(debug=False)
 
 

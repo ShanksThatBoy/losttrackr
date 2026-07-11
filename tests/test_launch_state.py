@@ -31,7 +31,8 @@ class LaunchStateTests(unittest.TestCase):
     def test_update_launch_shows_whats_new_without_onboarding(self):
         with tempfile.TemporaryDirectory() as tmp:
             support = Path(tmp)
-            with patch.object(losttrackr_app, "app_support_dir", return_value=support):
+            with patch.object(losttrackr_app, "app_support_dir", return_value=support), \
+                 patch("losttrackr_app.app_release_notes", return_value=["Inspiration test notes"]):
                 losttrackr_app.save_app_state(
                     {
                         "onboardingCompleted": True,
@@ -40,7 +41,7 @@ class LaunchStateTests(unittest.TestCase):
                 )
                 api = losttrackr_app.LostTrackrApi()
                 state = api.launch_state()
-
+    
         self.assertFalse(state["showOnboarding"])
         self.assertTrue(state["showWhatsNew"])
         self.assertIn("Inspiration", " ".join(state["releaseNotes"]))

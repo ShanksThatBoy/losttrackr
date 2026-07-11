@@ -10,7 +10,7 @@
 <div class="app" id="app" data-view="home" data-state="idle">
   <header class="titlebar" aria-label="Fenêtre LostTrackr">
     <div class="window-title">LostTrackr</div>
-    <div class="window-version" id="appVersionLabel">v1.3.5</div>
+    <div class="window-version" id="appVersionLabel">v1.4.0</div>
   </header>
 
   <div class="workspace">
@@ -690,7 +690,7 @@
           </div>
         </header>
 
-        <div class="mdx-wrap">
+        <div class="mdx-wrap" id="djSetMetadataConfig">
           <!-- Guidage : ce que fait l'analyse -->
           <div class="mdx-steps" aria-hidden="true">
             <div class="mdx-step">
@@ -753,9 +753,19 @@
         </div>
 
         <div id="djSetMetadataLoader" class="mdx-loader mdx-wrap" style="display: none; flex-direction: column;">
-          <div class="loader-spinner"></div>
-          <p id="djSetMetadataLoaderText">Scan et analyse des fichiers en cours…</p>
-          <div class="mdx-scanbar" aria-hidden="true"><i></i></div>
+          <canvas id="djSetScanCanvas" class="mdx-scan-canvas" aria-hidden="true"></canvas>
+          <p id="djSetMetadataLoaderText">Analyse acoustique en cours…</p>
+          <div class="mdx-pipeline" aria-hidden="true">
+            <span class="mdx-pl-step" data-step="0">Scan du dossier</span>
+            <span class="mdx-pl-step" data-step="1">Empreinte acoustique</span>
+            <span class="mdx-pl-step" data-step="2">Identification</span>
+            <span class="mdx-pl-step" data-step="3">Enrichissement</span>
+          </div>
+          <!-- Waveform Progress Bar -->
+          <div class="waveform-progress-container">
+            <div class="waveform-bar-wrapper" id="waveformProgressBarWrapper"></div>
+            <div class="waveform-progress-text" id="waveformProgressText">0%</div>
+          </div>
         </div>
 
         <div id="djSetMetadataResultsSection" class="mdx-wrap" style="display: none;">
@@ -785,6 +795,86 @@
               </table>
             </div>
           </div>
+          <div style="display: flex; justify-content: flex-end; margin: -14px 0 6px;">
+            <button class="mdx-btn-ghost" id="djSetValidateAllBtn" type="button" hidden>
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:7px;"><path d="M20 6 9 17l-5-5"></path><path d="m22 10-7.5 7.5L13 16"></path></svg>Tout valider
+            </button>
+          </div>
+          <div class="mdx-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 16px; margin-top: 20px;">
+            <label class="confirm-line" style="margin-bottom: 0;">
+              <input type="checkbox" id="djSetMetadataConfirmed">
+              <span>Je confirme vouloir écrire ces métadonnées (BPM, clé, etc.) dans les fichiers audio d’origine.</span>
+            </label>
+            <div style="display: flex; gap: 16px;">
+              <button class="action-btn mdx-cta" id="djSetMetadataSaveBtn" type="button" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Valider et enregistrer les modifications
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drawer d'affinage manuel : corriger / rechercher / valider un titre -->
+        <div class="mdx-refine-overlay" id="djSetRefineOverlay" hidden>
+          <aside class="mdx-refine" role="dialog" aria-modal="true" aria-labelledby="djSetRefineTitle">
+            <header class="mdx-refine-head">
+              <div>
+                <h2 id="djSetRefineTitle">Affiner ce titre</h2>
+                <code id="djSetRefineFile" class="mdx-refine-file"></code>
+              </div>
+              <button class="mdx-refine-close" id="djSetRefineClose" type="button" aria-label="Fermer (Échap)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+              </button>
+            </header>
+
+            <div class="mdx-refine-body">
+              <div class="mdx-refine-grid">
+                <label class="mdx-field">
+                  <span>Artiste</span>
+                  <input type="text" id="refArtist" autocomplete="off" placeholder="Ex. Linkin Park">
+                </label>
+                <label class="mdx-field">
+                  <span>Titre</span>
+                  <input type="text" id="refTitle" autocomplete="off" placeholder="Ex. Numb">
+                </label>
+                <label class="mdx-field mdx-field-s">
+                  <span>Année</span>
+                  <input type="number" id="refYear" min="1900" max="2100" placeholder="----">
+                </label>
+                <label class="mdx-field mdx-field-s">
+                  <span>Genre</span>
+                  <input type="text" id="refGenre" autocomplete="off" placeholder="Ex. Rock">
+                </label>
+                <label class="mdx-field mdx-field-s">
+                  <span>BPM</span>
+                  <input type="number" id="refBpm" min="30" max="260" step="0.1" placeholder="--">
+                </label>
+                <label class="mdx-field mdx-field-s">
+                  <span>Clé Camelot</span>
+                  <select id="refKey"><option value="">--</option></select>
+                </label>
+              </div>
+
+              <button class="mdx-btn-ghost mdx-refine-search" id="djSetRefineSearch" type="button">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                Relancer la recherche avec ces infos
+              </button>
+
+              <div class="mdx-refine-proposal" id="djSetRefineProposal" hidden>
+                <div class="mdx-refine-proposal-head">Proposition de la Base de connaissances</div>
+                <div class="mdx-refine-proposal-body" id="djSetRefineProposalBody"></div>
+                <button class="mdx-btn-ghost" id="djSetRefineApply" type="button">Utiliser ces valeurs</button>
+              </div>
+            </div>
+
+            <footer class="mdx-refine-foot">
+              <button class="action-btn mdx-refine-validate" id="djSetRefineValidate" type="button">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+                Valider ce titre
+              </button>
+              <p class="mdx-refine-hint">La validation met à jour la ligne — rien n'est écrit dans le fichier avant « Enregistrer les modifications ».</p>
+            </footer>
+          </aside>
         </div>
       </section>
 

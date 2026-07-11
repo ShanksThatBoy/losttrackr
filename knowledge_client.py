@@ -29,7 +29,7 @@ class KnowledgeError(Exception):
         self.retryable = retryable
 
 
-def _request(path, payload=None):
+def _request(path, payload=None, timeout=None):
     url = f"{KNOWLEDGE_BASE_URL}{path}"
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
     request = urllib.request.Request(
@@ -39,7 +39,7 @@ def _request(path, payload=None):
         method="POST" if data else "GET",
     )
     try:
-        with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+        with urllib.request.urlopen(request, timeout=timeout or REQUEST_TIMEOUT_SECONDS) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         try:
@@ -80,23 +80,51 @@ def match_tracks(tracks):
     return {"matches": results}
 
 
-# lt-intelligence — identification par empreinte acoustique.
-# L'empreinte Chromaprint est dérivée du signal audio (pas un chemin/nom) : privacy-safe.
-ALLOWED_FINGERPRINT_FIELDS = {"client_track_id", "fingerprint", "duration"}
+# lt-intelligence — identification par empreinte acoustique + repli texte serveur.
+# L'empreinte est dérivée du signal, titre/artiste viennent des tags/nom nettoyés :
+# jamais de chemin, dossier, crate ni commentaire.
+ALLOWED_FINGERPRINT_FIELDS = {"client_track_id", "fingerprint", "duration", "title", "artist"}
 
 
-def resolve_fingerprints(tracks):
-    """Identifie des morceaux par empreinte Chromaprint (artiste/titre/année via AcoustID)."""
+# Un titre jamais vu coûte ~1,5 s côté serveur (AcoustID + MusicBrainz
+# rate-limités, séquentiels) : de petits lots gardent chaque requête courte,
+# et un timeout généreux absorbe le pire cas d'un lot 100 % froid.
+RESOLVE_CHUNK_SIZE = 8
+RESOLVE_TIMEOUT_SECONDS = 45
+
+
+def resolve_fingerprints(tracks, on_progress=None):
+    """Identifie des morceaux (empreinte et/ou titre+artiste) via lt-intelligence.
+
+    Le serveur cascade : cache → AcoustID → recherche texte MusicBrainz, renvoie
+    l'identité + le canonique consolidé (bpm, clé, genre, année, drapeaux) et
+    déclenche l'enrichissement DSP pour les features manquantes.
+
+    Tolérant aux pannes partielles : un lot en échec est ignoré (ses titres
+    resteront « Incomplet » pour ce scan) au lieu de faire échouer tout le scan.
+    `on_progress(done, total)` est appelé après chaque lot.
+    """
     cleaned = [
-        {k: v for k, v in dict(t or {}).items() if k in ALLOWED_FINGERPRINT_FIELDS}
+        {k: v for k, v in dict(t or {}).items()
+         if k in ALLOWED_FINGERPRINT_FIELDS and v not in (None, "")}
         for t in tracks
-        if t and t.get("fingerprint")
+        if t and (t.get("fingerprint") or t.get("title"))
     ]
     if not cleaned:
         return {"results": []}
     results = []
-    for start in range(0, len(cleaned), 100):
-        chunk = cleaned[start:start + 100]
-        response = _request("/intelligence/resolve", {"tracks": chunk})
-        results.extend(response.get("results", []))
+    total = len(cleaned)
+    for start in range(0, total, RESOLVE_CHUNK_SIZE):
+        chunk = cleaned[start:start + RESOLVE_CHUNK_SIZE]
+        try:
+            response = _request("/intelligence/resolve", {"tracks": chunk},
+                                timeout=RESOLVE_TIMEOUT_SECONDS)
+            results.extend(response.get("results", []))
+        except KnowledgeError as exc:
+            print(f"resolve_fingerprints: lot {start}-{start + len(chunk)} en échec: {exc}")
+        if on_progress:
+            try:
+                on_progress(min(start + len(chunk), total), total)
+            except Exception:
+                pass
     return {"results": results}

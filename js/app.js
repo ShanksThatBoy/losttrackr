@@ -88,11 +88,11 @@
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
     async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; },
-    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.3.5",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}}; },
-    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}; },
-    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}; },
-    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.3.5",releaseNotes:[]}; },
-    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.3.5",updateAvailable:false}; },
+    async getAppInfo(){ if(window.pywebview?.api?.getAppInfo) return window.pywebview.api.getAppInfo(); await wait(60); return {name:"LostTrackr",version:"1.4.0",platform:navigator.platform,updateChannel:"demo",launchState:{showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}}; },
+    async getLaunchState(){ if(window.pywebview?.api?.getLaunchState) return window.pywebview.api.getLaunchState(); const info = await this.getAppInfo(); return info.launchState || {showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}; },
+    async completeOnboarding(){ if(window.pywebview?.api?.completeOnboarding) return window.pywebview.api.completeOnboarding(); try{ localStorage.setItem("lt_onboarded","1"); }catch(error){} return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}; },
+    async acknowledgeLaunchState(){ if(window.pywebview?.api?.acknowledgeLaunchState) return window.pywebview.api.acknowledgeLaunchState(); return {showOnboarding:false,showWhatsNew:false,currentVersion:"1.4.0",releaseNotes:[]}; },
+    async checkUpdate(){ if(window.pywebview?.api?.checkUpdate) return window.pywebview.api.checkUpdate(); await wait(120); return {ok:true,currentVersion:"1.4.0",updateAvailable:false}; },
     async installUpdate(){ if(window.pywebview?.api?.installUpdate) return window.pywebview.api.installUpdate(); await wait(120); return {launched:false,message:"Mode aperçu : aucune mise à jour."}; },
     async smartImportPreflight(){ if(window.pywebview?.api?.smartImportPreflight) return window.pywebview.api.smartImportPreflight(); await wait(120); return MOCK.smartImport.preflight; },
     async smartImportScan(options){
@@ -164,6 +164,13 @@
           {id: "4", file: "Inconnu - Titre.mp3", path: folderPath + "/Inconnu - Titre.mp3", artist: "Inconnu", title: "Titre", bpm: null, camelot_key: null, genre: "A verifier", status: "incomplete", source: "Non identifié"}
         ]
       };
+    },
+    async refineTrackMetadata(path, title, artist){
+      if(window.pywebview?.api?.refineTrackMetadata) return window.pywebview.api.refineTrackMetadata(path, title, artist);
+      await wait(700);
+      return {ok:true, status:"probable", method:"text",
+        recording:{artist:artist || "Linkin Park", title:title || "Numb", year:2003},
+        canonical:{artist:artist || "Linkin Park", title:title || "Numb", year:2003, bpm:110.0, camelot_key:"11A", genre:"Rock"}};
     },
     async djSetPreflight(){
       if(window.pywebview?.api?.djSetPreflight) return window.pywebview.api.djSetPreflight();
@@ -513,6 +520,7 @@
   let djSetGroupStates = new Map();
   let djSetExpandedGroupId = null;
   let djSetMetadataFolder = "";
+  let djSetMetadataTracks = [];
   try{ selectedSoftwareId = localStorage.getItem("lt_preferred_software") || null; }catch(error){}
 
   function esc(value){ return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char])); }
@@ -645,7 +653,7 @@
   function goHome(){ setState("idle"); showView("home"); }
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
   function goDjSet(){ setState("dj-set"); showView("djSet"); }
-  function goDjSetMetadata(){ setState("dj-set-metadata"); $("djSetMetadataFolder").value = djSetMetadataFolder; $("djSetMetadataStartBtn").disabled = !djSetMetadataFolder; $("djSetMetadataLoader").style.display = "none"; $("djSetMetadataResultsSection").style.display = "none"; showView("djSetMetadata"); }
+  function goDjSetMetadata(){ setState("dj-set-metadata"); $("djSetMetadataFolder").value = djSetMetadataFolder; $("djSetMetadataStartBtn").disabled = !djSetMetadataFolder; LTScanFX.stop(); $("djSetMetadataLoader").style.display = "none"; { var _cfg2 = $("djSetMetadataConfig"); if (_cfg2) _cfg2.style.display = ""; } $("djSetMetadataResultsSection").style.display = "none"; showView("djSetMetadata"); }
   function goDjSetEvent(){ setState("dj-set-event"); showView("djSetEvent"); }
   function goDjSetNewSet(){ setState("dj-set-new-set"); showView("djSetNewSet"); }
   function goDjSetStyleInspiration(){ setState("dj-set-style-inspiration"); showView("djSetStyleInspiration"); updateDjSetStyleControls(); }
@@ -1338,6 +1346,155 @@
     }
   }
 
+  // ===== lt-intelligence · animation de scan (WebGL, shader "wave" porté du composant Siri) =====
+  const LTScanFX = (function () {
+    const VS = "attribute vec2 aPos; void main(){ gl_Position=vec4(aPos,0.0,1.0); }";
+    const FS = `precision highp float;
+uniform vec2 iResolution; uniform float iTime;
+const float PI = 3.14159265359;
+const float AMPLITUDE=0.32; const float FREQ=1.1; const float ABER_FREQ=1.0; const float SPEED=2.4;
+const float WAVE_SCALE=0.6; const float ABERRATION=2.6; const float THICKNESS=3.0; const float INTENSITY=2.;
+const float FALLOFF=1.7; const float EDGE_MASK=0.4; const float EDGE_INSET=0.0; const float BAND_FILL=30000.0;
+const float BAND_THICK=0.08; const float SOFTNESS=2.5; const float LOW_AMP=6.0; const float LOW_INT=1.5;
+const float MID_ABER=0.8; const float MID_ABAMP=0.05; const float MID_BAND=20.0; const float MID_SOFT=0.4;
+const float HIGH_ABER=0.5; const float HIGH_ABAMP=0.06; const float RESOLVED=1.0; const float UNRES_SCALE=0.14;
+vec3 spectral4(int s){ float x=float(s); return clamp(vec3(abs(x-3.0)-1.0, 2.0-abs(x-2.0), 2.0-abs(x-4.0)),0.0,1.0); }
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+  vec2 R=iResolution.xy; float aspect=R.x/R.y;
+  vec2 p=(fragCoord+0.5)*2.0/R-1.0; p.x*=aspect; float yScreen=p.y; p/=max(WAVE_SCALE,0.1);
+  float t=iTime;
+  float low=clamp(0.45+0.45*sin(t*0.8)*sin(t*0.37+1.0),0.0,1.0);
+  float mid=clamp(0.40+0.40*sin(t*1.7+2.0)*sin(t*0.53),0.0,1.0);
+  float high=clamp(0.30+0.30*sin(t*2.9+4.0)*sin(t*0.71+2.0),0.0,1.0);
+  float res=clamp(RESOLVED,0.0,1.0); float drift=mod(t,20.0*PI)*SPEED;
+  float xN=p.x/max(aspect,1.0); float env=cos(PI*0.5*min(abs(0.9*xN),1.0)); env*=env;
+  float A1=AMPLITUDE+0.01*low*LOW_AMP; float A2=A1+mid*MID_ABAMP+high*HIGH_ABAMP;
+  float AB=(ABERRATION+mid*MID_ABER+high*HIGH_ABER)*res; float th=mix(0.1,0.01*THICKNESS,res);
+  float inten=mix(0.1,0.01*(INTENSITY+low*LOW_INT),res); float soft=0.01*res*max(0.0,SOFTNESS+mid*MID_SOFT);
+  float dUnres=max(length(p)-mix(0.14,UNRES_SCALE,res),0.0); float yMain=A1*env*res*sin(p.x*FREQ+drift);
+  float bandFillTh=max(BAND_THICK,1e-4); float bandAmt=1e-4*BAND_FILL*inten;
+  vec3 num=vec3(0.0), den=vec3(0.0);
+  for(int s=0;s<4;s++){
+    vec3 hue=mix(vec3(1.0),spectral4(s),res); den+=hue;
+    float ab=mix(-AB,AB,float(s)/3.0); float yL=A2*env*res*sin(p.x*ABER_FREQ+drift+ab);
+    float d=mix(dUnres,abs(p.y-yL),res); float lor=mix(1.0/(1.0+(0.02*d)*(0.02*d)),1.0,res);
+    float line=inten/(sqrt(d*d+soft*soft)+th);
+    float lo=min(yMain,yL), hi=max(yMain,yL); float dBand=max(0.0,max(p.y-hi,lo-p.y));
+    float band=bandAmt/(dBand+bandFillTh); num+=hue*lor*(line+band);
+  }
+  vec3 col=num/den;
+  float dM=mix(dUnres,abs(p.y-yMain),res); float lorM=mix(1.0/(1.0+(0.02*dM)*(0.02*dM)),1.0,res);
+  float boost=(1.0-res)*(14.0*low+4.0);
+  col+=0.5*inten*(lorM+boost)/(sqrt(dM*dM+soft*soft)+th);
+  col=pow(max(col,0.0),vec3(1.5));
+  float emT=clamp((abs(yScreen)-1.0+EDGE_INSET)/(-max(EDGE_MASK,1e-4)),0.0,1.0); float em=emT*emT*(3.0-2.0*emT);
+  float gauss=exp(-pow(xN*FALLOFF,2.0)); col*=mix(1.0,em*gauss,res); col*=res;
+  fragColor=vec4(col, clamp(max(col.r,max(col.g,col.b)),0.0,1.0));
+}
+void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
+    let raf = 0, stepTimer = 0, glCtx = null, prog = null, buf = null;
+    function compile(gl, type, src) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src); gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) { console.warn("shader:", gl.getShaderInfoLog(sh)); gl.deleteShader(sh); return null; }
+      return sh;
+    }
+    function stopStations() {
+      clearInterval(stepTimer); stepTimer = 0;
+      document.querySelectorAll("#djSetMetadataLoader .mdx-pl-step").forEach(function (e) { e.classList.remove("is-active", "is-done"); });
+    }
+    function startStations() {
+      stopStations();
+      const steps = Array.prototype.slice.call(document.querySelectorAll("#djSetMetadataLoader .mdx-pl-step"));
+      if (!steps.length) return;
+      let i = 0;
+      const tick = function () {
+        steps.forEach(function (e, k) { e.classList.toggle("is-active", k === i); e.classList.toggle("is-done", k < i); });
+        i = (i + 1) % (steps.length + 1);
+      };
+      tick();
+      stepTimer = setInterval(tick, 1100);
+    }
+    function stop() {
+      if (raf) cancelAnimationFrame(raf); raf = 0;
+      stopStations();
+      if (glCtx && prog) { glCtx.deleteProgram(prog); prog = null; }
+      if (glCtx && buf) { glCtx.deleteBuffer(buf); buf = null; }
+      glCtx = null;
+    }
+    function start(canvas) {
+      stop();
+      if (!canvas) return;
+      const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) { return; }
+      const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false, antialias: true });
+      if (!gl) return;
+      glCtx = gl;
+      const vs = compile(gl, gl.VERTEX_SHADER, VS);
+      const fs = compile(gl, gl.FRAGMENT_SHADER, FS);
+      if (!vs || !fs) { glCtx = null; return; }
+      prog = gl.createProgram();
+      gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog); gl.useProgram(prog);
+      buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const aPos = gl.getAttribLocation(prog, "aPos");
+      gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+      const uRes = gl.getUniformLocation(prog, "iResolution");
+      const uTime = gl.getUniformLocation(prog, "iTime");
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dim = Math.round((canvas.clientWidth || 320) * dpr);
+      canvas.width = dim; canvas.height = dim; gl.viewport(0, 0, dim, dim);
+      const t0 = performance.now();
+      const frame = function () {
+        const t = (performance.now() - t0) / 1000;
+        gl.uniform2f(uRes, dim, dim); gl.uniform1f(uTime, t);
+        gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        raf = requestAnimationFrame(frame);
+      };
+      frame();
+      startStations();
+    }
+    return { start: start, stop: stop };
+  })();
+
+  function generateWaveformBars() {
+    const wrapper = document.getElementById("waveformProgressBarWrapper");
+    if (!wrapper) return;
+    wrapper.innerHTML = "";
+    const barCount = 45;
+    for (let i = 0; i < barCount; i++) {
+      const bar = document.createElement("span");
+      bar.className = "waveform-bar";
+      const progress = i / (barCount - 1);
+      const sineHeight = Math.sin(progress * Math.PI);
+      const randHeight = 0.3 + 0.7 * Math.random();
+      const heightPercent = Math.max(12, Math.round(sineHeight * randHeight * 88));
+      bar.style.height = `${heightPercent}%`;
+      wrapper.appendChild(bar);
+    }
+  }
+
+  function updateWaveformProgress(percent) {
+    const wrapper = document.getElementById("waveformProgressBarWrapper");
+    if (!wrapper) return;
+    const bars = wrapper.querySelectorAll(".waveform-bar");
+    const count = bars.length;
+    const activeCount = Math.round((percent / 100) * count);
+    bars.forEach((bar, idx) => {
+      if (idx < activeCount) {
+        bar.classList.add("is-active");
+      } else {
+        bar.classList.remove("is-active");
+      }
+    });
+    const text = document.getElementById("waveformProgressText");
+    if (text) text.textContent = `${percent}%`;
+  }
+  window.updateMetadataProgress = updateWaveformProgress;
+
   async function startDjSetMetadataAnalysis() {
     if (!djSetMetadataFolder) return;
     
@@ -1345,10 +1502,14 @@
     $("djSetMetadataChooseFolder").disabled = true;
     $("djSetMetadataResultsSection").style.display = "none";
     $("djSetMetadataLoader").style.display = "flex";
+    { var _cfg = $("djSetMetadataConfig"); if (_cfg) _cfg.style.display = "none"; var _v = $("djSetMetadataView"); if (_v) _v.scrollTop = 0; }
+    generateWaveformBars();
+    updateWaveformProgress(0);
+    LTScanFX.start(document.getElementById("djSetScanCanvas"));
     
     try {
       const result = await API.analyzeFolderMetadata(djSetMetadataFolder);
-      $("djSetMetadataLoader").style.display = "none";
+      LTScanFX.stop(); $("djSetMetadataLoader").style.display = "none"; { var _cfg2 = $("djSetMetadataConfig"); if (_cfg2) _cfg2.style.display = ""; }
       $("djSetMetadataChooseFolder").disabled = false;
       $("djSetMetadataStartBtn").disabled = false;
       
@@ -1359,14 +1520,166 @@
       
       renderDjSetMetadataResults(result.tracks);
     } catch(error) {
-      $("djSetMetadataLoader").style.display = "none";
+      LTScanFX.stop(); $("djSetMetadataLoader").style.display = "none"; { var _cfg2 = $("djSetMetadataConfig"); if (_cfg2) _cfg2.style.display = ""; }
       $("djSetMetadataChooseFolder").disabled = false;
       $("djSetMetadataStartBtn").disabled = false;
       showToast("Une erreur critique est survenue lors de l'analyse.");
     }
   }
 
+  async function saveMetadataModifications() {
+    const saveBtn = $("djSetMetadataSaveBtn");
+    if (!saveBtn || saveBtn.disabled) return;
+    
+    saveBtn.disabled = true;
+    const originalText = saveBtn.innerHTML;
+    saveBtn.textContent = "Enregistrement en cours...";
+    
+    try {
+      const result = await API.saveTracksMetadata(djSetMetadataTracks);
+      if (result && result.ok) {
+        showToast(`${result.saved_count} fichier(s) mis à jour avec succès !`);
+        const confirmedCheck = $("djSetMetadataConfirmed");
+        if (confirmedCheck) confirmedCheck.checked = false;
+        saveBtn.disabled = true;
+      } else {
+        showToast(result?.error || "Une erreur est survenue lors de l'enregistrement.");
+      }
+    } catch(error) {
+      showToast("Impossible d'enregistrer les modifications.");
+    } finally {
+      saveBtn.innerHTML = originalText;
+    }
+  }
+
+  // ===== Drawer d'affinage manuel : corriger → rechercher → valider =====
+  let refineIndex = -1;
+  let refineProposal = null;
+
+  function initRefineKeySelect(){
+    const sel = $("refKey");
+    if (!sel || sel.options.length > 1) return;
+    for (let mode of ["A", "B"]) for (let n = 1; n <= 12; n++) {
+      const o = document.createElement("option");
+      o.value = `${n}${mode}`; o.textContent = `${n}${mode}`;
+      sel.appendChild(o);
+    }
+  }
+
+  function openRefineDrawer(i){
+    const t = djSetMetadataTracks[i];
+    if (!t) return;
+    refineIndex = i;
+    refineProposal = null;
+    initRefineKeySelect();
+    $("djSetRefineFile").textContent = t.file || "";
+    $("refArtist").value = t.artist || "";
+    $("refTitle").value = t.title || "";
+    $("refYear").value = t.year || "";
+    $("refGenre").value = (t.genre && t.genre !== "A verifier") ? t.genre : "";
+    $("refBpm").value = t.bpm || "";
+    $("refKey").value = t.camelot_key || "";
+    $("djSetRefineProposal").hidden = true;
+    $("djSetRefineOverlay").hidden = false;
+    setTimeout(() => { $(t.artist ? "refTitle" : "refArtist").focus(); }, 80);
+  }
+
+  function closeRefineDrawer(){
+    $("djSetRefineOverlay").hidden = true;
+    refineIndex = -1;
+  }
+
+  async function runRefineSearch(){
+    const btn = $("djSetRefineSearch");
+    if (btn.classList.contains("is-loading")) return;
+    btn.classList.add("is-loading");
+    const original = btn.innerHTML;
+    btn.textContent = "Recherche en cours…";
+    try {
+      const t = djSetMetadataTracks[refineIndex] || {};
+      const res = await API.refineTrackMetadata(t.path || "", $("refTitle").value.trim(), $("refArtist").value.trim());
+      const box = $("djSetRefineProposal");
+      const body = $("djSetRefineProposalBody");
+      if (res && res.ok && res.status && res.status !== "unmatched") {
+        const c = res.canonical || {}, r = res.recording || {};
+        refineProposal = {
+          artist: c.artist || r.artist || "", title: c.title || r.title || "",
+          year: c.year || r.year || null, genre: c.genre || null,
+          bpm: c.bpm || null, camelot_key: c.camelot_key || null
+        };
+        const chips = [];
+        if (refineProposal.year) chips.push(String(refineProposal.year));
+        if (refineProposal.bpm) chips.push(parseFloat(refineProposal.bpm).toFixed(1) + " BPM");
+        if (refineProposal.camelot_key) chips.push(refineProposal.camelot_key);
+        if (refineProposal.genre) chips.push(refineProposal.genre);
+        body.innerHTML = `<b>${esc(refineProposal.artist)} – ${esc(refineProposal.title)}</b><br>` +
+          chips.map(x => `<span class="mdx-chip">${esc(x)}</span>`).join("");
+      } else {
+        refineProposal = null;
+        body.innerHTML = `<span style="color:#f5b48a">Aucun résultat fiable. Vérifie l'orthographe, ou renseigne les champs et valide directement — c'est toi l'expert.</span>`;
+      }
+      $("djSetRefineApply").hidden = !refineProposal;
+      box.hidden = false;
+    } catch (error) {
+      showToast("Recherche impossible pour le moment.");
+    } finally {
+      btn.classList.remove("is-loading");
+      btn.innerHTML = original;
+    }
+  }
+
+  function applyRefineProposal(){
+    if (!refineProposal) return;
+    if (refineProposal.artist) $("refArtist").value = refineProposal.artist;
+    if (refineProposal.title) $("refTitle").value = refineProposal.title;
+    if (refineProposal.year) $("refYear").value = refineProposal.year;
+    if (refineProposal.genre) $("refGenre").value = refineProposal.genre;
+    if (refineProposal.bpm) $("refBpm").value = refineProposal.bpm;
+    if (refineProposal.camelot_key) $("refKey").value = refineProposal.camelot_key;
+    $("djSetRefineValidate").focus();
+  }
+
+  function validateAllSuggestions(){
+    let n = 0;
+    djSetMetadataTracks.forEach((t) => {
+      if (t.status === "probable_suggestion" || t.status === "enriched_sourcing") {
+        t.status = "complete";
+        t.source = "Validé par toi";
+        t.validated = true;
+        n++;
+      }
+    });
+    if (!n) return;
+    renderDjSetMetadataResults(djSetMetadataTracks);
+    showToast(`${n} titre(s) validé(s) ✓`);
+  }
+
+  function validateRefine(){
+    const t = djSetMetadataTracks[refineIndex];
+    if (!t) return;
+    const title = $("refTitle").value.trim();
+    if (!title) { showToast("Le titre ne peut pas être vide."); $("refTitle").focus(); return; }
+    t.artist = $("refArtist").value.trim();
+    t.title = title;
+    t.year = parseInt($("refYear").value, 10) || null;
+    t.genre = $("refGenre").value.trim() || t.genre;
+    t.bpm = parseFloat($("refBpm").value) || null;
+    t.camelot_key = $("refKey").value || null;
+    t.status = "complete";
+    t.source = "Validé par toi";
+    t.validated = true;
+    closeRefineDrawer();
+    renderDjSetMetadataResults(djSetMetadataTracks);
+    showToast(`« ${t.title} » validé ✓`);
+  }
+
   function renderDjSetMetadataResults(tracks) {
+    djSetMetadataTracks = tracks;
+    const confirmedCheck = $("djSetMetadataConfirmed");
+    if (confirmedCheck) confirmedCheck.checked = false;
+    const saveBtn = $("djSetMetadataSaveBtn");
+    if (saveBtn) saveBtn.disabled = true;
+
     const tbody = $("djSetMetadataTableBody");
     tbody.innerHTML = "";
     
@@ -1383,15 +1696,15 @@
       $("djSetMetadataResultsSection").style.display = "block";
       return;
     }
-    
-    tracks.forEach(track => {
+
+    tracks.forEach((track, idx) => {
       let badgeClass = "";
       let statusText = "";
-      
+
       if (track.status === "complete") {
         completeCount++;
         badgeClass = "status-complete";
-        statusText = "Base de connaissances";
+        statusText = track.validated ? "✓ Validé" : "Base de connaissances";
       } else if (track.status === "probable_suggestion" || track.status === "enriched_sourcing") {
         suggestionCount++;
         badgeClass = "status-suggestion";
@@ -1406,23 +1719,38 @@
       const keyText = track.camelot_key ? track.camelot_key : '<span style="color: #f87171;">--</span>';
       const artistTitle = track.artist ? `${track.artist} - ${track.title}` : track.title;
       
+      const editBadge = track.is_edit_detected ? ` <span class="status-badge" style="background: rgba(147, 197, 253, 0.15); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3); padding: 2px 6px; font-size: 11px; margin-left: 6px;">Edit ?</span>` : '';
+      const yearText = track.year ? ` <span style="color: #8794a7; font-weight: 500; font-size: 13px;">(${esc(String(track.year))})</span>` : '';
+
       const row = document.createElement("tr");
       row.className = "metadata-table-row";
       row.innerHTML = `
         <td style="word-break: break-all;" title="${esc(track.path || '')}">${esc(track.file || '')}</td>
-        <td><strong>${esc(artistTitle || 'Inconnu')}</strong></td>
+        <td><strong>${esc(artistTitle || 'Inconnu')}</strong>${yearText}${editBadge}</td>
         <td style="text-align: center; font-family: monospace;">${bpmText}</td>
         <td style="text-align: center; font-family: monospace; font-weight: 600;">${keyText}</td>
         <td>${esc(track.genre || 'Inconnu')}</td>
-        <td style="text-align: center;"><span class="status-badge ${badgeClass}">${statusText}</span></td>
+        <td style="text-align: center;"><span class="status-badge ${badgeClass}">${statusText}</span><svg class="mdx-row-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8fb6e4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"></path></svg></td>
       `;
+      row.tabIndex = 0;
+      row.setAttribute("role", "button");
+      row.setAttribute("aria-label", `Affiner ${track.file || 'ce titre'}`);
+      row.addEventListener("click", () => openRefineDrawer(idx));
+      row.addEventListener("keydown", (e) => { if (e.key === "Enter") openRefineDrawer(idx); });
       tbody.appendChild(row);
     });
-    
+
     $("djSetMetadataTotalCount").textContent = tracks.length;
     $("djSetMetadataCompleteCount").textContent = completeCount;
     $("djSetMetadataSuggestionCount").textContent = suggestionCount;
     $("djSetMetadataIncompleteCount").textContent = incompleteCount;
+
+    const validateAllBtn = $("djSetValidateAllBtn");
+    if (validateAllBtn) {
+      validateAllBtn.hidden = suggestionCount === 0;
+      const label = validateAllBtn.querySelector("svg") ? validateAllBtn.childNodes[validateAllBtn.childNodes.length - 1] : null;
+      if (label) label.textContent = `Tout valider (${suggestionCount})`;
+    }
     
     $("djSetMetadataResultsSection").style.display = "block";
   }
@@ -2246,6 +2574,26 @@
   $("advancedToggle").addEventListener("click", () => $("advancedOptions").classList.toggle("is-open"));
   confirmed.addEventListener("change", setRepairEnabled);
   applyBtn.addEventListener("click", () => { if(!applyBtn.disabled) doApply(); });
+
+  const djSetMetaConfirmed = $("djSetMetadataConfirmed");
+  const djSetMetaSaveBtn = $("djSetMetadataSaveBtn");
+  if (djSetMetaConfirmed && djSetMetaSaveBtn) {
+    djSetMetaConfirmed.addEventListener("change", () => {
+      djSetMetaSaveBtn.disabled = !djSetMetaConfirmed.checked;
+    });
+    djSetMetaSaveBtn.addEventListener("click", saveMetadataModifications);
+  }
+  const refineOverlay = $("djSetRefineOverlay");
+  if (refineOverlay) {
+    $("djSetRefineClose").addEventListener("click", closeRefineDrawer);
+    refineOverlay.addEventListener("click", (e) => { if (e.target === refineOverlay) closeRefineDrawer(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !refineOverlay.hidden) closeRefineDrawer(); });
+    $("djSetRefineSearch").addEventListener("click", runRefineSearch);
+    $("djSetRefineApply").addEventListener("click", applyRefineProposal);
+    $("djSetRefineValidate").addEventListener("click", validateRefine);
+  }
+  const validateAllBtnEl = $("djSetValidateAllBtn");
+  if (validateAllBtnEl) validateAllBtnEl.addEventListener("click", validateAllSuggestions);
   $("again").addEventListener("click", resetFlow);
   $("cleanMissingDone").addEventListener("click", doClean);
   $("restoreDone").addEventListener("click", doRestore);

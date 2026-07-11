@@ -21,7 +21,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 
-APP_VERSION = "1.3.5"
+APP_VERSION = "1.4.0"
 DEFAULT_CHANNEL = os.environ.get("LOSTTRACKR_UPDATE_CHANNEL", "beta")
 DEFAULT_MANIFEST_URL = os.environ.get(
     "LOSTTRACKR_UPDATE_MANIFEST_URL",
