@@ -230,5 +230,90 @@ class MetadataResolutionTests(unittest.TestCase):
         self.assertTrue(mock_id3.add.called)
         mock_id3.save.assert_called_once_with("test.mp3")
 
+
+class SampleUploadTests(unittest.TestCase):
+    """S1 : extraits audio du fichier exact envoyés à /intelligence/sample."""
+
+    def _make_mp3(self, tag_size, audio_bytes):
+        # En-tête ID3v2.3 minimal : taille syncsafe sur 4 octets.
+        syncsafe = bytes([
+            (tag_size >> 21) & 0x7F, (tag_size >> 14) & 0x7F,
+            (tag_size >> 7) & 0x7F, tag_size & 0x7F,
+        ])
+        tmp = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+        self.addCleanup(Path(tmp.name).unlink)
+        tmp.write(b"ID3\x03\x00\x00" + syncsafe + b"T" * tag_size + audio_bytes)
+        tmp.close()
+        return Path(tmp.name)
+
+    def test_extract_excerpt_skips_id3_and_caps_size(self):
+        path = self._make_mp3(tag_size=5000, audio_bytes=b"\xffA" * 600_000)
+        data = losttrackr_app.extract_audio_excerpt(path)
+        self.assertEqual(len(data), losttrackr_app.SAMPLE_MAX_BYTES)
+        self.assertNotIn(b"T" * 32, data)  # jamais d'octets ID3 dans la tranche
+
+    def test_extract_excerpt_small_audio_returned_whole(self):
+        audio = b"\xffB" * 50_000  # 100 Ko : au-dessus du plancher, sous le plafond
+        path = self._make_mp3(tag_size=100, audio_bytes=audio)
+        data = losttrackr_app.extract_audio_excerpt(path)
+        self.assertEqual(data, audio)
+
+    def test_extract_excerpt_rejects_non_mp3_and_tiny_files(self):
+        self.assertIsNone(losttrackr_app.extract_audio_excerpt(Path("dummy.flac")))
+        tiny = self._make_mp3(tag_size=10, audio_bytes=b"\xff" * 1000)
+        self.assertIsNone(losttrackr_app.extract_audio_excerpt(tiny))
+
+    def test_collect_candidates_priority_mp3_only_and_cap(self):
+        tracks, results = [], {}
+        # 0 : complet et sûr → exclu ; 1 : non mp3 → exclu ; 2 : sans ref → exclu
+        tracks.append({"path": "/a/0.mp3", "bpm": 120, "camelot_key": "8A"})
+        results[0] = {"recording_ref": "r0", "status": "matched", "canonical": {}}
+        tracks.append({"path": "/a/1.flac", "bpm": None})
+        results[1] = {"recording_ref": "r1", "status": "probable", "canonical": {}}
+        tracks.append({"path": "/a/2.mp3", "bpm": None})
+        results[2] = {"status": "unmatched"}
+        # 3 : probable simple ; 4 : features manquantes ; 5 : version suspecte
+        tracks.append({"path": "/a/3.mp3", "bpm": 124, "camelot_key": "3B"})
+        results[3] = {"recording_ref": "r3", "status": "probable", "canonical": {}}
+        tracks.append({"path": "/a/4.mp3", "bpm": None, "camelot_key": None,
+                       "duration_ms": 231_000})
+        results[4] = {"recording_ref": "r4", "status": "matched", "canonical": {}}
+        tracks.append({"path": "/a/5.mp3", "bpm": 128, "camelot_key": "5A"})
+        results[5] = {"recording_ref": "r5", "status": "matched",
+                      "canonical": {"version_mismatch": True}}
+
+        cands = losttrackr_app.collect_sample_candidates(tracks, results)
+        self.assertEqual([c["ref"] for c in cands], ["r5", "r4", "r3"])
+        self.assertEqual(cands[1]["duration_s"], 231)
+
+        # Plafond : 12 titres éligibles → 8 envoyés au maximum.
+        many_tracks = [{"path": f"/b/{i}.mp3", "bpm": None} for i in range(12)]
+        many_results = {i: {"recording_ref": f"m{i}", "status": "matched",
+                            "canonical": {}} for i in range(12)}
+        self.assertEqual(len(losttrackr_app.collect_sample_candidates(
+            many_tracks, many_results)), 8)
+
+    @patch("knowledge_client.upload_sample")
+    def test_upload_samples_background_sends_and_survives_errors(self, mock_upload):
+        import threading
+        audio = b"\xffC" * 50_000
+        path = self._make_mp3(tag_size=50, audio_bytes=audio)
+        done = threading.Event()
+        def flaky_then_ok(ref, data, dur=None):
+            if not flaky_then_ok.called:
+                flaky_then_ok.called = True
+                raise Exception("réseau")
+            done.set()
+        flaky_then_ok.called = False
+        mock_upload.side_effect = flaky_then_ok
+        losttrackr_app.upload_samples_background([
+            {"ref": "r-a", "path": str(path), "duration_s": 200},
+            {"ref": "r-b", "path": str(path), "duration_s": None},
+        ])
+        self.assertTrue(done.wait(timeout=5))
+        self.assertEqual(mock_upload.call_count, 2)
+        self.assertEqual(mock_upload.call_args.args[0], "r-b")
+
+
 if __name__ == "__main__":
     unittest.main()

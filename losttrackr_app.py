@@ -65,6 +65,91 @@ def compute_audio_fingerprint(file_path: Path) -> dict | None:
     except Exception:
         return None
 
+SAMPLE_MAX_BYTES = 900_000
+SAMPLE_MIN_BYTES = 64_000
+SAMPLE_MAX_PER_SCAN = 8
+
+def extract_audio_excerpt(file_path: Path, max_bytes: int = SAMPLE_MAX_BYTES) -> bytes | None:
+    """Tranche brute (~900 Ko) du fichier EXACT pour /intelligence/sample.
+
+    mp3 uniquement : les frames MPEG s'auto-synchronisent, donc une tranche
+    prise en plein milieu du fichier reste décodable côté worker sans
+    ré-encodage (aucun ffmpeg embarqué dans l'app). L'en-tête ID3v2 est sauté
+    pour ne pas gaspiller le budget en octets non audio.
+    """
+    try:
+        if file_path.suffix.lower() != ".mp3":
+            return None
+        size = file_path.stat().st_size
+        with open(file_path, "rb") as fh:
+            header = fh.read(10)
+            audio_start = 0
+            if header[:3] == b"ID3" and len(header) == 10:
+                syncsafe = header[6:10]
+                if all(b < 0x80 for b in syncsafe):
+                    audio_start = 10 + ((syncsafe[0] << 21) | (syncsafe[1] << 14)
+                                        | (syncsafe[2] << 7) | syncsafe[3])
+            audio_size = size - audio_start
+            if audio_size < SAMPLE_MIN_BYTES:
+                return None
+            if audio_size <= max_bytes:
+                fh.seek(audio_start)
+                return fh.read(max_bytes)
+            # Tranche au premier tiers de l'audio : passé l'intro, avant l'outro.
+            fh.seek(audio_start + (audio_size - max_bytes) // 3)
+            return fh.read(max_bytes)
+    except OSError:
+        return None
+
+def collect_sample_candidates(tracks, results_by_idx, limit=SAMPLE_MAX_PER_SCAN):
+    """Choisit les titres dont un extrait audio mérite l'analyse serveur.
+
+    Priorité : version suspecte (version_mismatch / needs_review) > features
+    manquantes (bpm ou clé) > identité seulement probable. mp3 uniquement.
+    """
+    scored = []
+    for i, t in enumerate(tracks):
+        r = results_by_idx.get(i) or {}
+        ref = r.get("recording_ref")
+        if not ref or not str(t.get("path") or "").lower().endswith(".mp3"):
+            continue
+        canonical = r.get("canonical") or {}
+        suspect = bool(canonical.get("version_mismatch") or canonical.get("needs_review"))
+        missing = t.get("bpm") is None or t.get("camelot_key") is None
+        probable = r.get("status") == "probable"
+        if not (suspect or missing or probable):
+            continue
+        rank = 0 if suspect else (1 if missing else 2)
+        duration_ms = t.get("duration_ms")
+        scored.append((rank, i, {
+            "ref": ref,
+            "path": t.get("path"),
+            "duration_s": int(duration_ms / 1000) if duration_ms else None,
+        }))
+    scored.sort(key=lambda x: (x[0], x[1]))
+    return [c for _, _, c in scored[:limit]]
+
+def upload_samples_background(candidates):
+    """Envoie les extraits en tâche de fond (fire-and-forget).
+
+    Le serveur ne fait que mettre en file (Redis TTL 15 min) : les résultats
+    AudD/DSP arrivent au prochain scan via le cache d'empreintes.
+    """
+    import threading
+    import knowledge_client
+
+    def run():
+        for c in candidates:
+            data = extract_audio_excerpt(Path(c["path"]))
+            if not data:
+                continue
+            try:
+                knowledge_client.upload_sample(c["ref"], data, c.get("duration_s"))
+            except Exception as exc:
+                print(f"upload_sample: {c['path']}: {exc}")
+
+    threading.Thread(target=run, daemon=True, name="lt-sample-upload").start()
+
 def read_audio_tags(file_path: Path) -> dict:
     from mutagen import File as MutagenFile
     
@@ -1702,6 +1787,16 @@ class LostTrackrApi:
             version = (t["version"] or "").lower()
             t["is_edit_detected"] = bool(canonical.get("version_mismatch")) or any(
                 w in version for w in EDIT_WORDS)
+
+        # 3. S1 : extraits du fichier EXACT (mp3, max 8/scan) envoyés en tâche
+        #    de fond — identification commerciale + DSP sur la vraie version
+        #    côté worker ; résultats visibles au prochain scan (cache).
+        try:
+            candidates = collect_sample_candidates(tracks, results_by_idx)
+            if candidates:
+                upload_samples_background(candidates)
+        except Exception as exc:
+            print(f"sample upload: {exc}")
 
         # Send progress (100%)
         if self.window:

@@ -128,3 +128,20 @@ def resolve_fingerprints(tracks, on_progress=None):
             except Exception:
                 pass
     return {"results": results}
+
+
+def upload_sample(recording_ref, sample_bytes, duration_s=None):
+    """Envoie un court extrait audio du fichier exact vers lt-intelligence.
+
+    Sert à l'identification commerciale (si configurée côté serveur) et au
+    calcul BPM/clé sur la vraie version. L'extrait est éphémère côté serveur
+    (file Redis, TTL 15 min, détruit après analyse). Aucun chemin ne transite.
+    """
+    import base64
+    payload = {
+        "recording_ref": str(recording_ref),
+        "sample_b64": base64.b64encode(bytes(sample_bytes)).decode("ascii"),
+    }
+    if duration_s:
+        payload["duration"] = int(duration_s)
+    return _request("/intelligence/sample", payload, timeout=RESOLVE_TIMEOUT_SECONDS)
