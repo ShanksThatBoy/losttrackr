@@ -198,23 +198,23 @@
           </div>
         </header>
 
-        <div class="smart-analysis-grid" aria-live="polite">
-          <article class="smart-analysis-card is-loading" id="smartAnalysisSourceCard">
-            <div class="smart-analysis-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
-            <div>
-              <h2>Fichiers à déplacer</h2>
-              <strong id="smartAnalysisSourceTitle">Analyse du dossier source…</strong>
-              <p id="smartAnalysisSourceDetail">Détection des fichiers audio compatibles.</p>
-            </div>
-          </article>
-          <article class="smart-analysis-card is-loading" id="smartAnalysisDestinationCard">
-            <div class="smart-analysis-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
-            <div>
-              <h2>Bibliothèque de destination</h2>
-              <strong id="smartAnalysisDestinationTitle">Cartographie des sous-dossiers…</strong>
-              <p id="smartAnalysisDestinationDetail">Analyse des dossiers enfants et des titres déjà présents.</p>
-            </div>
-          </article>
+        <div class="crate-insights" id="smartAnalysisInsights" aria-live="polite">
+          <div class="crate-tile is-loading" style="--accent:#3aa6ff;">
+            <strong id="ciSourceCount">–</strong><span>titres à ranger</span>
+            <small id="ciSourceDetail">Analyse du dossier source…</small>
+          </div>
+          <div class="crate-tile is-loading" style="--accent:#5cf07d;">
+            <strong id="ciLibraryCount">–</strong><span>titres en bibliothèque</span>
+            <small id="ciLibraryDetail">Cartographie en cours…</small>
+          </div>
+          <div class="crate-tile is-loading" style="--accent:#b48cff;">
+            <strong id="ciCrateCount">–</strong><span>crates détectées</span>
+            <small id="ciCrateDetail">Lecture des dossiers…</small>
+          </div>
+          <div class="crate-tile is-loading" style="--accent:#ff9b2a;">
+            <strong id="ciTopName" class="crate-tile-name">–</strong><span>plus grosse crate</span>
+            <small id="ciTopDetail">…</small>
+          </div>
         </div>
 
         <div class="smart-analysis-map">
@@ -351,6 +351,72 @@
             <span><b>Retour vérifier</b><small>Ajuster les destinations avant déplacement</small></span>
           </button>
           <button class="smart-apply-final" id="smartFinalApply" type="button">Valider et déplacer</button>
+        </div>
+      </section>
+
+      <section class="view smart-metadata-view" id="smartMetadataView" aria-labelledby="smartMetadataTitle">
+        <button class="back-btn smart-flow-back" id="smartMetadataBack" type="button">← Retour</button>
+        <div class="smart-stepper" aria-label="Progression Smart Import">
+          <div class="smart-step is-done"><span>1</span><b>Sélection des dossiers</b></div>
+          <i></i>
+          <div class="smart-step is-done"><span>2</span><b>Analyse</b></div>
+          <i></i>
+          <div class="smart-step is-done"><span>3</span><b>Vérifier</b></div>
+          <i></i>
+          <div class="smart-step is-active"><span>4</span><b>Métadonnées</b></div>
+        </div>
+        <header class="smart-review-hero smart-flow-hero smart-metadata-hero">
+          <span class="smart-spark" aria-hidden="true">≋</span>
+          <div>
+            <h1 class="page-title" id="smartMetadataTitle">Compléter les métadonnées</h1>
+            <p class="page-sub">LostTrackr interroge la Base de connaissances pour enrichir les titres sélectionnés. Aucun tag audio n’est écrit depuis cet écran.</p>
+          </div>
+        </header>
+
+        <div id="smartMetadataLoader" class="mdx-loader mdx-wrap smart-metadata-loader">
+          <canvas id="smartMetadataScanCanvas" class="mdx-scan-canvas" aria-hidden="true"></canvas>
+          <p id="smartMetadataLoaderText">Connexion au Centre de connaissances LostTrackr…</p>
+          <div class="mdx-pipeline" aria-hidden="true">
+            <span class="mdx-pl-step" data-step="0">Préparation du lot</span>
+            <span class="mdx-pl-step" data-step="1">Base de connaissances</span>
+            <span class="mdx-pl-step" data-step="2">Consensus</span>
+            <span class="mdx-pl-step" data-step="3">Suggestions</span>
+          </div>
+          <div class="waveform-progress-container">
+            <div class="waveform-bar-wrapper" id="smartMetadataWaveformProgressBarWrapper"></div>
+            <div class="waveform-progress-text" id="smartMetadataWaveformProgressText">0%</div>
+          </div>
+        </div>
+
+        <div id="smartMetadataResults" class="smart-metadata-results" hidden>
+          <div class="mdx-stats smart-metadata-stats">
+            <div class="mdx-stat" style="--accent:#eef3fb;"><strong id="smartMetadataTotalCount">0</strong><span>titres envoyés</span></div>
+            <div class="mdx-stat" style="--accent:#46ec6a;"><strong id="smartMetadataKnownCount">0</strong><span>base de connaissances</span></div>
+            <div class="mdx-stat" style="--accent:#ff9b2a;"><strong id="smartMetadataSuggestionCount">0</strong><span>suggestions à vérifier</span></div>
+            <div class="mdx-stat" style="--accent:#ff6a55;"><strong id="smartMetadataMissingCount">0</strong><span>non identifiés</span></div>
+          </div>
+
+          <div class="smart-metadata-panel">
+            <div class="smart-metadata-panel-head">
+              <div>
+                <h2>Résultats de la Base de connaissances</h2>
+                <p id="smartMetadataSummary">Les résultats enrichissent le plan Smart Import sans déplacer ni écrire les fichiers.</p>
+              </div>
+              <span class="smart-confidence-badge smart-confidence-high" id="smartMetadataSourceBadge">Knowledge Base</span>
+            </div>
+            <div class="smart-metadata-list" id="smartMetadataList" aria-live="polite"></div>
+          </div>
+
+          <div class="smart-review-cta-bar smart-flow-cta-bar smart-metadata-cta-bar">
+            <button class="smart-review-cta smart-review-cta-blue" id="smartMetadataReturn" type="button">
+              <span class="smart-cta-icon" aria-hidden="true">✓</span>
+              <span><b>Retour à l’application</b><small>Conserver ces résultats dans le plan de déplacement</small></span>
+            </button>
+            <button class="smart-review-cta smart-review-cta-orange" id="smartMetadataRetry" type="button">
+              <span class="smart-cta-icon" aria-hidden="true">↻</span>
+              <span><b>Relancer l’analyse</b><small>Réinterroger la Base de connaissances</small></span>
+            </button>
+          </div>
         </div>
       </section>
 

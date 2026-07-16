@@ -823,6 +823,104 @@ class LostTrackrApi:
     def smartImportApply(self, selectedIds=None):
         return self.smart_import_apply(selectedIds)
 
+    def smart_import_metadata(self, selected_ids=None):
+        if not self.last_smart_import_plan:
+            return {"ok": False, "error": "Aucun plan Smart Import à enrichir."}
+
+        wanted = {str(item) for item in (selected_ids or []) if item}
+        files = [
+            item for item in self.last_smart_import_plan.get("files", [])
+            if not wanted or str(item.get("id")) in wanted
+        ]
+        if not files:
+            return {
+                "ok": True,
+                "source": "Centre de connaissances LostTrackr",
+                "records": [],
+                "totals": {"complete": 0, "suggestion": 0, "incomplete": 0, "total": 0},
+            }
+
+        tracks = []
+        for item in files[:200]:
+            title = str(item.get("title") or Path(item.get("file", "")).stem).strip()
+            if not title:
+                continue
+            track = {
+                "client_track_id": str(item.get("id")),
+                "title": title,
+                "source_app": "smart_import",
+            }
+            artist = str(item.get("artist") or "").strip()
+            genre = str(item.get("genre") or "").strip()
+            if artist:
+                track["artist"] = artist
+            if genre and genre != "A verifier":
+                track["genre"] = genre
+            tracks.append(track)
+
+        try:
+            result = knowledge_client.match_tracks(tracks)
+        except knowledge_client.KnowledgeError as exc:
+            return {"ok": False, "error": str(exc), "retryable": exc.retryable}
+        except Exception:
+            return {
+                "ok": False,
+                "error": "LostTrackr n'arrive pas à joindre le centre de connaissances.",
+                "retryable": True,
+            }
+
+        matches_by_id = {
+            str(item.get("client_track_id")): item
+            for item in result.get("matches", [])
+            if item.get("client_track_id") is not None
+        }
+        records = []
+        totals = {"complete": 0, "suggestion": 0, "incomplete": 0, "total": len(files)}
+
+        for item in files:
+            match = matches_by_id.get(str(item.get("id")), {})
+            raw_status = str(match.get("status") or "unmatched").lower()
+            canonical = match.get("canonical") or match.get("recording") or {}
+            if raw_status in {"matched", "known", "complete", "exact"}:
+                status = "complete"
+                source = "Base de connaissances"
+                totals["complete"] += 1
+            elif raw_status in {"probable", "uncertain", "suggestion", "probable_suggestion", "enriched_sourcing"}:
+                status = "probable_suggestion"
+                source = "Suggestion KB"
+                totals["suggestion"] += 1
+            else:
+                status = "incomplete"
+                source = "Non identifié"
+                totals["incomplete"] += 1
+
+            record = {
+                "id": item.get("id"),
+                "file": item.get("file"),
+                "title": canonical.get("title") or item.get("title") or item.get("file"),
+                "artist": canonical.get("artist") or item.get("artist") or "",
+                "year": canonical.get("year") or match.get("year"),
+                "bpm": canonical.get("bpm") or match.get("bpm"),
+                "camelot_key": canonical.get("camelot_key") or match.get("camelot_key"),
+                "genre": canonical.get("genre") or item.get("genre") or "A verifier",
+                "status": status,
+                "source": source,
+                "confidence": match.get("confidence"),
+                "destinationDisplay": item.get("destinationDisplay"),
+            }
+            item["metadata"] = record
+            records.append(record)
+
+        return {
+            "ok": True,
+            "source": "Centre de connaissances LostTrackr",
+            "records": records,
+            "totals": totals,
+        }
+
+    def smartImportMetadata(self, selectedIds=None):
+        return self.smart_import_metadata(selectedIds)
+
     def update_smart_item_destination(self, item, destination_folder):
         folder = Path(destination_folder).expanduser()
         destination = smart_import.unique_file(folder / item["file"])

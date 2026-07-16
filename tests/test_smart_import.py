@@ -310,6 +310,55 @@ class SmartImportTests(unittest.TestCase):
             self.assertEqual(item["confidence"], "medium")
             self.assertEqual(item["reasonCode"], "manual_destination")
 
+    @patch("knowledge_client.match_tracks")
+    def test_smart_import_metadata_uses_knowledge_without_paths(self, mock_match):
+        mock_match.return_value = {
+            "matches": [
+                {
+                    "client_track_id": "one",
+                    "status": "matched",
+                    "confidence": 0.97,
+                    "canonical": {
+                        "artist": "Burna Boy",
+                        "title": "City Boys",
+                        "bpm": 120,
+                        "camelot_key": "8A",
+                        "genre": "Afrobeats",
+                        "year": 2023,
+                    },
+                }
+            ]
+        }
+        api = LostTrackrApi()
+        api.last_smart_import_plan = {
+            "files": [
+                {
+                    "id": "one",
+                    "file": "Burna Boy - City Boys.mp3",
+                    "source": "/private/downloads/Burna Boy - City Boys.mp3",
+                    "sourceDisplay": "~/Downloads/Burna Boy - City Boys.mp3",
+                    "destination": "/private/music/Afro/Burna Boy - City Boys.mp3",
+                    "destinationDisplay": "~/Music/Afro/Burna Boy - City Boys.mp3",
+                    "artist": "Burna Boy",
+                    "title": "City Boys",
+                    "genre": "Afro",
+                }
+            ]
+        }
+
+        result = api.smart_import_metadata(["one"])
+
+        self.assertTrue(result["ok"])
+        self.assertEqual(result["records"][0]["status"], "complete")
+        self.assertEqual(result["records"][0]["source"], "Base de connaissances")
+        payload = mock_match.call_args.args[0][0]
+        self.assertEqual(payload["client_track_id"], "one")
+        self.assertEqual(payload["source_app"], "smart_import")
+        self.assertNotIn("source", payload)
+        self.assertNotIn("destination", payload)
+        self.assertNotIn("sourceDisplay", payload)
+        self.assertNotIn("destinationDisplay", payload)
+
 
 if __name__ == "__main__":
     unittest.main()

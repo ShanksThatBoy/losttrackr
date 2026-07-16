@@ -107,6 +107,52 @@
       const files = (MOCK.smartImport.plan.files || []).filter(item => !wanted.size || wanted.has(item.id));
       return {moved:files.length,skipped:0,errors:0,manifestDisplay:"~/Music/LostTrackr Smart Import/_manifests/smart_import_demo.json",items:files.map(item => ({id:item.id,file:item.file,toDisplay:item.destinationDisplay}))};
     },
+    async smartImportMetadata(selectedIds){
+      if(window.pywebview?.api?.smartImportMetadata) return window.pywebview.api.smartImportMetadata(selectedIds || []);
+      await wait(900);
+      const basePlan = smartImportPlan || MOCK.smartImport.plan;
+      const wanted = new Set(selectedIds || []);
+      const files = (basePlan.files || []).filter(item => !wanted.size || wanted.has(item.id));
+      const tracks = files.slice(0,80).map(item => ({
+        client_track_id:String(item.id),
+        title:item.title || item.file,
+        artist:item.artist || "",
+        genre:item.genre && item.genre !== "A verifier" ? item.genre : "",
+        source_app:"smart_import"
+      }));
+      const result = await this.knowledgeMatch(tracks);
+      const byId = new Map((result?.matches || []).map(item => [String(item.client_track_id), item]));
+      const totals = {complete:0,suggestion:0,incomplete:0,total:files.length};
+      const records = files.map(item => {
+        const match = byId.get(String(item.id)) || {};
+        const canonical = match.canonical || {};
+        const rawStatus = String(match.status || "unmatched").toLowerCase();
+        let status = "incomplete";
+        let source = "Non identifié";
+        if(["matched","known","complete","exact"].includes(rawStatus)){
+          status = "complete"; source = "Base de connaissances"; totals.complete++;
+        }else if(["probable","uncertain","suggestion","probable_suggestion","enriched_sourcing"].includes(rawStatus)){
+          status = "probable_suggestion"; source = "Suggestion KB"; totals.suggestion++;
+        }else{
+          totals.incomplete++;
+        }
+        return {
+          id:item.id,
+          file:item.file,
+          title:canonical.title || item.title || item.file,
+          artist:canonical.artist || item.artist || "",
+          year:canonical.year || null,
+          bpm:canonical.bpm || null,
+          camelot_key:canonical.camelot_key || null,
+          genre:canonical.genre || item.genre || "A verifier",
+          status,
+          source,
+          confidence:match.confidence || null,
+          destinationDisplay:item.destinationDisplay
+        };
+      });
+      return {ok:true, source:"Centre de connaissances LostTrackr", records, totals};
+    },
     async smartImportChooseDestination(payload){
       if(window.pywebview?.api?.smartImportChooseDestination) return window.pywebview.api.smartImportChooseDestination(payload || {});
       const folder = payload?.destinationFolder || prompt("Choisir le dossier de destination");
@@ -146,6 +192,10 @@
         "Wedding March Vs EoO Bad Bunny Mashup":{status:"uncertain",confidence:.48,canonical:{title:"Wedding March Vs EoO Mashup",artist:"DJ Edit",bpm:96,camelot_key:"9A",genre:"Latin"}},
         "Suavemente":{status:"matched",confidence:.97,canonical:{title:"Suavemente",artist:"Elvis Crespo",bpm:127,camelot_key:"4B",genre:"Merengue"}},
         "Warmup Edit 124":{status:"unmatched"},
+        "City Boys":{status:"matched",confidence:.96,canonical:{title:"City Boys",artist:"Burna Boy",bpm:100,camelot_key:"3A",genre:"Afrobeats"}},
+        "Nanana":{status:"matched",confidence:.94,canonical:{title:"Nanana",artist:"Peggy Gou",bpm:122,camelot_key:"6A",genre:"House"}},
+        "warmup edit 124":{status:"uncertain",confidence:.56,canonical:{title:"Warmup Edit 124",artist:"DJ Edit",bpm:124,camelot_key:"7A",genre:"Warmup"}},
+        "Houdini":{status:"matched",confidence:.98,canonical:{title:"Houdini",artist:"Dua Lipa",bpm:117,camelot_key:"5A",genre:"Pop"}},
         "Remix":{status:"unmatched"},
         "Gasolina":{status:"matched",confidence:.99,canonical:{title:"Gasolina",artist:"Daddy Yankee",bpm:96,camelot_key:"11B",genre:"Reggaeton"}},
         "Djadja":{status:"matched",confidence:.95,canonical:{title:"Djadja",artist:"Aya Nakamura",bpm:100,camelot_key:"8A",genre:"Afropop"}}
@@ -477,6 +527,7 @@
     smartAnalysis:$("smartAnalysisView"),
     smartFiles:$("smartFilesView"),
     smartComplete:$("smartCompleteView"),
+    smartMetadata:$("smartMetadataView"),
     djSet:$("djSetView"),
     djSetNewSet:$("djSetNewSetView"),
     djSetStyleInspiration:$("djSetStyleInspirationView"),
@@ -516,6 +567,8 @@
   let smartDestinationManual = false;
   let smartDestinationMode = "existing";
   let smartApplySelectedIds = [];
+  let smartMetadataResult = null;
+  let smartMetadataRunning = false;
   let djSetPlan = null;
   let djSetGroupStates = new Map();
   let djSetExpandedGroupId = null;
@@ -761,16 +814,36 @@
     return childPath === parentPath || childPath.startsWith(`${parentPath}/`);
   }
   function setSmartAnalysisLoading(){
-    $("smartAnalysisSourceCard").classList.add("is-loading");
-    $("smartAnalysisDestinationCard").classList.add("is-loading");
-    $("smartAnalysisSourceTitle").textContent = "Analyse du dossier source…";
-    $("smartAnalysisSourceDetail").textContent = "Détection des fichiers audio compatibles.";
-    $("smartAnalysisDestinationTitle").textContent = "Cartographie des sous-dossiers…";
-    $("smartAnalysisDestinationDetail").textContent = "Analyse des dossiers enfants et des titres déjà présents.";
+    document.querySelectorAll("#smartAnalysisInsights .crate-tile").forEach(tile => tile.classList.add("is-loading"));
+    $("ciSourceCount").textContent = "–";
+    $("ciSourceDetail").textContent = "Analyse du dossier source…";
+    $("ciLibraryCount").textContent = "–";
+    $("ciLibraryDetail").textContent = "Cartographie en cours…";
+    $("ciCrateCount").textContent = "–";
+    $("ciCrateDetail").textContent = "Lecture des dossiers…";
+    $("ciTopName").textContent = "–";
+    $("ciTopDetail").textContent = "…";
     $("smartAnalysisMapIntro").textContent = "LostTrackr lit la structure de ta bibliothèque.";
     $("smartAnalysisStatus").textContent = "Analyse en cours";
     $("smartAnalysisTree").innerHTML = `<div class="smart-analysis-placeholder"><i></i><i></i><i></i><span>Lecture des dossiers…</span></div>`;
     $("smartContinueVerify").disabled = true;
+  }
+
+  function crateCountUp(el, target){
+    const value = Math.max(0, Number(target) || 0);
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.textContent = value.toLocaleString("fr-FR");
+      return;
+    }
+    // setTimeout plutôt que requestAnimationFrame : rAF est suspendu quand la
+    // fenêtre est occultée et laisserait le compteur figé à 0.
+    const t0 = performance.now(), duration = 650;
+    (function tick(){
+      const p = Math.min(1, (performance.now() - t0) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(value * eased).toLocaleString("fr-FR");
+      if (p < 1) setTimeout(tick, 24);
+    })();
   }
   function smartFolderSuggestionCount(folder){
     const path = folder?.path || "";
@@ -832,25 +905,53 @@
       if(top) directChildren.add(top);
     });
     const childCount = Math.max(0, folders.length - directChildren.size);
-    $("smartAnalysisSourceCard").classList.remove("is-loading");
-    $("smartAnalysisDestinationCard").classList.remove("is-loading");
-    $("smartAnalysisSourceTitle").textContent = `${fmt(audioCount, "titre détecté", "titres détectés")} dans ${sourceLabel}`;
-    $("smartAnalysisSourceDetail").textContent = smartImportPlan?.totals?.limited ? "Analyse limitée aux premiers titres compatibles." : "Tous les fichiers audio compatibles ont été pris en compte.";
-    $("smartAnalysisDestinationTitle").textContent = `${fmt(directChildren.size || folders.length, "sous-dossier", "sous-dossiers")} et ${fmt(childCount, "dossier enfant", "dossiers enfants")} détectés`;
-    $("smartAnalysisDestinationDetail").textContent = `Sous ${destinationRoot}`;
-    $("smartAnalysisMapIntro").textContent = `${fmt(directChildren.size || folders.length, "sous-dossier", "sous-dossiers")} et ${fmt(childCount, "dossier enfant", "dossiers enfants")} détectés sous ${destinationRoot}.`;
+    const libraryTotal = folders.reduce((sum, f) => sum + Number(f.audioCount || 0), 0);
+    let biggest = null;
+    folders.forEach(f => { if (!biggest || Number(f.audioCount || 0) > Number(biggest.audioCount || 0)) biggest = f; });
+
+    document.querySelectorAll("#smartAnalysisInsights .crate-tile").forEach(tile => tile.classList.remove("is-loading"));
+    crateCountUp($("ciSourceCount"), audioCount);
+    $("ciSourceDetail").textContent = `dans ${sourceLabel}`;
+    crateCountUp($("ciLibraryCount"), libraryTotal);
+    $("ciLibraryDetail").textContent = `sous ${destinationRoot}`;
+    crateCountUp($("ciCrateCount"), folders.length);
+    $("ciCrateDetail").textContent = `${fmt(directChildren.size || 0, "famille", "familles")} · ${fmt(childCount, "dossier enfant", "dossiers enfants")}`;
+    $("ciTopName").textContent = biggest ? smartPathName(biggest.path || "") : "—";
+    $("ciTopDetail").textContent = biggest ? fmt(Number(biggest.audioCount || 0), "titre présent", "titres présents") : "aucune crate détectée";
+
+    $("smartAnalysisMapIntro").textContent = `${fmt(directChildren.size || folders.length, "famille", "familles")} et ${fmt(childCount, "dossier enfant", "dossiers enfants")} sous ${destinationRoot}. La longueur des barres reflète le volume de chaque crate.`;
     $("smartAnalysisStatus").textContent = "Analyse terminée";
+
     const rows = smartFolderTreeRows();
-    $("smartAnalysisTree").innerHTML = rows.length ? rows.map(row => `
-      <article class="smart-analysis-branch">
-        <header><strong>${esc(row.top)}</strong><span>${esc(fmt(row.totalSuggestions, "titre suggéré", "titres suggérés"))}</span></header>
-        <div>
-          ${row.children.map(child => `
-            <p><b>${esc(child.name)}</b><span>${child.count ? esc(fmt(child.count, "titre suggéré", "titres suggérés")) : esc(fmt(child.audioCount, "titre présent", "titres présents"))}</span></p>
-          `).join("")}
-        </div>
-      </article>
-    `).join("") : `<div class="empty">Aucun sous-dossier exploitable détecté dans ce dossier racine.</div>`;
+    $("smartAnalysisTree").innerHTML = rows.length ? `<div class="crate-map">` + rows.map((row, i) => {
+      const groupTotal = row.children.reduce((sum, c) => sum + Number(c.audioCount || 0), 0);
+      const share = libraryTotal ? Math.round(groupTotal / libraryTotal * 100) : 0;
+      const maxCount = Math.max(1, ...row.children.map(c => Number(c.audioCount || 0) + Number(c.count || 0)));
+      const bars = row.children.map((child, j) => {
+        const present = Number(child.audioCount || 0);
+        const incoming = Number(child.count || 0);
+        const w = Math.max(4, Math.round(present / maxCount * 100));
+        const sw = incoming ? Math.max(2, Math.min(100 - w, Math.round(incoming / maxCount * 100))) : 0;
+        const delay = i * 70 + 160 + j * 45;
+        const genres = (child.genres || []).slice(0, 4).join(", ");
+        const barLabel = child.name === row.top ? "À la racine" : child.name;
+        return `<div class="crate-bar"${genres ? ` title="${esc(genres)}"` : ""}>
+          <span class="crate-bar-name">${esc(barLabel)}</span>
+          <span class="crate-bar-track"><i style="--w:${w}%; --d:${delay}ms"></i>${sw ? `<em style="--w:${w}%; --sw:${sw}%; --d:${delay}ms"></em>` : ""}</span>
+          <span class="crate-bar-count">${esc(String(present))}${incoming ? ` <b>+${esc(String(incoming))}</b>` : ""}</span>
+        </div>`;
+      }).join("");
+      return `<article class="crate-card" style="--d:${i * 70}ms">
+        <header class="crate-card-head">
+          <h3>${esc(row.top)}</h3>
+          <div class="crate-card-meta">
+            ${row.totalSuggestions ? `<span class="crate-card-badge">+${esc(String(row.totalSuggestions))} à ranger</span>` : ""}
+            <span class="crate-card-share">${esc(fmt(groupTotal, "titre", "titres"))}${share ? ` · ${share}%` : ""}</span>
+          </div>
+        </header>
+        <div class="crate-bars">${bars}</div>
+      </article>`;
+    }).join("") + `</div>` : `<div class="empty">Aucun sous-dossier exploitable détecté dans ce dossier racine.</div>`;
     $("smartContinueVerify").disabled = false;
   }
   async function startSmartImportScan(){
@@ -870,6 +971,7 @@
       });
       smartGroupStates = new Map();
       smartExpandedGroupId = null;
+      smartMetadataResult = null;
       renderSmartAnalysisComplete();
     }catch(error){
       showView("smartImport");
@@ -1186,6 +1288,7 @@
     $("smartApplyBackReview").disabled = false;
     $("smartMetadataButton").disabled = false;
     renderSmartApplyList(selectedFiles);
+    updateSmartMetadataButtonState();
     setState("smart-apply");
     showView("smartComplete");
   }
@@ -1230,30 +1333,165 @@
     $("smartFinalApply").disabled = true;
     $("smartFinalApply").textContent = "Déplacement terminé";
     $("smartApplyBackReview").disabled = true;
+    $("smartMetadataButton").disabled = true;
     setState("smart-complete");
     showView("smartComplete");
   }
-  async function enrichSmartMetadata(){
-    const files = smartImportPlan?.files || [];
-    if(!files.length){ showToast("Aucun titre à enrichir pour l’instant."); return; }
+  function smartMetadataSelectedIds(){
+    return smartApplySelectedIds.length ? smartApplySelectedIds : smartValidatedFileIds();
+  }
+  function smartMetadataSelectedFiles(){
+    const fileMap = smartFilesById();
+    return smartMetadataSelectedIds().map(id => fileMap.get(id)).filter(Boolean);
+  }
+  function updateSmartMetadataButtonState(){
     const button = $("smartMetadataButton");
-    button.disabled = true;
-    button.textContent = "Analyse...";
+    if(!button) return;
+    const title = button.querySelector("b");
+    const detail = button.querySelector("small");
+    const totals = smartMetadataResult?.totals;
+    if(totals && Number(totals.total || 0) > 0){
+      if(title) title.textContent = "Métadonnées prêtes";
+      if(detail) detail.textContent = `${Number(totals.complete || 0)} reconnus · ${Number(totals.suggestion || 0)} suggestions · ${Number(totals.incomplete || 0)} incomplets`;
+    }else{
+      if(title) title.textContent = "Compléter les métadonnées";
+      if(detail) detail.textContent = "BPM, artiste, titre, année, genre et clé Camelot";
+    }
+  }
+  function smartMetadataStatusClass(status){
+    if(status === "complete") return "is-complete";
+    if(status === "probable_suggestion" || status === "enriched_sourcing") return "is-suggestion";
+    return "is-incomplete";
+  }
+  function smartMetadataStatusBadge(status){
+    if(status === "complete") return `<span class="status-badge status-complete">Base de connaissances</span>`;
+    if(status === "probable_suggestion" || status === "enriched_sourcing") return `<span class="status-badge status-suggestion">Suggestion KB</span>`;
+    return `<span class="status-badge status-incomplete">Incomplet</span>`;
+  }
+  function smartMetadataConfidenceText(value){
+    if(value === null || value === undefined || value === "") return "";
+    const numeric = Number(value);
+    if(Number.isNaN(numeric)) return "";
+    const pct = numeric <= 1 ? Math.round(numeric * 100) : Math.round(numeric);
+    return `${pct}% confiance`;
+  }
+  function smartMetadataChip(label, muted = false){
+    return `<span class="smart-metadata-chip${muted ? " is-muted" : ""}">${esc(label)}</span>`;
+  }
+  function renderSmartMetadataError(message){
+    $("smartMetadataLoader").style.display = "none";
+    $("smartMetadataResults").hidden = false;
+    $("smartMetadataTotalCount").textContent = "0";
+    $("smartMetadataKnownCount").textContent = "0";
+    $("smartMetadataSuggestionCount").textContent = "0";
+    $("smartMetadataMissingCount").textContent = "0";
+    $("smartMetadataSummary").textContent = message || "Le centre de connaissances est momentanément indisponible.";
+    $("smartMetadataList").innerHTML = `<div class="empty">Aucune métadonnée n’a été appliquée. Tu peux revenir à l’écran précédent et relancer plus tard.</div>`;
+  }
+  function renderSmartMetadataResults(result){
+    const records = result?.records || [];
+    const totals = result?.totals || records.reduce((acc, record) => {
+      acc.total++;
+      if(record.status === "complete") acc.complete++;
+      else if(record.status === "probable_suggestion" || record.status === "enriched_sourcing") acc.suggestion++;
+      else acc.incomplete++;
+      return acc;
+    }, {complete:0,suggestion:0,incomplete:0,total:0});
+    const fileMap = smartFilesById();
+    records.forEach(record => {
+      const item = fileMap.get(record.id);
+      if(item) item.metadata = record;
+    });
+    $("smartMetadataLoader").style.display = "none";
+    $("smartMetadataResults").hidden = false;
+    $("smartMetadataTotalCount").textContent = Number(totals.total || records.length || 0);
+    $("smartMetadataKnownCount").textContent = Number(totals.complete || 0);
+    $("smartMetadataSuggestionCount").textContent = Number(totals.suggestion || 0);
+    $("smartMetadataMissingCount").textContent = Number(totals.incomplete || 0);
+    $("smartMetadataSourceBadge").textContent = result?.source || "Knowledge Base";
+    $("smartMetadataSummary").textContent = records.length
+      ? "Ces résultats enrichissent le plan Smart Import. Les suggestions orange restent à vérifier avant toute écriture de tags."
+      : "Aucun titre sélectionné n’a pu être envoyé à la Base de connaissances.";
+    $("smartMetadataList").innerHTML = records.length ? records.map(record => {
+      const artistTitle = record.artist ? `${record.artist} - ${record.title || record.file}` : (record.title || record.file || "Titre inconnu");
+      const chips = [
+        record.bpm ? smartMetadataChip(`${parseFloat(record.bpm).toFixed(1)} BPM`) : smartMetadataChip("BPM manquant", true),
+        record.camelot_key ? smartMetadataChip(record.camelot_key) : smartMetadataChip("Clé manquante", true),
+        record.genre ? smartMetadataChip(record.genre) : smartMetadataChip("Genre manquant", true),
+        record.year ? smartMetadataChip(String(record.year)) : ""
+      ].filter(Boolean).join("");
+      const confidence = smartMetadataConfidenceText(record.confidence);
+      return `
+        <article class="smart-metadata-row ${smartMetadataStatusClass(record.status)}">
+          <div class="smart-metadata-file">
+            <b>${esc(record.file || record.title || "Titre")}</b>
+            <small>${esc(record.destinationDisplay || "Destination conservée dans le plan")}</small>
+          </div>
+          <div class="smart-metadata-main">
+            <strong>${esc(artistTitle)}</strong>
+            <div class="smart-metadata-chips">${chips}</div>
+          </div>
+          <div class="smart-metadata-status">
+            ${smartMetadataStatusBadge(record.status)}
+            ${confidence ? `<span class="smart-metadata-confidence">${confidence}</span>` : ""}
+          </div>
+        </article>`;
+    }).join("") : `<div class="empty">Aucun résultat à afficher.</div>`;
+    updateSmartMetadataButtonState();
+    renderSmartApplyList(smartMetadataSelectedFiles());
+  }
+  function returnSmartMetadataToApply(){
+    LTScanFX.stop();
+    setState("smart-apply");
+    showView("smartComplete");
+  }
+  async function enrichSmartMetadata(){
+    if(smartMetadataRunning) return;
+    const selectedIds = smartMetadataSelectedIds();
+    if(!selectedIds.length){ showToast("Valide au moins une suggestion avant d’enrichir les métadonnées."); return; }
+    smartMetadataRunning = true;
+    const metadataButton = $("smartMetadataButton");
+    const retryButton = $("smartMetadataRetry");
+    if(metadataButton) metadataButton.disabled = true;
+    if(retryButton) retryButton.disabled = true;
+    $("smartMetadataLoader").style.display = "flex";
+    $("smartMetadataResults").hidden = true;
+    $("smartMetadataLoaderText").textContent = "Connexion au Centre de connaissances LostTrackr…";
+    setState("smart-metadata");
+    showView("smartMetadata");
+    setWaveformProgressTarget("smartMetadataWaveformProgressBarWrapper", "smartMetadataWaveformProgressText");
+    generateWaveformBars();
+    updateWaveformProgress(0);
+    LTScanFX.start(document.getElementById("smartMetadataScanCanvas"), "#smartMetadataLoader");
+    let progress = 0;
+    const progressTimer = setInterval(() => {
+      progress = Math.min(92, progress + (progress < 55 ? 9 : 4));
+      updateWaveformProgress(progress);
+      if(progress > 30) $("smartMetadataLoaderText").textContent = "Croisement avec lt-intelligence et lt-db-prod…";
+      if(progress > 68) $("smartMetadataLoaderText").textContent = "Consolidation BPM, clé Camelot et genre…";
+    }, 260);
     try{
-      const tracks = files.slice(0,80).map((item, index) => ({
-        client_track_id:`smart-${index}`,
-        title:item.title || item.file,
-        artist:item.artist || "",
-        source_app:"smart_import"
-      }));
-      const result = await API.knowledgeMatch(tracks);
-      const matched = (result?.matches || []).filter(item => item.status && item.status !== "unmatched").length;
-      showToast(`${matched} titre${matched > 1 ? "s" : ""} identifié${matched > 1 ? "s" : ""} pour les métadonnées.`);
+      const result = await API.smartImportMetadata(selectedIds);
+      if(!result || !result.ok) throw new Error(result?.error || "Le centre de connaissances est indisponible.");
+      smartMetadataResult = result;
+      clearInterval(progressTimer);
+      updateWaveformProgress(100);
+      await wait(220);
+      LTScanFX.stop();
+      renderSmartMetadataResults(result);
+      const totals = result.totals || {};
+      const known = Number(totals.complete || 0) + Number(totals.suggestion || 0);
+      showToast(`${known} titre${known > 1 ? "s" : ""} enrichi${known > 1 ? "s" : ""} par la Base de connaissances.`);
     }catch(error){
-      showToast("Le centre de connaissances est momentanément indisponible.");
+      clearInterval(progressTimer);
+      LTScanFX.stop();
+      renderSmartMetadataError(error?.message || "Le centre de connaissances est momentanément indisponible.");
+      showToast(error?.message || "Le centre de connaissances est momentanément indisponible.");
     }finally{
-      button.disabled = false;
-      button.textContent = "Compléter les métadonnées";
+      smartMetadataRunning = false;
+      if(metadataButton) metadataButton.disabled = false;
+      if(retryButton) retryButton.disabled = false;
+      updateSmartMetadataButtonState();
     }
   }
 
@@ -1392,7 +1630,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord){
   fragColor=vec4(col, clamp(max(col.r,max(col.g,col.b)),0.0,1.0));
 }
 void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
-    let raf = 0, stepTimer = 0, glCtx = null, prog = null, buf = null;
+    let raf = 0, stepTimer = 0, glCtx = null, prog = null, buf = null, activeLoaderSelector = "#djSetMetadataLoader";
     function compile(gl, type, src) {
       const sh = gl.createShader(type);
       gl.shaderSource(sh, src); gl.compileShader(sh);
@@ -1401,11 +1639,11 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
     }
     function stopStations() {
       clearInterval(stepTimer); stepTimer = 0;
-      document.querySelectorAll("#djSetMetadataLoader .mdx-pl-step").forEach(function (e) { e.classList.remove("is-active", "is-done"); });
+      document.querySelectorAll(`${activeLoaderSelector} .mdx-pl-step`).forEach(function (e) { e.classList.remove("is-active", "is-done"); });
     }
     function startStations() {
       stopStations();
-      const steps = Array.prototype.slice.call(document.querySelectorAll("#djSetMetadataLoader .mdx-pl-step"));
+      const steps = Array.prototype.slice.call(document.querySelectorAll(`${activeLoaderSelector} .mdx-pl-step`));
       if (!steps.length) return;
       let i = 0;
       const tick = function () {
@@ -1422,9 +1660,10 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
       if (glCtx && buf) { glCtx.deleteBuffer(buf); buf = null; }
       glCtx = null;
     }
-    function start(canvas) {
+    function start(canvas, loaderSelector) {
       stop();
       if (!canvas) return;
+      activeLoaderSelector = loaderSelector || "#djSetMetadataLoader";
       const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (reduce) { return; }
       const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false, antialias: true });
@@ -1460,8 +1699,12 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
     return { start: start, stop: stop };
   })();
 
-  function generateWaveformBars() {
-    const wrapper = document.getElementById("waveformProgressBarWrapper");
+  let waveformProgressTarget = {wrapper:"waveformProgressBarWrapper", text:"waveformProgressText"};
+  function setWaveformProgressTarget(wrapperId, textId){
+    waveformProgressTarget = {wrapper:wrapperId, text:textId};
+  }
+  function generateWaveformBars(wrapperId = waveformProgressTarget.wrapper) {
+    const wrapper = document.getElementById(wrapperId);
     if (!wrapper) return;
     wrapper.innerHTML = "";
     const barCount = 45;
@@ -1477,8 +1720,8 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
     }
   }
 
-  function updateWaveformProgress(percent) {
-    const wrapper = document.getElementById("waveformProgressBarWrapper");
+  function updateWaveformProgress(percent, wrapperId = waveformProgressTarget.wrapper, textId = waveformProgressTarget.text) {
+    const wrapper = document.getElementById(wrapperId);
     if (!wrapper) return;
     const bars = wrapper.querySelectorAll(".waveform-bar");
     const count = bars.length;
@@ -1490,7 +1733,7 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
         bar.classList.remove("is-active");
       }
     });
-    const text = document.getElementById("waveformProgressText");
+    const text = document.getElementById(textId);
     if (text) text.textContent = `${percent}%`;
   }
   window.updateMetadataProgress = updateWaveformProgress;
@@ -1503,6 +1746,7 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
     $("djSetMetadataResultsSection").style.display = "none";
     $("djSetMetadataLoader").style.display = "flex";
     { var _cfg = $("djSetMetadataConfig"); if (_cfg) _cfg.style.display = "none"; var _v = $("djSetMetadataView"); if (_v) _v.scrollTop = 0; }
+    setWaveformProgressTarget("waveformProgressBarWrapper", "waveformProgressText");
     generateWaveformBars();
     updateWaveformProgress(0);
     LTScanFX.start(document.getElementById("djSetScanCanvas"));
@@ -2512,6 +2756,9 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
   $("smartReviewRemaining").addEventListener("click", focusSmartReviewGroups);
   $("smartMoveFiles").addEventListener("click", goSmartApplyPreview);
   $("smartMetadataButton").addEventListener("click", enrichSmartMetadata);
+  $("smartMetadataBack").addEventListener("click", returnSmartMetadataToApply);
+  $("smartMetadataReturn").addEventListener("click", returnSmartMetadataToApply);
+  $("smartMetadataRetry").addEventListener("click", enrichSmartMetadata);
   $("smartApplyBackReview").addEventListener("click", () => { renderSmartFilePlan(); showView("smartFiles"); });
   $("smartFinalApply").addEventListener("click", applySmartImportMoves);
   $("djSetBack").addEventListener("click", goHome);
