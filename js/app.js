@@ -85,6 +85,12 @@
     async detectSoftware(){ if(window.pywebview?.api?.detectSoftware) return window.pywebview.api.detectSoftware(); const info = await this.preflight(); return info.softwareDetection; },
     async selectSoftware(id){ if(window.pywebview?.api?.selectSoftware) return window.pywebview.api.selectSoftware(id); const info = await this.preflight(); info.activeSoftwareId = id; return info; },
     async apply(){ if(window.pywebview?.api?.apply) return window.pywebview.api.apply(); await wait(450); return {fixed:620,missing:2,backupPath:"~/Music/_Serato_BACKUP_20260624_121500"}; },
+    async getUserProfile(){
+      if(window.pywebview?.api?.getUserProfile) return window.pywebview.api.getUserProfile();
+      await wait(80);
+      return {displayName:"Utilisateur", login:"demo", initials:"—", home:"~", platform:"macos",
+              softwareName:"Serato DJ", softwareDetected:true};
+    },
     async restore(){ if(window.pywebview?.api?.restore) return window.pywebview.api.restore(); await wait(350); return {restoredFrom:"~/Music/_Serato_BACKUP_20260624_121500",previousMovedTo:"~/Music/_Serato_REPLACED_20260624_122000"}; },
     async cleanMissing(){ if(window.pywebview?.api?.cleanMissing) return window.pywebview.api.cleanMissing(); if(window.pywebview?.api?.clean_missing) return window.pywebview.api.clean_missing(); await wait(350); return {removed:2,referencesRemoved:4,missing:0,backupPath:"~/Music/_Serato_BACKUP_20260624_122500",reportPath:"~/Music/LostTrackr_CLEANUP.csv"}; },
     async openSerato(){ if(window.pywebview?.api?.openSerato) return window.pywebview.api.openSerato(); if(window.pywebview?.api?.open_serato) return window.pywebview.api.open_serato(); await wait(180); return {opened:true,app:"Serato DJ Pro"}; },
@@ -279,9 +285,11 @@
   function backendAvailable(){ return Boolean(window.pywebview?.api?.scan); }
   function showToast(message){ toast.textContent = message; toast.classList.add("is-open"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("is-open"), 3600); }
 
+  let appInfo = null;
   async function loadAppInfo(){
     try{
       const info = await API.getAppInfo();
+      appInfo = info || null;
       if(info?.version) $("appVersionLabel").textContent = `v${info.version}`;
       return info;
     }catch(error){}
@@ -395,11 +403,12 @@
   function showView(name){
     Object.entries(views).forEach(([key, view]) => view.classList.toggle("is-active", key === name));
     app.dataset.view = name;
+    LTField.setProgress(FIELD_PROGRESS[name] ?? 0);
     setNav(name === "home" ? "home" : (name === "complete" || name === "relink") ? "complete" : name.startsWith("smart") ? "organize" : "prepare");
   }
   function showScreen(name){ showView(name); }
 
-  function goHome(){ setState("idle"); showView("home"); LTHomeWave.play(); }
+  function goHome(){ setState("idle"); showView("home"); }
   function goPrepare(){ setState("prepare"); showView("prepare"); refreshPreflight(); }
   function goComplete(){ setState("complete"); $("completeFolder").value = completeFolder; $("completeStartBtn").disabled = !completeFolder; LTScanFX.stop(); $("completeLoader").style.display = "none"; { var _cfg2 = $("completeConfig"); if (_cfg2) _cfg2.style.display = ""; } $("completeResultsSection").style.display = "none"; showView("complete"); }
 
@@ -1201,27 +1210,39 @@
 
   // ===== lt-intelligence · animation de scan (WebGL, shader "wave" porté du composant Siri) =====
   /* ------------------------------------------------------------------
-     LTHomeWave — signature d'accueil.
-     Portage 2D de la direction artistique du site (ParticleField) : un nuage
-     de particules « perdu » (chaud, desature, cassé) se recompose en une
-     forme d'onde DJ propre qui culmine sur le bleu LostTrackr.
-     Volontairement plus leger que le site (WebGL, ~6000 particules) : ici
-     ~1600 particules en canvas 2D, joue une fois puis se fige.
+     LTField — fond de particules pilote par la PROGRESSION.
+     Reprend la direction artistique du site (ParticleField) : un champ
+     « perdu » disperse sur tout l'espace de travail se recompose en un
+     spectre DJ propre. Ici la progression n'est pas temporelle mais
+     NAVIGATIONNELLE : chaque etape d'un flux reconstitue un peu plus la
+     bibliotheque. Accueil = eclate, fin de flux = spectre complet.
+     Canvas 2D, ~2600 particules, RAF actif uniquement pendant une
+     transition (au repos le champ est fige : cout nul).
      ------------------------------------------------------------------ */
-  const LTHomeWave = (function () {
-    const COLS = 230, ROWS = 11, COUNT = COLS * ROWS;
-    const DURATION = 2400;
+  const LTField = (function () {
+    const COLS = 320, ROWS = 13, COUNT = COLS * ROWS;   // ~4160 : le chaos couvre tout l'ecran
+    const TWEEN = 1100;
 
-    // Etat casse : les couleurs d'alerte du systeme (--danger / --orange).
+    // Etat casse : couleurs d'alerte du systeme (--danger / --orange).
     const LOST = [[255,106,85],[201,74,58],[255,133,14],[124,80,64]];
     // Etat repare : noyau grave chaud -> pointes aigues sur le bleu de marque.
     const FIXED = [[0,[255,59,47]],[0.2,[255,106,61]],[0.4,[255,155,42]],
                    [0.58,[255,93,143]],[0.74,[198,92,255]],[0.88,[21,152,255]],[1,[87,180,255]]];
 
-    let canvas = null, ctx = null, raf = 0, started = 0, field = null, dpr = 1;
+    let canvas = null, ctx = null, raf = 0, field = null, dpr = 1;
+    let current = 0, from = 0, target = 0, tweenStart = 0, ready = false;
+    let tweening = false, lastFrame = 0, enabled = true;
+
+    /* Influence du curseur. Le champ « perdu » est instable et se derange au
+       passage de la souris ; le champ repare est pose et ne bouge plus.
+       La force est donc indexee sur l'inverse de la reconstitution. */
+    const P_RADIUS = 0.23;   // rayon d'influence, en fraction de la petite dimension
+    const P_PUSH   = 0.075;  // deplacement max, en fraction de la petite dimension
+    const pointer = {x:0.5, y:0.5, tx:0.5, ty:0.5, force:0, tforce:0, inside:false};
 
     const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
     const hash = n => { const v = Math.sin(n * 12.9898) * 43758.5453; return v - Math.floor(v); };
+    const reduced = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     function gradient(v){
       v = clamp01(v);
@@ -1245,40 +1266,46 @@
       return Math.max(0.06, (build + phrase) * (0.55 + 0.45 * detail) + beat * 0.55);
     }
 
+    /* Coordonnees normalisees 0..1 sur toute la zone de travail.
+       - disperse : chaos sur tout l'ecran (etat « bibliotheque perdue »)
+       - organise : spectre horizontal dans le tiers bas (etat « reparee ») */
     function build(){
-      const ox = new Float32Array(COUNT), oy = new Float32Array(COUNT);
-      const sx = new Float32Array(COUNT), sy = new Float32Array(COUNT);
-      const cl = new Float32Array(COUNT*3), cf = new Float32Array(COUNT*3);
-      const stag = new Float32Array(COUNT), size = new Float32Array(COUNT);
+      const f = {
+        ox:new Float32Array(COUNT), oy:new Float32Array(COUNT),
+        sx:new Float32Array(COUNT), sy:new Float32Array(COUNT),
+        cl:new Float32Array(COUNT*3), cf:new Float32Array(COUNT*3),
+        stag:new Float32Array(COUNT), size:new Float32Array(COUNT)
+      };
       const amps = new Float32Array(COLS);
       let max = 0;
       for(let i = 0; i < COLS; i++){ amps[i] = amplitude(i); if(amps[i] > max) max = amps[i]; }
 
+      const AXIS = 0.88, AMP = 0.13;   // le spectre repare vit dans le sol reserve (bas de vue)
       let n = 0;
       for(let i = 0; i < COLS; i++){
         const u = i / (COLS - 1);
         const norm = amps[i] / max;
         for(let j = 0; j < ROWS; j++){
-          const r1 = hash(n * 1.7), r2 = hash(n * 3.1 + 5), r3 = hash(n * 5.3 + 11);
-          const v = ROWS === 1 ? 0 : (j / (ROWS - 1)) * 2 - 1;   // -1..1 autour de l'axe
-          ox[n] = u;                                              // 0..1 sur la largeur
-          oy[n] = v * norm * (0.82 + 0.3 * r1);                   // -1..1, amplitude locale
-          sx[n] = clamp01(u + (r2 - 0.5) * 0.34);                 // nuage disperse
-          sy[n] = (r3 - 0.5) * 2.4;
+          const r1 = hash(n * 1.7), r2 = hash(n * 3.1 + 5), r3 = hash(n * 5.3 + 11), r4 = hash(n * 7.7 + 3);
+          const v = ROWS === 1 ? 0 : (j / (ROWS - 1)) * 2 - 1;
+          f.ox[n] = u;
+          f.oy[n] = AXIS - v * norm * AMP * (0.82 + 0.3 * r1);
+          f.sx[n] = clamp01(0.04 + r2 * 0.92);          // chaos : tout l'ecran
+          f.sy[n] = clamp01(0.05 + r3 * 0.90);
           const lost = LOST[n % LOST.length];
-          cl[n*3] = lost[0]; cl[n*3+1] = lost[1]; cl[n*3+2] = lost[2];
+          f.cl[n*3] = lost[0]; f.cl[n*3+1] = lost[1]; f.cl[n*3+2] = lost[2];
           const g = gradient(Math.abs(v) * (0.55 + 0.45 * norm));
-          cf[n*3] = g[0]; cf[n*3+1] = g[1]; cf[n*3+2] = g[2];
-          stag[n] = clamp01(u * 0.55 + r1 * 0.3);                 // se repare de gauche a droite
-          size[n] = 0.7 + 1.5 * r2;
+          f.cf[n*3] = g[0]; f.cf[n*3+1] = g[1]; f.cf[n*3+2] = g[2];
+          f.stag[n] = clamp01(u * 0.5 + r4 * 0.34);     // se repare de gauche a droite
+          f.size[n] = 0.7 + 1.5 * r2;
           n++;
         }
       }
-      return {ox, oy, sx, sy, cl, cf, stag, size};
+      return f;
     }
 
     function resize(){
-      if(!canvas) return;
+      if(!canvas) return false;
       const rect = canvas.getBoundingClientRect();
       if(!rect.width || !rect.height) return false;
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1289,65 +1316,273 @@
     }
 
     function draw(progress){
-      if(!ctx || !canvas) return;
+      if(!ctx || !canvas || !field) return;
       const w = canvas.width / dpr, h = canvas.height / dpr;
       ctx.clearRect(0, 0, w, h);
       ctx.globalCompositeOperation = "lighter";
-      const midY = h * 0.5, amp = h * 0.44;
       const f = field;
+      const small = Math.min(w, h);
+      const radius = P_RADIUS * small, push = P_PUSH * small;
+      const r2max = radius * radius;
+      const px = pointer.x * w, py = pointer.y * h;
+      const pForce = pointer.force;
       for(let i = 0; i < COUNT; i++){
         // chaque particule se repare sur sa propre fenetre : effet de vague
-        const local = clamp01((progress - f.stag[i] * 0.45) / 0.55);
-        const e = local * local * (3 - 2 * local);              // smoothstep
-        const x = (f.sx[i] + (f.ox[i] - f.sx[i]) * e) * w;
-        const y = midY - (f.sy[i] + (f.oy[i] - f.sy[i]) * e) * amp;
+        const local = clamp01((progress - f.stag[i] * 0.42) / 0.58);
+        const e = local * local * (3 - 2 * local);            // smoothstep
+        let x = (f.sx[i] + (f.ox[i] - f.sx[i]) * e) * w;
+        let y = (f.sy[i] + (f.oy[i] - f.sy[i]) * e) * h;
+        // repulsion douce, d'autant plus forte que la particule est encore « perdue »
+        if(pForce > 0.001){
+          const dx = x - px, dy = y - py;
+          const d2 = dx*dx + dy*dy;
+          if(d2 < r2max && d2 > 0.0001){
+            const d = Math.sqrt(d2);
+            const falloff = 1 - d / radius;
+            const amount = falloff * falloff * push * pForce * (1 - e * 0.88);
+            x += (dx / d) * amount;
+            y += (dy / d) * amount;
+          }
+        }
         const r = f.cl[i*3]   + (f.cf[i*3]   - f.cl[i*3])   * e;
         const g = f.cl[i*3+1] + (f.cf[i*3+1] - f.cl[i*3+1]) * e;
         const b = f.cl[i*3+2] + (f.cf[i*3+2] - f.cl[i*3+2]) * e;
-        const a = (0.10 + 0.62 * e) * (0.5 + 0.5 * f.size[i]);
+        // le champ disperse reste discret pour ne jamais gener la lecture ;
+        // il gagne en presence a mesure qu'il se structure vers le bas
+        const a = (0.26 + 0.16 * e) * (0.5 + 0.5 * f.size[i]);
         ctx.fillStyle = `rgba(${r|0},${g|0},${b|0},${a.toFixed(3)})`;
-        const s = f.size[i] * (1.15 + 0.5 * e);
+        const s = f.size[i] * (1.25 + 0.4 * e);
         ctx.fillRect(x, y, s, s);
       }
       ctx.globalCompositeOperation = "source-over";
     }
 
-    function frame(now){
-      const p = clamp01((now - started) / DURATION);
-      const eased = 1 - Math.pow(1 - p, 3);                       // ease-out cubic
-      draw(eased);
-      if(p < 1) raf = requestAnimationFrame(frame);
-      else raf = 0;
+    /* Boucle unique. Elle tourne tant qu'une transition de progression est en
+       cours OU que le curseur influence encore le champ, puis s'arrete : au
+       repos absolu, plus aucune frame n'est calculee. */
+    function loop(now){
+      const dt = lastFrame ? Math.min((now - lastFrame) / 1000, 0.05) : 0.016;
+      lastFrame = now;
+
+      if(tweening){
+        const t = clamp01((now - tweenStart) / TWEEN);
+        current = from + (target - from) * (1 - Math.pow(1 - t, 3));   // ease-out cubic
+        if(t >= 1){ current = target; tweening = false; }
+      }
+
+      // inertie : le champ suit le curseur avec un leger retard, et retombe seul
+      const k = 1 - Math.pow(0.001, dt);
+      pointer.x += (pointer.tx - pointer.x) * k;
+      pointer.y += (pointer.ty - pointer.y) * k;
+      pointer.force += (pointer.tforce - pointer.force) * (1 - Math.pow(0.02, dt));
+
+      draw(current);
+
+      const settled = !tweening
+        && Math.abs(pointer.force - pointer.tforce) < 0.004
+        && Math.abs(pointer.x - pointer.tx) < 0.002
+        && Math.abs(pointer.y - pointer.ty) < 0.002;
+      if(settled){
+        raf = 0; lastFrame = 0;
+        pointer.force = pointer.tforce; pointer.x = pointer.tx; pointer.y = pointer.ty;
+        draw(current);                       // image finale exacte, puis plus aucune frame
+      }
+      else raf = requestAnimationFrame(loop);
     }
 
-    function play(){
-      canvas = document.getElementById("homeWave");
-      if(!canvas || !canvas.getContext) return;
+    function ensureLoop(){
+      if(raf) return;
+      lastFrame = 0;
+      raf = requestAnimationFrame(loop);
+    }
+
+    function init(){
+      canvas = document.getElementById("ltField");
+      if(!canvas || !canvas.getContext) return false;
       ctx = canvas.getContext("2d");
-      if(!ctx) return;
+      if(!ctx) return false;
       if(!field) field = build();
-      if(!resize()) return;
-      if(raf) cancelAnimationFrame(raf), raf = 0;
-      // Mouvement reduit : on affiche directement la bibliotheque reparee.
-      if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-        draw(1);
+      if(!resize()) return false;
+      ready = true;
+      bindPointer();
+      return true;
+    }
+
+    /* Cible de progression : 0 = bibliotheque eclatee, 1 = spectre reconstitue. */
+    function setProgress(value, options){
+      const next = clamp01(Number(value) || 0);
+      if(!ready && !init()) return;
+      if(raf){ cancelAnimationFrame(raf); raf = 0; lastFrame = 0; }
+      if(options && options.immediate || reduced() || !enabled){
+        current = target = next; tweening = false;
+        draw(current);
         return;
       }
-      started = performance.now();
-      raf = requestAnimationFrame(frame);
+      from = current; target = next;
+      if(Math.abs(target - from) < 0.001){ draw(current); return; }
+      tweenStart = performance.now();
+      tweening = true;
+      ensureLoop();
     }
 
-    function stop(){ if(raf){ cancelAnimationFrame(raf); raf = 0; } }
+    /* Le canvas est pointer-events:none : on ecoute sur la zone de travail. */
+    function bindPointer(){
+      const host = canvas && canvas.parentElement;
+      if(!host || reduced()) return;
+      host.addEventListener("mousemove", event => {
+        if(!enabled) return;
+        const rect = canvas.getBoundingClientRect();
+        if(!rect.width || !rect.height) return;
+        pointer.tx = clamp01((event.clientX - rect.left) / rect.width);
+        pointer.ty = clamp01((event.clientY - rect.top) / rect.height);
+        if(!pointer.inside){                    // arrivee : on evite un saut depuis l'ancienne position
+          pointer.inside = true;
+          pointer.x = pointer.tx; pointer.y = pointer.ty;
+        }
+        pointer.tforce = 1;
+        ensureLoop();
+      });
+      host.addEventListener("mouseleave", () => {
+        pointer.inside = false;
+        pointer.tforce = 0;
+        ensureLoop();
+      });
+    }
 
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
-      if(!canvas) return;
+      if(!ready) return;
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { if(resize()) draw(1); }, 160);
+      resizeTimer = setTimeout(() => { if(resize()) draw(current); }, 160);
     });
 
-    return {play, stop};
+    /* Interrupteur des animations de fond (reglage Apparence).
+       Coupe : on dessine l'etat final une fois, sans boucle ni pointeur. */
+    function setEnabled(on){
+      enabled = Boolean(on);
+      if(!ready && !init()) return;
+      if(raf){ cancelAnimationFrame(raf); raf = 0; lastFrame = 0; }
+      if(!enabled){
+        pointer.force = pointer.tforce = 0;
+        current = target; tweening = false;
+      }
+      draw(current);
+    }
+
+    return {setProgress, init, setEnabled};
   })();
+
+  /* Progression narrative par vue : plus on avance dans un flux, plus la
+     bibliotheque se reconstitue sous les yeux du DJ. */
+  /* ------------------------------------------------------------------
+     Panneau de parametres. Regle d'or appliquee ici : ce qui est reel est
+     branche (session, version, canal, logiciel DJ, sauvegarde, animations) ;
+     ce qui n'existe pas encore (abonnement, theme clair) est explicitement
+     signale comme non branche plutot que simule silencieusement.
+     ------------------------------------------------------------------ */
+  const MOTION_KEY = "lt_background_motion";
+  let userProfile = null;
+  let settingsLastFocus = null;
+
+  function motionEnabled(){
+    try{ return localStorage.getItem(MOTION_KEY) !== "off"; }catch(error){ return true; }
+  }
+
+  function applyMotionPreference(){
+    const on = motionEnabled();
+    const box = $("setMotion");
+    if(box) box.checked = on;
+    app.classList.toggle("no-motion", !on);   // fige aussi le vinyle du panneau
+    LTField.setEnabled(on);
+  }
+
+  async function loadUserProfile(){
+    try{
+      userProfile = await API.getUserProfile();
+    }catch(error){
+      userProfile = null;
+    }
+    renderProfileButton();
+  }
+
+  function renderProfileButton(){
+    // Pas de systeme de comptes : libelle generique jusqu'a l'arrivee des profils.
+    const name = $("profileName"), sub = $("profileSub"), avatar = $("profileAvatar");
+    if(name) name.textContent = "Profil DJ";
+    if(avatar) avatar.textContent = "DJ";
+    if(sub){
+      sub.textContent = userProfile?.softwareDetected && userProfile?.softwareName
+        ? userProfile.softwareName
+        : "Aucun logiciel détecté";
+    }
+  }
+
+  function renderSettings(){
+    const p = userProfile || {};
+    const set = (id, value) => { const el = $(id); if(el) el.textContent = value || "—"; };
+
+    $("setAvatar").textContent = "DJ";
+    set("setHeadSub", "Profil DJ · session locale");
+
+    set("setUserName", "Profil DJ");
+    set("setUserLogin", p.login);
+    set("setUserHome", p.home);
+    set("setUserPlatform", p.platform === "macos" ? "macOS" : p.platform === "windows" ? "Windows" : p.platform);
+    set("setUserSoftware", p.softwareDetected ? p.softwareName : "Aucun logiciel détecté");
+
+    const info = appInfo || {};
+    set("setVersion", info.version ? `v${info.version}` : "—");
+    set("setChannel", info.updateChannel ? info.updateChannel : "—");
+    set("setAboutName", info.name || "LostTrackr");
+    set("setAboutVersion", info.version ? `v${info.version}` : "—");
+
+    // le selecteur de logiciel reutilise le rendu existant
+    const host = $("setSoftwareChoice");
+    if(host && preflightInfo){
+      const choices = detectedSoftwares(preflightInfo);
+      const active = activeSoftware(preflightInfo);
+      host.innerHTML = "";
+      if(!choices.length){
+        host.innerHTML = `<div class="empty">Aucun logiciel DJ détecté pour l’instant.</div>`;
+      }else{
+        choices.forEach(software => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `software-option ${software.id === active.id ? "is-active" : ""} ${software.repairSupported ? "is-supported" : ""}`;
+          const count = (software.sources || []).length;
+          button.innerHTML = `<span><b>${esc(software.name)}</b><small>${count ? `${count} source${count > 1 ? "s" : ""} détectée${count > 1 ? "s" : ""}` : "Non détecté"}</small></span><em>${esc(software.repairSupported ? "Réparation active" : "Détection")}</em>`;
+          button.addEventListener("click", async () => { await chooseSoftware(software.id); renderSettings(); });
+          host.appendChild(button);
+        });
+      }
+    }
+    applyMotionPreference();
+  }
+
+  function openSettings(){
+    settingsLastFocus = document.activeElement;
+    renderSettings();
+    $("settingsPanel").hidden = false;
+    $("settingsClose").focus();
+  }
+
+  function closeSettings(){
+    $("settingsPanel").hidden = true;
+    if(settingsLastFocus && settingsLastFocus.focus) settingsLastFocus.focus();
+  }
+
+  function showSettingsSection(name){
+    document.querySelectorAll(".set-tab").forEach(tab => tab.classList.toggle("is-active", tab.dataset.section === name));
+    document.querySelectorAll(".set-pane").forEach(pane => pane.classList.toggle("is-active", pane.dataset.pane === name));
+  }
+
+  const FIELD_PROGRESS = {
+    home:0,
+    prepare:0.22, scan:0.46, results:0.66, review:0.76, preview:0.86, completed:1,
+    complete:0.22, relink:0.86,
+    smartImport:0.18, smartAnalysis:0.44, smartFiles:0.66, smartMetadata:0.86, smartComplete:1
+  };
+
 
   const LTScanFX = (function () {
     const VS = "attribute vec2 aPos; void main(){ gl_Position=vec4(aPos,0.0,1.0); }";
@@ -2312,6 +2547,48 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
   $("navHome").addEventListener("click", goHome);
   $("navRepair").addEventListener("click", goPrepare);
   $("navOrganize").addEventListener("click", goSmartImport);
+  $("profileButton").addEventListener("click", openSettings);
+  $("settingsClose").addEventListener("click", closeSettings);
+  $("settingsPanel").addEventListener("click", event => { if(event.target === $("settingsPanel")) closeSettings(); });
+  document.addEventListener("keydown", event => {
+    if(event.key === "Escape" && !$("settingsPanel").hidden) closeSettings();
+  });
+  document.querySelectorAll(".set-tab").forEach(tab => {
+    tab.addEventListener("click", () => showSettingsSection(tab.dataset.section));
+  });
+  document.querySelectorAll(".billing-switch button").forEach(button => {
+    button.addEventListener("click", () => {
+      const yearly = button.dataset.billing === "yearly";
+      document.querySelectorAll(".billing-switch button").forEach(other => {
+        other.classList.toggle("is-active", other === button);
+      });
+      $("setProPrice").textContent = yearly ? "8,32 €" : "9,99 €";
+      $("setProNote").textContent = yearly ? "99,90 € facturés une fois par an." : "Facturé chaque mois.";
+    });
+  });
+  $("setMotion").addEventListener("change", event => {
+    try{ localStorage.setItem(MOTION_KEY, event.target.checked ? "on" : "off"); }catch(error){}
+    applyMotionPreference();
+    showToast(event.target.checked ? "Animations de fond activées." : "Animations de fond désactivées.");
+  });
+  $("setCheckUpdate").addEventListener("click", async () => {
+    const button = $("setCheckUpdate"), status = $("setUpdateStatus");
+    button.disabled = true;
+    status.textContent = "Vérification en cours…";
+    try{
+      const info = await API.checkUpdate();
+      status.textContent = info?.available
+        ? `Version ${info.version} disponible.`
+        : "Tu es à jour.";
+      if(info?.available) renderUpdateBanner(info);
+    }catch(error){
+      status.textContent = "Vérification impossible pour l’instant.";
+    }finally{
+      button.disabled = false;
+    }
+  });
+  $("setRestore").addEventListener("click", () => { closeSettings(); doRestore(); });
+  $("setReleaseNotes").addEventListener("click", () => { closeSettings(); openUpdateNotes(); });
   $("navComplete").addEventListener("click", goComplete);
   $("goComplete").addEventListener("click", goComplete);
   $("repairCard").addEventListener("click", event => {
@@ -2507,6 +2784,9 @@ void main(){ mainImage(gl_FragColor, gl_FragCoord.xy); }`;
 
   buildRepairWave();
   attachCardGlow();
+  LTField.init();
+  applyMotionPreference();
+  loadUserProfile();
   goHome();
   refreshPreflight();
   loadAppInfo();

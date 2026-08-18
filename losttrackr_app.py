@@ -1481,6 +1481,49 @@ class LostTrackrApi:
     def openSerato(self):
         return self.open_serato()
 
+    def user_profile(self):
+        """Identite reelle de la session locale. L'app n'a pas de systeme de
+        comptes : on expose l'utilisateur du systeme, jamais un profil invente."""
+        import getpass
+
+        login = ""
+        full_name = ""
+        try:
+            login = getpass.getuser() or ""
+        except Exception:
+            login = ""
+        if not login:
+            login = os.environ.get("USER") or os.environ.get("USERNAME") or ""
+
+        # Nom complet du compte (macOS/Linux : champ GECOS)
+        try:
+            import pwd
+
+            entry = pwd.getpwnam(login) if login else None
+            if entry:
+                full_name = (entry.pw_gecos or "").split(",")[0].strip()
+        except Exception:
+            full_name = ""
+
+        display = full_name or login or "Utilisateur"
+        initials = "".join(part[0] for part in display.replace("-", " ").split()[:2]).upper()
+
+        detection = self.detect_software() or {}
+        software = self.software_payload(self.active_software_id(detection), detection) or {}
+
+        return {
+            "displayName": display,
+            "login": login,
+            "initials": initials or "?",
+            "home": str(Path.home()),
+            "platform": update_manager.platform_key(),
+            "softwareName": software.get("name") or "",
+            "softwareDetected": bool(software.get("sources")),
+        }
+
+    def getUserProfile(self):
+        return self.user_profile()
+
     def app_info(self):
         return {
             "name": APP_NAME,

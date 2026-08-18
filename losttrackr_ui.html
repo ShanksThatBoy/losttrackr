@@ -40,13 +40,18 @@
         </button>
       </nav>
 
-      <div class="profile" id="sidebarStatus" aria-label="Logiciel DJ détecté">
-        <div class="avatar" aria-hidden="true"><img src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt=""></div>
-        <strong id="sidebarSoftware">Détection en cours…</strong>
-      </div>
+      <button class="profile" id="profileButton" type="button" aria-haspopup="dialog" aria-label="Ouvrir les paramètres">
+        <span class="avatar" id="profileAvatar" aria-hidden="true">·</span>
+        <span class="profile-copy">
+          <strong id="profileName">Chargement…</strong>
+          <small id="profileSub">Détection en cours</small>
+        </span>
+        <svg class="profile-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
     </aside>
 
     <main class="main">
+      <canvas class="lt-field" id="ltField" aria-hidden="true"></canvas>
       <div class="update-banner" id="updateBanner" hidden>
         <div class="update-copy">
           <strong id="updateTitle">Mise à jour disponible</strong>
@@ -59,7 +64,6 @@
         </div>
       </div>
       <section class="view home-view is-active" id="homeView" aria-labelledby="homeTitle">
-        <canvas class="home-wave" id="homeWave" aria-hidden="true"></canvas>
         <h1 class="hero-title" id="homeTitle">Que veux-tu faire aujourd’hui&nbsp;?</h1>
         <p class="hero-sub">Réparer ce qui est cassé, compléter ce qui manque, ranger ce qui arrive.<br>Rien n’est modifié sans ton aperçu et ta confirmation.</p>
 
@@ -891,6 +895,185 @@
       <div class="bottom-wave" aria-hidden="true"></div>
     </main>
   </div>
+
+  <section class="settings" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+    <div class="vinyl" aria-hidden="true">
+      <div class="vinyl-sheen"></div>
+      <div class="vinyl-label"><img src="assets/losttrackr_icons/clean/logo_losttrackr_mark_ui.png" alt=""></div>
+      <div class="vinyl-hole"></div>
+    </div>
+    <div class="settings-box">
+      <header class="settings-head">
+        <div class="settings-identity">
+          <span class="settings-avatar" id="setAvatar" aria-hidden="true">·</span>
+          <div>
+            <strong id="settingsTitle">Paramètres</strong>
+            <small id="setHeadSub">Session locale</small>
+          </div>
+        </div>
+        <button class="settings-close" id="settingsClose" type="button" aria-label="Fermer les paramètres">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </header>
+
+      <div class="settings-body">
+        <nav class="settings-nav" aria-label="Sections des paramètres">
+          <button class="set-tab is-active" type="button" data-section="account">Compte</button>
+          <button class="set-tab" type="button" data-section="plan">Abonnement</button>
+          <button class="set-tab" type="button" data-section="appearance">Apparence</button>
+          <button class="set-tab" type="button" data-section="updates">Mises à jour</button>
+          <button class="set-tab" type="button" data-section="library">Bibliothèque DJ</button>
+          <button class="set-tab" type="button" data-section="about">À propos</button>
+        </nav>
+
+        <div class="settings-panes">
+
+          <!-- ---------------- COMPTE ---------------- -->
+          <section class="set-pane is-active" data-pane="account">
+            <h3>Compte</h3>
+            <p class="set-lead">LostTrackr fonctionne en local et n’utilise pas de compte en ligne. Les informations ci-dessous viennent de ta session système.</p>
+            <div class="set-rows">
+              <div class="set-row"><span>Utilisateur</span><b id="setUserName">—</b></div>
+              <div class="set-row"><span>Identifiant système</span><b class="set-mono" id="setUserLogin">—</b></div>
+              <div class="set-row"><span>Dossier personnel</span><b class="set-mono" id="setUserHome">—</b></div>
+              <div class="set-row"><span>Plateforme</span><b id="setUserPlatform">—</b></div>
+              <div class="set-row"><span>Logiciel DJ détecté</span><b id="setUserSoftware">—</b></div>
+            </div>
+          </section>
+
+          <!-- ---------------- ABONNEMENT ---------------- -->
+          <section class="set-pane" data-pane="plan">
+            <div class="set-eyebrow">Tarifs</div>
+            <h3>Réparer est gratuit.<span>Le reste s’ouvre avec Pro.</span></h3>
+            <p class="set-lead">Retrouver tes fichiers manquants ne coûtera jamais rien — c’est l’urgence, elle doit rester accessible. Pro ouvre les outils qui te font gagner du temps le reste de la semaine.</p>
+
+            <div class="set-beta-strip" role="note">
+              <div><b>Tu fais partie des premiers.</b> L’accès à la bêta privée t’ouvre toutes les fonctions, sans rien payer. Les paiements seront branchés très bientôt — d’ici là, profite, et parle de LostTrackr autour de toi : c’est ce qui nous fait avancer.</div>
+            </div>
+
+            <div class="set-current">
+              <div>
+                <div class="set-eyebrow">Ton accès</div>
+                <b>Bêta fermée — tout est ouvert</b>
+              </div>
+              <span class="set-current-state">Aucune facturation active</span>
+            </div>
+
+            <div class="billing-switch" role="group" aria-label="Choix de facturation">
+              <button class="is-active" type="button" data-billing="monthly">Mensuel</button>
+              <button type="button" data-billing="yearly">Annuel<em class="billing-badge">2 mois offerts</em></button>
+            </div>
+
+            <div class="plans">
+              <article class="plan">
+                <h4 class="plan-name">Gratuit</h4>
+                <p class="plan-price"><strong>0 €</strong><span>pour toujours</span></p>
+                <p class="plan-note"></p>
+                <p class="plan-pitch">Tout ce qu’il faut pour remettre une bibliothèque d’aplomb.</p>
+                <ul class="plan-list">
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Réparer les chemins cassés</li>
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Scan local, aucune modification pendant l’analyse</li>
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Cue points et beatgrids préservés</li>
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Sauvegarde et restauration</li>
+                </ul>
+                <footer class="plan-foot">
+                  <button class="secondary plan-btn" type="button" disabled>Ton plan actuel</button>
+                  <span>Aucun compte requis</span>
+                </footer>
+              </article>
+
+              <article class="plan plan-pro">
+                <div class="plan-title-row">
+                  <h4 class="plan-name">LostTrackr Pro</h4>
+                  <span class="plan-badge">Tout débloqué</span>
+                </div>
+                <p class="plan-price"><strong id="setProPrice">9,99 €</strong><span>/ mois</span></p>
+                <p class="plan-note" id="setProNote">Facturé chaque mois.</p>
+                <p class="plan-pitch">Tout le gratuit, plus les outils qui préparent tes sets.</p>
+                <ul class="plan-list">
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Tout ce que contient la version gratuite</li>
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Compléter : identité, BPM, clé, genre</li>
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Ranger : destination trouvée et validée</li>
+                  <li><svg class="plan-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.8"/></svg>Renommage sécurisé avec relink Serato</li>
+                </ul>
+                <footer class="plan-foot">
+                  <button class="primary plan-btn" id="setManagePlan" type="button" disabled>Bientôt disponible</button>
+                  <span>Résiliable à tout moment</span>
+                </footer>
+              </article>
+            </div>
+
+            <p class="set-footnote">La réparation reste gratuite, même si tu ne prends jamais Pro.</p>
+          </section>
+
+          <!-- ---------------- APPARENCE ---------------- -->
+          <section class="set-pane" data-pane="appearance">
+            <h3>Apparence</h3>
+            <div class="set-rows">
+              <div class="set-row set-row-control">
+                <div><span>Thème</span><small>L’interface sombre est pensée pour les cabines et les environnements peu éclairés.</small></div>
+                <div class="set-theme-choice">
+                  <button class="set-theme is-active" type="button" data-theme="dark">Sombre</button>
+                  <button class="set-theme is-soon" type="button" data-theme="light" disabled>Clair<em>bientôt</em></button>
+                </div>
+              </div>
+              <div class="set-row set-row-control">
+                <div><span>Animations de fond</span><small>Le champ de particules qui se reconstitue au fil des étapes.</small></div>
+                <label class="set-switch">
+                  <input type="checkbox" id="setMotion" checked>
+                  <i aria-hidden="true"></i>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- MISES A JOUR ---------------- -->
+          <section class="set-pane" data-pane="updates">
+            <h3>Mises à jour</h3>
+            <div class="set-rows">
+              <div class="set-row"><span>Version installée</span><b id="setVersion">—</b></div>
+              <div class="set-row"><span>Canal</span><b id="setChannel">—</b></div>
+              <div class="set-row set-row-control">
+                <div><span>Rechercher une mise à jour</span><small id="setUpdateStatus">LostTrackr vérifie automatiquement au démarrage.</small></div>
+                <button class="secondary compact" id="setCheckUpdate" type="button">Vérifier maintenant</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- BIBLIOTHEQUE DJ ---------------- -->
+          <section class="set-pane" data-pane="library">
+            <h3>Bibliothèque DJ</h3>
+            <p class="set-lead">LostTrackr détecte automatiquement les logiciels installés. Tu peux forcer celui sur lequel travailler.</p>
+            <div class="set-software" id="setSoftwareChoice"></div>
+            <h4 class="set-subhead">Sauvegarde</h4>
+            <div class="set-rows">
+              <div class="set-row set-row-control">
+                <div><span>Restaurer la dernière sauvegarde</span><small>Remet la base de ton logiciel DJ dans l’état précédant la dernière réparation.</small></div>
+                <button class="secondary danger compact" id="setRestore" type="button">Restaurer</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- ---------------- A PROPOS ---------------- -->
+          <section class="set-pane" data-pane="about">
+            <h3>À propos</h3>
+            <div class="set-rows">
+              <div class="set-row"><span>Application</span><b id="setAboutName">LostTrackr</b></div>
+              <div class="set-row"><span>Version</span><b id="setAboutVersion">—</b></div>
+              <div class="set-row"><span>Licence</span><b>Tous droits réservés</b></div>
+            </div>
+            <div class="set-rows" style="margin-top:14px">
+              <div class="set-row set-row-control">
+                <div><span>Notes de version</span><small>Ce qui a changé dans cette version.</small></div>
+                <button class="secondary compact" id="setReleaseNotes" type="button">Voir</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-box">
