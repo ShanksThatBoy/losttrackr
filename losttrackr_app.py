@@ -18,7 +18,6 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
-import dj_set
 import dj_software
 import knowledge_client
 import losttrackr_platform as platform
@@ -1068,86 +1067,6 @@ class LostTrackrApi:
 
     def smartImportChooseDestination(self, payload=None):
         return self.smart_import_choose_destination(payload)
-
-    def dj_set_recent_files(self, require_moved=False):
-        if not self.last_smart_import_plan:
-            return []
-        moved_by_id = {
-            item.get("id"): item
-            for item in (self.last_smart_import_result or {}).get("items", [])
-            if item.get("id")
-        }
-        only_moved = bool(moved_by_id)
-        if require_moved and not only_moved:
-            return []
-        files = []
-        for file_item in self.last_smart_import_plan.get("files", []):
-            file_id = file_item.get("id")
-            if only_moved and file_id not in moved_by_id:
-                continue
-            clone = dict(file_item)
-            moved = moved_by_id.get(file_id)
-            if moved:
-                clone["source"] = moved.get("to") or clone.get("destination")
-                clone["sourceDisplay"] = moved.get("toDisplay") or clone.get("destinationDisplay")
-                clone["destination"] = moved.get("to") or clone.get("destination")
-                clone["destinationDisplay"] = moved.get("toDisplay") or clone.get("destinationDisplay")
-            files.append(clone)
-        return files
-
-    def dj_set_preflight(self):
-        detection = self.detect_software()
-        libraries = self.discover_libraries()
-        active_id = self.active_software_id(detection)
-        active_software = self.software_payload(active_id, detection)
-        existing_targets = self.discover_serato_crates(libraries) if active_id == "serato" else []
-        return {
-            "activeSoftwareId": active_id,
-            "activeSoftware": active_software,
-            "softwareDetection": detection,
-            "existingTargets": existing_targets,
-            "recentFilesCount": len(self.dj_set_recent_files(require_moved=True)),
-            "writeMode": "backup_required",
-            "modes": [
-                {"id": "event", "label": "Préparer un nouvel évènement"},
-                {"id": "organize", "label": "Organiser mes playlists"},
-                {"id": "recent_imports", "label": "Envoyer mes derniers imports dans les crates"},
-            ],
-            "eventTypes": [
-                {"id": "club", "label": "Club"},
-                {"id": "wedding", "label": "Mariage"},
-            ],
-        }
-
-    def djSetPreflight(self):
-        return self.dj_set_preflight()
-
-    def dj_set_plan(self, options=None):
-        options = options or {}
-        preflight = self.dj_set_preflight()
-        mode = options.get("mode") or "event"
-        return dj_set.build_plan(
-            mode=mode,
-            files=self.dj_set_recent_files(require_moved=(mode == "recent_imports")),
-            software_detection=preflight["softwareDetection"],
-            existing_targets=preflight["existingTargets"],
-            event_type=options.get("eventType"),
-        )
-
-    def djSetPlan(self, options=None):
-        return self.dj_set_plan(options)
-
-    def dj_set_style_inspiration_plan(self, options=None):
-        options = options or {}
-        self.dj_set_preflight()
-        recent_files = self.dj_set_recent_files(require_moved=False)
-        return dj_set.build_style_inspiration_plan(
-            options=options,
-            local_tracks=recent_files
-        )
-
-    def djSetStyleInspirationPlan(self, options=None):
-        return self.dj_set_style_inspiration_plan(options)
 
     def choose_folder(self, title="Choisir un dossier"):
         try:

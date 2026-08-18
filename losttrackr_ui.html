@@ -16,8 +16,7 @@
   <div class="workspace">
     <aside class="sidebar" aria-label="Navigation principale">
       <div class="brand">
-        <div class="brand-mark"><img src="assets/losttrackr_icons/clean/logo_losttrackr_v2_clean.png" alt=""></div>
-        <div class="brand-copy"><strong>LostTrackr</strong></div>
+        <img class="brand-lockup" src="assets/losttrackr_icons/clean/logo_losttrackr_lockup_ui.png" alt="LostTrackr">
       </div>
 
       <nav class="nav">
@@ -29,21 +28,21 @@
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" aria-hidden="true">
           <span>Réparer</span>
         </button>
+        <button class="nav-btn" id="navComplete" type="button" data-target="complete">
+          <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" aria-hidden="true">
+          <span>Compléter</span>
+          <span class="soon-pill pro-pill" aria-hidden="true">Pro</span>
+        </button>
         <button class="nav-btn" id="navOrganize" type="button" data-target="organize">
           <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" aria-hidden="true">
           <span>Ranger</span>
-          <span class="soon-pill smart-pill" aria-hidden="true">Smart</span>
-        </button>
-        <button class="nav-btn" id="navLibrary" type="button" data-target="djset">
-          <img class="nav-icon" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" aria-hidden="true">
-          <span>DJ Set</span>
-          <span class="soon-pill smart-pill" aria-hidden="true">Smart</span>
+          <span class="soon-pill pro-pill" aria-hidden="true">Pro</span>
         </button>
       </nav>
 
-      <div class="profile" aria-label="Profil utilisateur">
-        <div class="avatar" aria-hidden="true"><img src="assets/losttrackr_icons/clean/icon_user_v2_clean.png" alt=""></div>
-        <strong>DJ Cipher — <span>Pro</span></strong>
+      <div class="profile" id="sidebarStatus" aria-label="Logiciel DJ détecté">
+        <div class="avatar" aria-hidden="true"><img src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt=""></div>
+        <strong id="sidebarSoftware">Détection en cours…</strong>
       </div>
     </aside>
 
@@ -60,55 +59,58 @@
         </div>
       </div>
       <section class="view home-view is-active" id="homeView" aria-labelledby="homeTitle">
+        <canvas class="home-wave" id="homeWave" aria-hidden="true"></canvas>
         <h1 class="hero-title" id="homeTitle">Que veux-tu faire aujourd’hui&nbsp;?</h1>
-        <p class="hero-sub">LostTrackr t’aide à retrouver, organiser et protéger ta musique.<br>Rien n’est modifié sans ta confirmation.</p>
+        <p class="hero-sub">Réparer ce qui est cassé, compléter ce qui manque, ranger ce qui arrive.<br>Rien n’est modifié sans ton aperçu et ta confirmation.</p>
 
         <div class="cards">
-          <article class="feature-card">
-            <span class="badge">Gratuit</span>
+          <article class="feature-card" id="repairCard">
+            <span class="badge">Hors ligne</span>
             <div class="feature-art">
               <img class="feature-img" src="assets/losttrackr_icons/clean/icon_repair_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art repair" hidden><i class="wave-icon" aria-hidden="true"></i></div>
             </div>
-            <h2>Retrouver mes<br>sons perdus</h2>
-            <p>Scanne tes disques et dossiers<br>pour retrouver les fichiers manquants,<br>déplacés ou introuvables.</p>
+            <h2>Réparer mes<br>sons perdus</h2>
+            <p>Ton logiciel DJ affiche des titres en rouge&nbsp;? LostTrackr retrouve les fichiers déplacés et répare les chemins.</p>
             <div class="feature-card-footer">
+              <div class="coming-note">Aperçu avant écriture · sauvegarde automatique</div>
               <button class="action-btn" id="goPrepare" type="button">Lancer un scan</button>
             </div>
           </article>
 
-          <article class="feature-card" id="comingCard">
-            <span class="badge smart">Analyse intelligente</span>
+          <article class="feature-card" id="completeCard">
+            <span class="badge smart">Base de connaissances</span>
             <div class="feature-art">
-              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+              <img class="feature-img" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
-            <h2>Ranger mes<br>titres</h2>
-            <p>Analyse tes fichiers audio,<br>trouve les dossiers cohérents<br>et déplace après validation.</p>
+            <h2>Compléter mes<br>titres</h2>
+            <p>Identifie tes fichiers mal nommés et récupère artiste, titre, BPM, clé Camelot, genre et année.</p>
             <div class="feature-card-footer">
-              <div class="coming-note">Déplacement contrôlé · aperçu obligatoire</div>
-              <button class="action-btn" id="goSmartImport" type="button">Ranger mes titres</button>
+              <div class="coming-note">Tu valides chaque titre avant écriture</div>
+              <button class="action-btn" id="goComplete" type="button">Analyser un dossier</button>
             </div>
           </article>
 
-          <article class="feature-card" id="djSetCard">
-            <span class="badge smart">Smart DJ</span>
+          <article class="feature-card" id="organizeCard">
+            <span class="badge smart">Smart</span>
             <div class="feature-art">
               <img class="feature-img" src="assets/losttrackr_icons/clean/icon_smart_import_v2_clean.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
               <div class="fallback-art crate" hidden><i class="disc" aria-hidden="true"></i></div>
             </div>
-            <h2>Préparer mon<br>DJ Set</h2>
-            <p>Crée des crates, sous-crates<br>ou playlists cohérentes<br>pour tes prochains sets.</p>
+            <h2>Ranger mes<br>nouveaux sons</h2>
+            <p>Analyse ton dossier de téléchargements, trouve le bon dossier de destination et déplace après ta validation.</p>
             <div class="feature-card-footer">
-              <button class="action-btn" id="goDjSet" type="button">Préparer un set</button>
+              <div class="coming-note">Aucune copie, aucune suppression</div>
+              <button class="action-btn" id="goSmartImport" type="button">Ranger mes titres</button>
             </div>
           </article>
         </div>
 
-        <div class="status-strip" aria-label="Statut LostTrackr">
-          <div class="status-item status-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v4M17 3v4M4 9h16M5 5h14v15H5z"/><path d="M8 13h2M12 13h2M16 13h2M8 17h2M12 17h2"/></svg><span>Dernier scan&nbsp;: 24 juin 2026</span></div>
-          <div class="status-item status-green"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16.5 8.7"/></svg><span>Bibliothèque&nbsp;: OK</span></div>
-          <div class="status-item status-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .7-7.94A6 6 0 0 0 6.1 8.9 4.5 4.5 0 0 0 7 18Z"/></svg><span>Sauvegarde disponible</span></div>
+        <div class="status-strip" aria-label="État de ta bibliothèque">
+          <div class="status-item status-blue" id="homeStatusSoftware"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16.5 8.7"/></svg><span id="homeStatusSoftwareText">Détection du logiciel DJ…</span></div>
+          <div class="status-item status-blue" id="homeStatusLibrary"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span id="homeStatusLibraryText">Recherche de ta bibliothèque…</span></div>
+          <div class="status-item status-green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 11l4 4 4-4M4 19h16"/></svg><span>Sauvegarde avant toute écriture</span></div>
         </div>
       </section>
 
@@ -420,343 +422,23 @@
         </div>
       </section>
 
-      <section class="view smart-djset-view" id="djSetView" aria-labelledby="djSetTitle">
-        <button class="back-btn smart-flow-back" id="djSetBack" type="button">← Retour</button>
+
+
+
+
+
+
+      <section class="view complete-view" id="completeView" aria-labelledby="completeTitle">
+        <button class="back-btn smart-flow-back" id="completeBack" type="button">← Retour</button>
         <header class="smart-review-hero smart-flow-hero">
           <span class="smart-spark" aria-hidden="true">✦</span>
           <div>
-            <h1 class="page-title" id="djSetTitle">Préparer mon DJ Set</h1>
-              <p class="page-sub">Cette zone se concentre sur Serato, Rekordbox et les playlists.<br>LostTrackr prépare les crates, tu ajustes, une sauvegarde est créée avant toute écriture.</p>
-          </div>
-        </header>
-
-        <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Choix Préparer mon DJ Set">
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetNewEvent">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="feature-visual">
-              <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_event_prepare_v2_transparent.png" alt="Préparer un nouveau set">
-            </div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Préparer un nouveau set</h2>
-                <em class="smart-confidence-badge smart-confidence-high">Crates intelligentes</em>
-              </div>
-              <span class="smart-suggestion-count">Playlist simple ou évènement complet</span>
-              <p class="smart-suggestion-reason">Crée une base de set depuis un style musical, une ambiance ou une structure complète d’évènement. LostTrackr prépare les suggestions, tu gardes le contrôle avant toute écriture.</p>
-            </div>
-          </article>
-
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetOrganizePlaylists">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="feature-visual">
-              <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_playlist_organizer_v2_transparent.png" alt="Organiser mes playlists">
-            </div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Organiser mes playlists</h2>
-                <em class="smart-confidence-badge smart-confidence-medium">Analyse cohérence</em>
-              </div>
-              <span class="smart-suggestion-count">Titres, styles, artistes, BPM et tags</span>
-              <p class="smart-suggestion-reason">LostTrackr détectera les titres présents, repèrera les incohérences et proposera des regroupements reliés à la base de connaissance.</p>
-            </div>
-          </article>
-
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetRecentImports">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="feature-visual">
-              <img class="feature-icon-premium" src="assets/losttrackr_icons/icon_import_to_crates_v2_transparent.png" alt="Envoyer mes derniers imports dans les crates">
-            </div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Envoyer mes derniers imports dans les crates</h2>
-                <em class="smart-confidence-badge smart-confidence-high">Dernier Smart Import</em>
-              </div>
-              <span class="smart-suggestion-count">Titres déplacés lors du dernier Smart Import</span>
-              <p class="smart-suggestion-reason">LostTrackr analyse les titres récemment rangés et préapar leur placement dans les crates ou playlists appropriées.</p>
-            </div>
-          </article>
-
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetMetadataAnalysis">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="feature-visual">
-              <img class="feature-icon-premium" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt="Analyser les métadonnées de titres">
-            </div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Analyser les métadonnées de titres</h2>
-                <em class="smart-confidence-badge smart-confidence-high" style="border-color: rgba(34,143,255,.55); background: rgba(7,43,93,.35); color: #2ea2ff;">Sourcing automatique</em>
-              </div>
-              <span class="smart-suggestion-count">BPM, clés, genres et corrections</span>
-              <p class="smart-suggestion-reason">Scanne un dossier pour trouver les données manquantes. LostTrackr interroge d'abord la base de connaissances locale, puis recherche sur tes plateformes favorites.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="view smart-djset-new-set-view" id="djSetNewSetView" aria-labelledby="djSetNewSetTitle">
-        <button class="back-btn smart-flow-back" id="djSetNewSetBack" type="button">← Retour</button>
-        <header class="smart-review-hero smart-flow-hero">
-          <span class="smart-spark" aria-hidden="true">✦</span>
-          <div>
-            <h1 class="page-title" id="djSetNewSetTitle">Préparer un nouveau set</h1>
-            <p class="page-sub">Choisis entre une inspiration rapide par style ou une structure complète d’évènement.</p>
-          </div>
-        </header>
-
-        <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Options Préparer un nouveau set">
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetNewSetSimple">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>P</span></div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Playlist simple</h2>
-                <em class="smart-confidence-badge smart-confidence-medium">Inspiration par style</em>
-              </div>
-              <span class="smart-suggestion-count">Styles, ambiances, Deezer, Spotify, Apple Music</span>
-              <p class="smart-suggestion-reason">LostTrackr s’appuie sur les grandes plateformes de streaming comme source d’inspiration, puis retrouve les titres déjà présents dans ta bibliothèque locale.</p>
-            </div>
-          </article>
-
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetNewSetEvent">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>E</span></div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Évènement complet</h2>
-                <em class="smart-confidence-badge smart-confidence-high">Structure complète</em>
-              </div>
-              <span class="smart-suggestion-count">Club, mariage, warmup, peak time, closing</span>
-              <p class="smart-suggestion-reason">LostTrackr prépare une structure complète de crates pour un évènement, puis propose le placement des titres dans chaque moment du set.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="view smart-djset-style-view" id="djSetStyleInspirationView" aria-labelledby="djSetStyleTitle">
-        <button class="back-btn smart-flow-back" id="djSetStyleBack" type="button">← Retour</button>
-        <header class="smart-review-hero smart-flow-hero">
-          <span class="smart-spark" aria-hidden="true">✦</span>
-          <div>
-            <h1 class="page-title" id="djSetStyleTitle">Inspiration par genre</h1>
-            <p class="page-sub">Choisis un genre et un service de sourcing. LostTrackr proposera une base de titres puis indiquera ceux qui sont déjà présents dans ta bibliothèque.</p>
-          </div>
-        </header>
-
-        <div class="style-form-container">
-          <div class="style-form-grid">
-            <div class="style-option-card">
-              <label for="styleGenre">Genre musical</label>
-              <select id="styleGenre" class="style-select">
-                <option value="Afro House" selected>Afro House</option>
-                <option value="Amapiano">Amapiano</option>
-                <option value="Reggaeton">Reggaeton</option>
-                <option value="Baile Funk">Baile Funk</option>
-                <option value="Latino">Latino</option>
-                <option value="Tech House">Tech House</option>
-                <option value="Rap FR">Rap FR</option>
-                <option value="R&B">R&B</option>
-                <option value="Afrobeats">Afrobeats</option>
-                <option value="Hardtech">Hardtech</option>
-                <option value="Techno">Techno</option>
-                <option value="Rock">Rock</option>
-                <option value="Métal">Métal</option>
-                <option value="Soul">Soul</option>
-                <option value="Jazz">Jazz</option>
-                <option value="Disco">Disco</option>
-                <option value="Pop">Pop</option>
-                <option value="Electro">Electro</option>
-                <option value="Dubstep">Dubstep</option>
-                <option value="Drum & Bass">Drum & Bass</option>
-                <option value="Généraliste">Généraliste</option>
-              </select>
-            </div>
-
-            <div class="style-option-card">
-              <label>Service de sourcing</label>
-              <div class="style-source-group">
-                <button type="button" class="style-source-pill is-active" data-source="deezer">
-                  <span>Deezer</span>
-                  <small>Prévu · source principale</small>
-                </button>
-                <button type="button" class="style-source-pill is-preview" data-source="spotify">
-                  <span>Spotify</span>
-                  <small>Prévu</small>
-                </button>
-                <button type="button" class="style-source-pill is-preview" data-source="apple_music">
-                  <span>Apple Music</span>
-                  <small>Prévu</small>
-                </button>
-              </div>
-            </div>
-
-            <div class="style-option-card">
-              <label for="styleLimit">Taille de la proposition</label>
-              <select id="styleLimit" class="style-select">
-                <option value="20">20 titres</option>
-                <option value="40" selected>40 titres</option>
-                <option value="60">60 titres</option>
-                <option value="100">100 titres</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="style-preview-info-card">
-            <span class="info-icon">ℹ</span>
-            <p><b>Mode aperçu :</b> les suggestions sont générées localement pour tester l’expérience. Les connexions Deezer, Spotify et Apple Music seront branchées plus tard.</p>
-          </div>
-
-          <div class="style-local-toggle-container">
-            <label class="style-local-toggle">
-              <input type="checkbox" id="styleLocalOnly">
-              <span class="toggle-box"></span>
-              <div class="toggle-label-group">
-                <span class="toggle-title">Utiliser uniquement les morceaux que j’ai déjà localement</span>
-                <span class="toggle-help">Si cette option est activée, LostTrackr masque les titres absents de ta bibliothèque. Sinon, ils apparaissent grisés en bas de liste.</span>
-              </div>
-            </label>
-          </div>
-
-          <div class="style-action-bar">
-            <button class="smart-apply-final" id="styleGenerateBtn" type="button">Générer l’inspiration</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="view smart-djset-style-results-view" id="djSetStyleResultsView" aria-labelledby="djSetStyleResultsTitle">
-        <button class="back-btn smart-flow-back" id="djSetStyleResultsBack" type="button">← Retour</button>
-        <header class="smart-review-hero smart-flow-hero">
-          <span class="smart-spark" aria-hidden="true">✦</span>
-          <div>
-            <h1 class="page-title" id="djSetStyleResultsTitle">Inspiration générée</h1>
-            <p class="page-sub" id="djSetStyleResultsSub">Base Afro House · Club · Deezer · 40 titres</p>
-          </div>
-        </header>
-
-        <div class="smart-flow-stats" id="djSetStyleResultsStats" aria-label="Statistiques de l’inspiration" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
-          <div><strong id="styleStatLocal">0</strong><span>Titres présents dans la bibliothèque</span></div>
-          <div><strong id="styleStatMissing">0</strong><span>Titres absents de la bibliothèque</span></div>
-          <div><strong id="styleStatSource">Deezer</strong><span>Plateforme de sourcing</span></div>
-        </div>
-
-        <div class="style-local-only-warning" id="styleLocalOnlyWarning" style="display: none;">
-          <span class="warning-icon">⚠</span>
-          <span id="styleLocalOnlyWarningText">X titres absents ont été masqués car l’option local uniquement est activée.</span>
-        </div>
-
-        <div class="style-results-columns-container" id="styleResultsColumns">
-          <div class="style-results-column present-column">
-            <div class="column-header">
-              <h3>Titres présents <span class="badge-count" id="stylePresentBadgeCount">0</span></h3>
-            </div>
-            <div class="style-results-list" id="stylePresentList" aria-live="polite"></div>
-          </div>
-          <div class="style-results-column absent-column" id="styleAbsentColumn">
-            <div class="column-header">
-              <h3>Titres absents <span class="badge-count" id="styleAbsentBadgeCount">0</span></h3>
-            </div>
-            <div class="style-results-list" id="styleAbsentList" aria-live="polite"></div>
-          </div>
-        </div>
-
-        <div class="smart-review-cta-bar smart-flow-cta-bar">
-          <button class="smart-review-cta smart-review-cta-blue" id="styleValidateBtn" type="button">
-            <span class="smart-cta-icon" aria-hidden="true">✓</span>
-            <span><b>Valider les titres présents</b><small id="styleValidateSubText">0 titre prêt pour une future crate</small></span>
-          </button>
-          <button class="smart-review-cta smart-review-cta-orange" id="styleExportMissingBtn" type="button">
-            <span class="smart-cta-icon" aria-hidden="true">⌕</span>
-            <span><b>Exporter la liste des absents</b><small>Télécharger un résumé CSV</small></span>
-          </button>
-        </div>
-      </section>
-
-      <section class="view smart-djset-event-view" id="djSetEventView" aria-labelledby="djSetEventTitle">
-        <button class="back-btn smart-flow-back" id="djSetEventBack" type="button">← Retour</button>
-        <header class="smart-review-hero smart-flow-hero">
-          <span class="smart-spark" aria-hidden="true">✦</span>
-          <div>
-            <h1 class="page-title" id="djSetEventTitle">Préparer un nouvel évènement</h1>
-            <p class="page-sub">Choisis la base de travail avant l’analyse.<br>Les crates restent personnalisables avant que LostTrackr propose le placement des titres.</p>
-          </div>
-        </header>
-
-        <div class="smart-suggestion-list smart-setup-list smart-djset-list" aria-label="Type d’évènement DJ Set">
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetEventClub">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>C</span></div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Club</h2>
-                <em class="smart-confidence-badge smart-confidence-high">Base énergique</em>
-              </div>
-              <span class="smart-suggestion-count">Warmup, Groove, Peak Time, Closing</span>
-              <p class="smart-suggestion-reason">Une structure simple pour organiser un set club, inspirée d’une crate principale et affinée par style, artiste et cohérence musicale.</p>
-            </div>
-          </article>
-
-          <article class="smart-suggestion-card smart-setup-card smart-choice-card" id="djSetEventWedding">
-            <div class="smart-card-handle" aria-hidden="true"></div>
-            <div class="smart-crate-logo-placeholder smart-folder-placeholder" aria-hidden="true"><span>M</span></div>
-            <div class="smart-suggestion-copy">
-              <div class="smart-suggestion-top">
-                <h2>Mariage</h2>
-                <em class="smart-confidence-badge smart-confidence-medium">Base complète</em>
-              </div>
-              <span class="smart-suggestion-count">Cocktail, Dîner, Ouverture, Dancefloor, Fin</span>
-              <p class="smart-suggestion-reason">Une base prête à personnaliser pour les temps forts d’un mariage, avec suggestions de titres dans chaque crate.</p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="view smart-djset-plan-view" id="djSetPlanView" aria-labelledby="djSetPlanTitle">
-        <button class="back-btn smart-flow-back" id="djSetPlanBack" type="button">← Retour</button>
-        <div class="smart-stepper" aria-label="Progression Préparer mon DJ Set">
-          <div class="smart-step is-done"><span>1</span><b>Choisir</b></div>
-          <i></i>
-          <div class="smart-step is-done"><span>2</span><b>Analyser</b></div>
-          <i></i>
-          <div class="smart-step is-active"><span>3</span><b>Vérifier</b></div>
-          <i></i>
-          <div class="smart-step"><span>4</span><b>Appliquer</b></div>
-        </div>
-        <header class="smart-review-hero smart-flow-hero">
-          <span class="smart-spark" aria-hidden="true">✦</span>
-          <div>
-            <h1 class="page-title" id="djSetPlanTitle">Vérifier les suggestions</h1>
-            <p class="page-sub" id="djSetPlanSub">LostTrackr prépare une proposition de crates et playlists.<br>Une sauvegarde sera obligatoire avant toute écriture dans le logiciel DJ.</p>
-          </div>
-        </header>
-        <div class="smart-flow-stats" aria-label="Résumé du plan DJ Set">
-          <div><strong id="djSetReliableCount">0</strong><span>titres fiables</span></div>
-          <div><strong id="djSetNewTargetCount">0</strong><span>nouvelles destinations</span></div>
-          <div><strong id="djSetReviewCount">0</strong><span>à vérifier</span></div>
-        </div>
-        <div class="smart-suggestion-list smart-djset-plan-list" id="djSetPlanList" aria-live="polite"></div>
-        <div class="smart-review-cta-bar smart-flow-cta-bar">
-          <button class="smart-review-cta smart-review-cta-blue" id="djSetValidateReliable" type="button">
-            <span class="smart-cta-icon" aria-hidden="true">✓</span>
-            <span><b>Valider les suggestions fiables</b><small id="djSetValidateReliableSub">0 titre prêt pour l’aperçu</small></span>
-          </button>
-          <button class="smart-review-cta smart-review-cta-orange" id="djSetReviewRemaining" type="button">
-            <span class="smart-cta-icon" aria-hidden="true">⌕</span>
-            <span><b>Vérifier les groupes restants</b><small id="djSetReviewRemainingSub">0 titre nécessite ton avis</small></span>
-          </button>
-          <button class="smart-apply-final" id="djSetPreviewApply" type="button">Préparer l’écriture sécurisée</button>
-        </div>
-      </section>
-
-      <section class="view smart-djset-metadata-view" id="djSetMetadataView" aria-labelledby="djSetMetadataTitle">
-        <button class="back-btn smart-flow-back" id="djSetMetadataBack" type="button">← Retour</button>
-        <header class="smart-review-hero smart-flow-hero">
-          <span class="smart-spark" aria-hidden="true">✦</span>
-          <div>
-            <h1 class="page-title" id="djSetMetadataTitle">Analyser les métadonnées</h1>
+            <h1 class="page-title" id="completeTitle">Analyser les métadonnées</h1>
             <p class="page-sub">Identifie les données manquantes de tes titres et enrichis-les via la Base de connaissances LostTrackr.</p>
           </div>
         </header>
 
-        <div class="mdx-wrap" id="djSetMetadataConfig">
+        <div class="mdx-wrap" id="completeConfig">
           <!-- Guidage : ce que fait l'analyse -->
           <div class="mdx-steps" aria-hidden="true">
             <div class="mdx-step">
@@ -786,10 +468,10 @@
                   <svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
                 </span>
                 <div class="mdx-drop-body">
-                  <input type="text" id="djSetMetadataFolder" readonly placeholder="Aucun dossier sélectionné…" aria-label="Dossier à analyser">
+                  <input type="text" id="completeFolder" readonly placeholder="Aucun dossier sélectionné…" aria-label="Dossier à analyser">
                   <span class="mdx-drop-hint">Clique sur « Choisir un dossier » pour sélectionner un emplacement.</span>
                 </div>
-                <button class="mdx-btn-ghost" id="djSetMetadataChooseFolder" type="button">Choisir un dossier</button>
+                <button class="mdx-btn-ghost" id="completeChooseFolder" type="button">Choisir un dossier</button>
               </div>
             </div>
 
@@ -806,7 +488,7 @@
             </div>
 
             <div class="mdx-launch">
-              <button class="action-btn mdx-cta" id="djSetMetadataStartBtn" type="button" disabled>
+              <button class="action-btn mdx-cta" id="completeStartBtn" type="button" disabled>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9l-3.4 3 .8 4.6L12 14.4 8.1 16.6l.8-4.6L5.5 9l4.6-1.4z"></path></svg>
                 Lancer l'analyse
               </button>
@@ -818,9 +500,9 @@
           </div>
         </div>
 
-        <div id="djSetMetadataLoader" class="mdx-loader mdx-wrap" style="display: none; flex-direction: column;">
-          <canvas id="djSetScanCanvas" class="mdx-scan-canvas" aria-hidden="true"></canvas>
-          <p id="djSetMetadataLoaderText">Analyse acoustique en cours…</p>
+        <div id="completeLoader" class="mdx-loader mdx-wrap" style="display: none; flex-direction: column;">
+          <canvas id="completeScanCanvas" class="mdx-scan-canvas" aria-hidden="true"></canvas>
+          <p id="completeLoaderText">Analyse acoustique en cours…</p>
           <div class="mdx-pipeline" aria-hidden="true">
             <span class="mdx-pl-step" data-step="0">Scan du dossier</span>
             <span class="mdx-pl-step" data-step="1">Empreinte acoustique</span>
@@ -834,12 +516,12 @@
           </div>
         </div>
 
-        <div id="djSetMetadataResultsSection" class="mdx-wrap" style="display: none;">
+        <div id="completeResultsSection" class="mdx-wrap" style="display: none;">
           <div class="mdx-stats">
-            <div class="mdx-stat" style="--accent:#eef3fb;"><strong id="djSetMetadataTotalCount">0</strong><span>titres scannés</span></div>
-            <div class="mdx-stat" style="--accent:#4ade80;"><strong id="djSetMetadataCompleteCount">0</strong><span>base de connaissances</span></div>
-            <div class="mdx-stat" style="--accent:#ff9b2a;"><strong id="djSetMetadataSuggestionCount">0</strong><span>suggestions probables</span></div>
-            <div class="mdx-stat" style="--accent:#f87171;"><strong id="djSetMetadataIncompleteCount">0</strong><span>non identifiés</span></div>
+            <div class="mdx-stat" style="--accent:#eef3fb;"><strong id="completeTotalCount">0</strong><span>titres scannés</span></div>
+            <div class="mdx-stat" style="--accent:#4ade80;"><strong id="completeKbCount">0</strong><span>base de connaissances</span></div>
+            <div class="mdx-stat" style="--accent:#ff9b2a;"><strong id="completeSuggestionCount">0</strong><span>suggestions probables</span></div>
+            <div class="mdx-stat" style="--accent:#f87171;"><strong id="completeUnknownCount">0</strong><span>non identifiés</span></div>
           </div>
 
           <div style="background: rgba(9, 18, 30, 0.45); border: 1px solid rgba(127, 176, 236, 0.12); border-radius: 16px; overflow: hidden; margin-bottom: 30px;">
@@ -855,24 +537,25 @@
                     <th style="padding: 14px 18px; text-align: center; width: 13%;">Statut / Source</th>
                   </tr>
                 </thead>
-                <tbody id="djSetMetadataTableBody" style="color: #fff;">
+                <tbody id="completeTableBody" style="color: #fff;">
                   <!-- Lines will be dynamically generated by JS -->
                 </tbody>
               </table>
             </div>
           </div>
           <div style="display: flex; justify-content: flex-end; margin: -14px 0 6px;">
-            <button class="mdx-btn-ghost" id="djSetValidateAllBtn" type="button" hidden>
+            <button class="mdx-btn-ghost" id="completeValidateAllBtn" type="button" hidden>
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px;margin-right:7px;"><path d="M20 6 9 17l-5-5"></path><path d="m22 10-7.5 7.5L13 16"></path></svg>Tout valider
             </button>
           </div>
           <div class="mdx-actions" style="display: flex; flex-direction: column; align-items: flex-end; gap: 16px; margin-top: 20px;">
             <label class="confirm-line" style="margin-bottom: 0;">
-              <input type="checkbox" id="djSetMetadataConfirmed">
+              <input type="checkbox" id="completeConfirmed">
               <span>Je confirme vouloir écrire ces métadonnées (BPM, clé, etc.) dans les fichiers audio d’origine.</span>
             </label>
             <div style="display: flex; gap: 16px;">
-              <button class="action-btn mdx-cta" id="djSetMetadataSaveBtn" type="button" disabled>
+              <button class="mdx-btn-ghost" id="goRelink" type="button">Renommer &amp; réparer Serato</button>
+              <button class="action-btn mdx-cta" id="completeSaveBtn" type="button" disabled>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                 Valider et enregistrer les modifications
               </button>
@@ -881,14 +564,14 @@
         </div>
 
         <!-- Drawer d'affinage manuel : corriger / rechercher / valider un titre -->
-        <div class="mdx-refine-overlay" id="djSetRefineOverlay" hidden>
-          <aside class="mdx-refine" role="dialog" aria-modal="true" aria-labelledby="djSetRefineTitle">
+        <div class="mdx-refine-overlay" id="refineOverlay" hidden>
+          <aside class="mdx-refine" role="dialog" aria-modal="true" aria-labelledby="refineTitle">
             <header class="mdx-refine-head">
               <div>
-                <h2 id="djSetRefineTitle">Affiner ce titre</h2>
-                <code id="djSetRefineFile" class="mdx-refine-file"></code>
+                <h2 id="refineTitle">Affiner ce titre</h2>
+                <code id="refineFile" class="mdx-refine-file"></code>
               </div>
-              <button class="mdx-refine-close" id="djSetRefineClose" type="button" aria-label="Fermer (Échap)">
+              <button class="mdx-refine-close" id="refineClose" type="button" aria-label="Fermer (Échap)">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
               </button>
             </header>
@@ -921,20 +604,20 @@
                 </label>
               </div>
 
-              <button class="mdx-btn-ghost mdx-refine-search" id="djSetRefineSearch" type="button">
+              <button class="mdx-btn-ghost mdx-refine-search" id="refineSearch" type="button">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
                 Relancer la recherche avec ces infos
               </button>
 
-              <div class="mdx-refine-proposal" id="djSetRefineProposal" hidden>
+              <div class="mdx-refine-proposal" id="refineProposal" hidden>
                 <div class="mdx-refine-proposal-head">Proposition de la Base de connaissances</div>
-                <div class="mdx-refine-proposal-body" id="djSetRefineProposalBody"></div>
-                <button class="mdx-btn-ghost" id="djSetRefineApply" type="button">Utiliser ces valeurs</button>
+                <div class="mdx-refine-proposal-body" id="refineProposalBody"></div>
+                <button class="mdx-btn-ghost" id="refineApply" type="button">Utiliser ces valeurs</button>
               </div>
             </div>
 
             <footer class="mdx-refine-foot">
-              <button class="action-btn mdx-refine-validate" id="djSetRefineValidate" type="button">
+              <button class="action-btn mdx-refine-validate" id="refineValidate" type="button">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
                 Valider ce titre
               </button>
@@ -942,6 +625,43 @@
             </footer>
           </aside>
         </div>
+      </section>
+
+      <section class="view relink-view" id="relinkView" aria-labelledby="relinkTitle">
+        <button class="back-btn" id="relinkBack" type="button">← Retour</button>
+        <h1 class="page-title" id="relinkTitle">Renommer sans rien casser</h1>
+        <p class="page-sub">LostTrackr renomme le fichier <em>et</em> répare le chemin dans Serato dans la même opération.<br>Tes crates, tes cues et ton historique restent intacts.</p>
+
+        <article class="preview-panel">
+          <div class="safe-banner"><img src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""><span>Aucun fichier n’a été renommé. Cet écran est un aperçu.</span></div>
+
+          <div class="before-after">
+            <div class="path-column before"><h3>Nom actuel</h3><p>Fichiers mal nommés</p><div class="path-list" id="relinkBeforePaths"></div></div>
+            <div class="arrow-lane" id="relinkArrows" aria-hidden="true"></div>
+            <div class="path-column after"><h3>Nom proposé</h3><p>D’après les métadonnées validées</p><div class="path-list" id="relinkAfterPaths"></div></div>
+          </div>
+
+          <div class="mini-stats">
+            <div class="mini-stat"><strong id="relinkRenameCount">0</strong><span>fichiers à renommer</span></div>
+            <div class="mini-stat"><strong id="relinkSeratoCount">0</strong><span>chemins Serato à re-suturer</span></div>
+            <div class="mini-stat"><strong id="relinkSkipCount">0</strong><span>ignorés, non identifiés</span></div>
+          </div>
+
+          <div class="side-card notice" style="margin-top:18px">
+            <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_library_health_v2_clean.png" alt=""></div>
+            <div><b>Renommage et réparation forment une seule opération.</b><p>Un renommage sans mise à jour de la base Serato casserait tes crates. LostTrackr écrit les deux ensemble, ou n’écrit rien.</p></div>
+          </div>
+
+          <div class="side-card notice" id="relinkPendingNote" style="margin-top:12px">
+            <div class="notice-icon"><img class="source-icon" src="assets/losttrackr_icons/clean/icon_tip_v2_clean.png" alt=""></div>
+            <div><b>Aperçu du flux — l’écriture n’est pas encore branchée.</b><p>Les noms proposés ci-dessus sont calculés depuis tes vraies métadonnées validées. L’opération atomique renommage + relink arrive dans une prochaine version.</p></div>
+          </div>
+
+          <div class="screen-actions">
+            <button class="secondary" id="relinkToResults" type="button">Retour aux résultats</button>
+            <button class="primary" id="relinkApply" type="button" disabled>Appliquer le renommage</button>
+          </div>
+        </article>
       </section>
 
       <section class="view prepare-view" id="prepareView" aria-labelledby="prepareTitle">
