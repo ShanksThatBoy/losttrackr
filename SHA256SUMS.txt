@@ -1,3 +1,6 @@
 4ac9dfa944f0c2f93655bc77f98808f2403685cc694e44785f134a1b00c78f46  LostTrackr-v1.4.0-macos.dmg
 0568d477942024f0e3272d17e4c0bfad636b254ef9ef1bb830b08dd8931896da  LostTrackr-v1.4.0-macos.pkg
 872141d4f53db46aadd2f7ddda13c572725bca49f557f2cdaa3afe75979e62c7  LostTrackrSetup-v1.4.0-x64.exe
+58dbaa36b2dcd3baf1a651ee1fd5fff1000bf4e934927f4dff3d2e2379c5b9ef  LostTrackr-v1.5.0-macos.dmg
+0d493c7a69b0a3e6bb37afb33894bb283a1c0e167a488eeda4666bbc7e20021c  LostTrackr-v1.5.0-macos.pkg
+73721b8b17fb3bcd493379cbccbd43fc6b011c7f799f90e8bd94732422146c49  LostTrackrSetup-v1.5.0-x64.exe
