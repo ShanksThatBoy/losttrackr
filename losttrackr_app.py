@@ -266,6 +266,13 @@ APP_NAME = "LostTrackr"
 APP_VERSION = update_manager.APP_VERSION
 
 RELEASE_NOTES = {
+    "1.5.0": [
+        "Trois fonctions, un seul niveau de navigation : Réparer, Compléter, Ranger.",
+        "L'analyse de métadonnées devient « Compléter » et passe au premier plan.",
+        "Fond de particules qui se reconstitue au fil des étapes et réagit à la souris.",
+        "Nouveau profil DJ avec un panneau de paramètres complet.",
+        "Aperçu du renommage et de la réparation du chemin Serato (écriture pas encore branchée).",
+    ],
     "1.4.0": [
         "Nouveau drawer d'affinage manuel pour corriger ou relancer la recherche d'un titre.",
         "Écriture des métadonnées (BPM, clé, etc.) directement dans les fichiers physiques.",
