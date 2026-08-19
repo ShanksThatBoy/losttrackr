@@ -74,7 +74,9 @@ ORBIT_TILT = -25.0  # inclinaison, degrés (sens horaire écran)
 T_FRONT = (0.0, 180.0)
 
 GROOVES = (158.0, 147.0, 135.0, 121.0, 105.0, 88.0)
-GROOVES_SMALL = ()
+GROOVES_SMALL = ()  # <= 32 px : les sillons ne sont plus que du bruit
+# Aplats monochromes : sillons evides en creux, espaces pour rester lisibles
+GROOVES_MONO = (157.0, 134.0, 108.0)
 
 _A = math.radians(ORBIT_TILT)
 _COS_A, _SIN_A = math.cos(_A), math.sin(_A)
@@ -227,10 +229,14 @@ def style_for(variant: str) -> dict:
             "label_r": 40.0,
             "label_flat": "#8FA6B9",
         }
+    # Aplats : une seule couleur, opacite pleine. Ces variantes servent a la
+    # reproduction monochrome (gravure, tampon, impression 1 ton) — toute
+    # opacite partielle y introduirait un second ton.
+    mono = {**base, "orbit_w": 26.0, "ring_w": 12.0, "node_r": 22.0, "ring_op": 1.0}
     if variant == "white":
-        return {**base, "mono": WHITE, "orbit_w": 26.0, "ring_w": 11.0, "node_r": 22.0}
+        return {**mono, "mono": WHITE}
     if variant == "cyan":
-        return {**base, "mono": CYAN, "orbit_w": 26.0, "ring_w": 11.0, "node_r": 22.0}
+        return {**mono, "mono": CYAN}
     raise ValueError(variant)
 
 
@@ -293,8 +299,8 @@ def mark_defs(s: dict, uid: str) -> str:
             f'        <path d="{FRONT_D}" stroke-width="{gap:g}"/>\n'
             f'        <path d="{RING_D}" stroke-width="{s["ring_w"] + 12:g}"/>\n'
         )
-        for r in GROOVES_SMALL:
-            d += f'        <circle cx="{CX:g}" cy="{CY:g}" r="{r:g}" stroke-width="5"/>\n'
+        for r in GROOVES_MONO:
+            d += f'        <circle cx="{CX:g}" cy="{CY:g}" r="{r:g}" stroke-width="6"/>\n'
         d += (
             f'        <circle cx="{CX:g}" cy="{CY:g}" r="{R_LABEL:g}" stroke-width="9"/>\n'
             f'      </g>\n'
@@ -555,6 +561,11 @@ def build_app_icon(platform: str = "macos", small: bool = False) -> str:
     if platform == "macos":
         # Grille Big Sur : la plaque occupe 824 px centrés dans 1024.
         plate, radius, mark_w = 824.0, 185.0, 690.0
+    elif platform == "web":
+        # apple-touch-icon : iOS applique lui-même son masque arrondi. On livre
+        # donc un carré à fond perdu — un squircle déjà arrondi serait rogné
+        # une seconde fois, avec des coins transparents apparents.
+        plate, radius, mark_w = 1024.0, 0.0, 760.0
     else:
         # Windows : pas de masque système, la plaque occupe davantage le canvas.
         plate, radius, mark_w = 936.0, 196.0, 772.0
@@ -607,7 +618,7 @@ def build_app_icon(platform: str = "macos", small: bool = False) -> str:
             f'transform="translate({tx:.2f} {ty:.2f}) scale({scale:.5f})"'
         ),
     )
-    label = "macOS" if platform == "macos" else "Windows"
+    label = {"macos": "macOS", "windows": "Windows", "web": "web"}[platform]
     suffix = " (petites tailles)" if small else ""
     return svg(n, n, f"LostTrackr — App Icon {label}{suffix}", defs, body)
 
@@ -631,6 +642,7 @@ TARGETS = {
     "losttrackr-app-icon-macos-small.svg": lambda: build_app_icon("macos", small=True),
     "losttrackr-app-icon-windows.svg": lambda: build_app_icon("windows"),
     "losttrackr-app-icon-windows-small.svg": lambda: build_app_icon("windows", small=True),
+    "losttrackr-app-icon-web.svg": lambda: build_app_icon("web"),
 }
 
 

@@ -64,7 +64,6 @@ ditto "$APP_PATH" "$STAGE/${APP_NAME}.app"
 ln -s /Applications "$STAGE/Applications"
 cp README_BETA_LOSTTRACKR_MACOS.md "$STAGE/"
 cp OUVRIR_LOSTTRACKR_MACOS_BETA.txt "$STAGE/"
-cp assets/LostTrackr.icns "$STAGE/.VolumeIcon.icns"
 
 LOGO_TMP="${TMP_ROOT}/logo.png"
 BG_PATH="$STAGE/.background/background.png"
@@ -83,10 +82,15 @@ hdiutil create \
 
 mkdir -p "$MOUNT_DIR"
 hdiutil attach "$RW_DMG" -readwrite -noverify -noautoopen -mountpoint "$MOUNT_DIR"
-SetFile -a C "$MOUNT_DIR" || true
 SetFile -a V "$MOUNT_DIR/.background" || true
 
 osascript "packaging/dmg_layout.applescript" "$MOUNT_DIR" "${MOUNT_DIR}/.background/background.png"
+
+# L'icone du volume se pose APRES le Finder, jamais avant : en appliquant le
+# fond de fenetre, il supprime .VolumeIcon.icns et efface le bit d'icone
+# personnalisee du volume (C -> c). Une copie faite dans le stage ne survit pas.
+cp assets/LostTrackr.icns "$MOUNT_DIR/.VolumeIcon.icns"
+SetFile -a C "$MOUNT_DIR"
 sync
 hdiutil detach "$MOUNT_DIR"
 
@@ -99,6 +103,7 @@ hdiutil attach "$DMG_NAME" -readonly -noverify -noautoopen -mountpoint "$VERIFY_
 test -d "$VERIFY_MOUNT/${APP_NAME}.app"
 test -L "$VERIFY_MOUNT/Applications"
 test -f "$VERIFY_MOUNT/README_BETA_LOSTTRACKR_MACOS.md"
+test -f "$VERIFY_MOUNT/.VolumeIcon.icns"
 hdiutil detach "$VERIFY_MOUNT"
 
 echo

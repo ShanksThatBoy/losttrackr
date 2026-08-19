@@ -99,11 +99,15 @@ magick "$B/windows/LostTrackr-AppIcon-256.png" "$B/windows/LostTrackr-AppIcon-12
        "$B/windows/LostTrackr-AppIcon-16.png" "$B/windows/LostTrackr.ico"
 
 echo "==> Web (favicons)"
-cp "$M/losttrackr-app-icon-macos.svg" "$B/web/favicon.svg"
-png losttrackr-app-icon-macos-small.svg "$B/web/favicon-32.png" 32 32
-png losttrackr-app-icon-macos-small.svg "$B/web/favicon-16.png" 16 16
-png losttrackr-app-icon-macos.svg       "$B/web/favicon-180.png" 180 180
-png losttrackr-app-icon-macos.svg       "$B/web/apple-touch-icon.png" 180 180
+# Onglets : master Windows, dont la plaque remplit 91 % du canvas. Le master
+# macOS suit la grille Big Sur (plaque à 80 %), pensée pour un dock qui ajoute
+# sa propre marge — en favicon l'icône paraîtrait rétrécie.
+cp "$M/losttrackr-app-icon-windows.svg" "$B/web/favicon.svg"
+png losttrackr-app-icon-windows-small.svg "$B/web/favicon-32.png" 32 32
+png losttrackr-app-icon-windows-small.svg "$B/web/favicon-16.png" 16 16
+png losttrackr-app-icon-windows.svg       "$B/web/favicon-180.png" 180 180
+# apple-touch-icon : carré à fond perdu, iOS applique son propre arrondi.
+png losttrackr-app-icon-web.svg           "$B/web/apple-touch-icon.png" 180 180
 magick "$B/web/favicon-32.png" "$B/web/favicon-16.png" "$B/web/favicon.ico"
 
 # --- optimisation lossless -------------------------------------------------
@@ -157,8 +161,17 @@ check_alpha() {
     echo "  SANS ALPHA  $f"; fail=1
   fi
 }
-while IFS= read -r -d '' f; do check_alpha "$f"; done \
-  < <(find "$B/marks" "$B/lockups" "$B/web" -name '*.png' -print0)
+# apple-touch-icon est volontairement a fond perdu : iOS applique son propre
+# masque arrondi, un PNG transparent y ferait apparaitre des coins vides.
+while IFS= read -r -d '' f; do
+  [[ "$(basename "$f")" == "apple-touch-icon.png" ]] && continue
+  check_alpha "$f"
+done < <(find "$B/marks" "$B/lockups" "$B/web" -name '*.png' -print0)
+ATI="$B/web/apple-touch-icon.png"
+# ImageMagick renvoie « True » capitalise : comparaison insensible a la casse
+if [[ "$(magick identify -format '%[opaque]' "$ATI" | tr '[:upper:]' '[:lower:]')" != "true" ]]; then
+  echo "  apple-touch-icon NON OPAQUE  $ATI"; fail=1
+fi
 if [[ "$SYNC_LEGACY" == "1" ]]; then
   for f in assets/LostTrackr_Icon_transparent.png assets/LostTrackr_FullLogo_transparent.png \
            assets/losttrackr_icons/clean/logo_losttrackr_mark_ui.png \
