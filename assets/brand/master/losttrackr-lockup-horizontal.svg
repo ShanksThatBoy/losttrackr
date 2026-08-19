@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 8209.4 1908" width="8209.4" height="1908" role="img" aria-labelledby="ltTitle">
+  <title id="ltTitle">LostTrackr — lockup horizontal (fonds sombres)</title>
+  <defs>
+    <linearGradient id="lkDarkTrail" gradientUnits="userSpaceOnUse" x1="441.6" y1="0" x2="59.4" y2="0">
+      <stop offset="0" stop-color="#20DFFF" stop-opacity="1"/>
+      <stop offset="0.58" stop-color="#20DFFF" stop-opacity="0.97"/>
+      <stop offset="0.84" stop-color="#1598FF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#1598FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lkDarkLabel" gradientUnits="userSpaceOnUse" x1="210" y1="212" x2="298" y2="300">
+      <stop offset="0" stop-color="#CFE1EF"/>
+      <stop offset="0.5" stop-color="#9FBACF"/>
+      <stop offset="1" stop-color="#5A748B"/>
+    </linearGradient>
+  </defs>
+  <g inkscape:label="mark" transform="translate(35.66 -170.57) scale(4.39286)">
+    <g inkscape:label="orbite-arriere">
+      <path d="M 451.58 163.87 C 473.28 210.42 402.42 289.40 293.30 340.29 C 184.19 391.17 78.13 394.68 56.42 348.13 C 34.72 301.58 105.58 222.60 214.70 171.71 C 323.81 120.83 429.87 117.32 451.58 163.87 Z" fill="none" stroke="#1598FF" stroke-width="9" opacity="0.55"/>
+    </g>
+    <g inkscape:label="vinyle">
+      <circle cx="254" cy="256" r="168" fill="#0A1726"/>
+      <g inkscape:label="sillons" fill="none" stroke="#1B3149" stroke-width="2.2" opacity="0.3">
+        <circle cx="254" cy="256" r="158"/>
+        <circle cx="254" cy="256" r="147"/>
+        <circle cx="254" cy="256" r="135"/>
+        <circle cx="254" cy="256" r="121"/>
+        <circle cx="254" cy="256" r="105"/>
+        <circle cx="254" cy="256" r="88"/>
+      </g>
+      <circle cx="254" cy="256" r="167" fill="none" stroke="#D7E8F4" stroke-width="2.5" opacity="0.34"/>
+      <circle cx="254" cy="256" r="44" fill="url(#lkDarkLabel)"/>
+      <circle cx="254" cy="256" r="44" fill="none" stroke="#020812" stroke-width="2" opacity="0.5"/>
+      <circle cx="254" cy="256" r="6.5" fill="#020812"/>
+    </g>
+    <g inkscape:label="orbite-avant">
+      <path d="M 451.58 163.87 C 473.28 210.42 402.42 289.40 293.30 340.29 C 184.19 391.17 78.13 394.68 56.42 348.13" fill="none" stroke="url(#lkDarkTrail)" stroke-width="23" stroke-linecap="round"/>
+    </g>
+    <g inkscape:label="point-de-reconnexion">
+      <circle cx="451.58" cy="163.87" r="19" fill="#20DFFF"/>
+      <circle cx="447.40" cy="159.31" r="7.60" fill="#F6FAFF" opacity="0.92"/>
+    </g>
+  </g>
+  <g inkscape:label="wordmark">
+      <g inkscape:label="lost" fill="#F6FAFF">
+        <path transform="translate(2448.4 1314.0)" d="M0 0V-720H128V-116H536V0Z"/>
+        <path transform="translate(3056.4 1314.0)" d="M190 0Q133 0 90.5 -24Q48 -48 24 -90.5Q0 -133 0 -190V-330Q0 -387 24 -430Q48 -473 90.5 -496.5Q133 -520 190 -520H348Q405 -520 448 -496.5Q491 -473 514.5 -430Q538 -387 538 -330V-190Q538 -133 514.5 -90.5Q491 -48 448 -24Q405 0 348 0ZM217 -110H321Q364 -110 390 -136Q416 -162 416 -205V-315Q416 -358 390 -384Q364 -410 321 -410H217Q174 -410 148 -384Q122 -358 122 -315V-205Q122 -162 148 -136Q174 -110 217 -110Z"/>
+        <path transform="translate(3660.4 1314.0)" d="M0 0V-110H361Q372 -110 379 -117Q386 -124 386 -135Q386 -147 379 -154Q372 -161 361 -161H0V-370Q0 -415 19 -448.5Q38 -482 71.5 -501Q105 -520 150 -520H508V-410H192Q160 -410 141 -391Q122 -372 122 -340Q122 -309 141 -290Q160 -271 192 -271H508V-150Q508 -105 489 -71.5Q470 -38 436.5 -19Q403 0 358 0Z"/>
+        <path transform="translate(4236.4 1314.0)" d="M132 0V-410H0V-520H132V-646H254V-520H406V-410H254V0Z"/>
+      </g>
+      <g inkscape:label="trackr" fill="#20DFFF">
+        <path transform="translate(4730.4 1314.0)" d="M0 -594V-720H620V-594H374V0H246V-594Z"/>
+        <path transform="translate(5380.4 1314.0)" d="M0 0V-520H122V-513Q147 -520 176 -520H224Q277 -520 316.5 -498Q356 -476 378 -436.5Q400 -397 400 -344V-312H278V-332Q278 -367 256.5 -388.5Q235 -410 200 -410Q165 -410 143.5 -388.5Q122 -367 122 -332V0Z"/>
+        <path transform="translate(5832.4 1314.0)" d="M176 0Q123 0 83.5 -22Q44 -44 22 -83.5Q0 -123 0 -176V-344Q0 -397 22 -436.5Q44 -476 83.5 -498Q123 -520 176 -520H530V0ZM203 -110H408V-410H203Q166 -410 144 -388Q122 -366 122 -329V-191Q122 -154 144 -132Q166 -110 203 -110Z"/>
+        <path transform="translate(6432.4 1314.0)" d="M182 0Q127 0 86.5 -23Q46 -46 23 -86.5Q0 -127 0 -182V-338Q0 -393 23 -434Q46 -475 86.5 -497.5Q127 -520 182 -520H330Q380 -520 419 -500.5Q458 -481 482 -445.5Q506 -410 511 -362H382Q373 -384 352 -397Q331 -410 303 -410H209Q170 -410 146 -386Q122 -362 122 -323V-197Q122 -158 146 -134Q170 -110 209 -110H303Q331 -110 352 -123Q373 -136 382 -158H511Q506 -110 482 -74.5Q458 -39 419 -19.5Q380 0 330 0Z"/>
+        <path transform="translate(7011.4 1314.0)" d="M0 0V-752H122V-338L401 -520H524V-440L245 -258L524 -80V0H400L122 -178V0Z"/>
+        <path transform="translate(7593.4 1314.0)" d="M0 0V-520H122V-513Q147 -520 176 -520H224Q277 -520 316.5 -498Q356 -476 378 -436.5Q400 -397 400 -344V-312H278V-332Q278 -367 256.5 -388.5Q235 -410 200 -410Q165 -410 143.5 -388.5Q122 -367 122 -332V0Z"/>
+      </g>
+  </g>
+</svg>

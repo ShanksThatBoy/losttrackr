@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-labelledby="ltTitle">
+  <title id="ltTitle">LostTrackr — App Icon macOS (petites tailles)</title>
+  <defs>
+    <linearGradient id="aiMacosSmPlate" gradientUnits="userSpaceOnUse" x1="100" y1="100" x2="924" y2="924">
+      <stop offset="0" stop-color="#0B1B2B"/>
+      <stop offset="0.52" stop-color="#06121E"/>
+      <stop offset="1" stop-color="#020812"/>
+    </linearGradient>
+    <radialGradient id="aiMacosSmHalo" gradientUnits="userSpaceOnUse" cx="512" cy="512" r="511">
+      <stop offset="0" stop-color="#1598FF" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#1598FF" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="aiMacosSmClip">
+      <rect x="100" y="100" width="824" height="824" rx="185" ry="185"/>
+    </clipPath>
+    <linearGradient id="aiMacosSmTrail" gradientUnits="userSpaceOnUse" x1="441.6" y1="0" x2="59.4" y2="0">
+      <stop offset="0" stop-color="#20DFFF" stop-opacity="1"/>
+      <stop offset="0.58" stop-color="#20DFFF" stop-opacity="0.97"/>
+      <stop offset="0.84" stop-color="#1598FF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#1598FF" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="aiMacosSmDisc" gradientUnits="userSpaceOnUse" cx="186.8" cy="182.1" r="299.0">
+      <stop offset="0" stop-color="#0E1B29"/>
+      <stop offset="0.55" stop-color="#050D17"/>
+      <stop offset="1" stop-color="#01050B"/>
+    </radialGradient>
+    <linearGradient id="aiMacosSmSheen" gradientUnits="userSpaceOnUse" x1="86" y1="88" x2="346" y2="424">
+      <stop offset="0" stop-color="#D7E8F4" stop-opacity="0.15"/>
+      <stop offset="0.34" stop-color="#D7E8F4" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#D7E8F4" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="aiMacosSmGlow" gradientUnits="userSpaceOnUse" cx="451.6" cy="163.9" r="74.1">
+      <stop offset="0" stop-color="#20DFFF" stop-opacity="0.5"/>
+      <stop offset="0.5" stop-color="#20DFFF" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#20DFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="aiMacosSmLabel" gradientUnits="userSpaceOnUse" x1="210" y1="212" x2="298" y2="300">
+      <stop offset="0" stop-color="#CFE1EF"/>
+      <stop offset="0.5" stop-color="#8FA6B9"/>
+      <stop offset="1" stop-color="#5A748B"/>
+    </linearGradient>
+  </defs>
+  <g inkscape:label="plaque">
+    <rect x="100" y="100" width="824" height="824" rx="185" ry="185" fill="url(#aiMacosSmPlate)"/>
+    <rect x="100" y="100" width="824" height="824" rx="185" ry="185" fill="url(#aiMacosSmHalo)"/>
+    <rect x="101.0" y="101.0" width="822" height="822" rx="184" ry="184" fill="none" stroke="#D7E8F4" stroke-width="2" opacity="0.10"/>
+  </g>
+  <g inkscape:label="mark-premium" clip-path="url(#aiMacosSmClip)" transform="translate(101.05 100.75) scale(1.60644)">
+    <g inkscape:label="orbite-arriere">
+      <path d="M 451.58 163.87 C 473.28 210.42 402.42 289.40 293.30 340.29 C 184.19 391.17 78.13 394.68 56.42 348.13 C 34.72 301.58 105.58 222.60 214.70 171.71 C 323.81 120.83 429.87 117.32 451.58 163.87 Z" fill="none" stroke="#1598FF" stroke-width="16" opacity="0.8"/>
+    </g>
+    <g inkscape:label="vinyle">
+      <circle cx="254" cy="256" r="168" fill="url(#aiMacosSmDisc)"/>
+      <circle cx="254" cy="256" r="168" fill="url(#aiMacosSmSheen)"/>
+      <circle cx="254" cy="256" r="167" fill="none" stroke="#D7E8F4" stroke-width="7" opacity="0.55"/>
+      <circle cx="254" cy="256" r="40" fill="url(#aiMacosSmLabel)"/>
+      <circle cx="254" cy="256" r="40" fill="none" stroke="#020812" stroke-width="2" opacity="0.5"/>
+      <circle cx="254" cy="256" r="6.5" fill="#020812"/>
+    </g>
+    <g inkscape:label="orbite-avant">
+      <path d="M 451.58 163.87 C 473.28 210.42 402.42 289.40 293.30 340.29 C 184.19 391.17 78.13 394.68 56.42 348.13" fill="none" stroke="url(#aiMacosSmTrail)" stroke-width="34" stroke-linecap="round"/>
+    </g>
+    <g inkscape:label="point-de-reconnexion">
+      <circle cx="451.58" cy="163.87" r="74.10" fill="url(#aiMacosSmGlow)"/>
+      <circle cx="451.58" cy="163.87" r="38" fill="#20DFFF"/>
+      <circle cx="443.22" cy="154.75" r="15.20" fill="#F6FAFF" opacity="0.92"/>
+    </g>
+  </g>
+</svg>

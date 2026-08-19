@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="ltTitle">
+  <title id="ltTitle">LostTrackr — symbole A1 simplifié (petites tailles)</title>
+  <defs>
+    <linearGradient id="mSmallTrail" gradientUnits="userSpaceOnUse" x1="441.6" y1="0" x2="59.4" y2="0">
+      <stop offset="0" stop-color="#20DFFF" stop-opacity="1"/>
+      <stop offset="0.58" stop-color="#20DFFF" stop-opacity="0.97"/>
+      <stop offset="0.84" stop-color="#1598FF" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#1598FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="mSmallLabel" gradientUnits="userSpaceOnUse" x1="210" y1="212" x2="298" y2="300">
+      <stop offset="0" stop-color="#CFE1EF"/>
+      <stop offset="0.5" stop-color="#8FA6B9"/>
+      <stop offset="1" stop-color="#5A748B"/>
+    </linearGradient>
+  </defs>
+  <g inkscape:label="orbite-arriere">
+    <path d="M 451.58 163.87 C 473.28 210.42 402.42 289.40 293.30 340.29 C 184.19 391.17 78.13 394.68 56.42 348.13 C 34.72 301.58 105.58 222.60 214.70 171.71 C 323.81 120.83 429.87 117.32 451.58 163.87 Z" fill="none" stroke="#1598FF" stroke-width="16" opacity="0.8"/>
+  </g>
+  <g inkscape:label="vinyle">
+    <circle cx="254" cy="256" r="168" fill="#14283E"/>
+    <circle cx="254" cy="256" r="167" fill="none" stroke="#D7E8F4" stroke-width="7" opacity="0.55"/>
+    <circle cx="254" cy="256" r="40" fill="url(#mSmallLabel)"/>
+    <circle cx="254" cy="256" r="40" fill="none" stroke="#020812" stroke-width="2" opacity="0.5"/>
+    <circle cx="254" cy="256" r="6.5" fill="#020812"/>
+  </g>
+  <g inkscape:label="orbite-avant">
+    <path d="M 451.58 163.87 C 473.28 210.42 402.42 289.40 293.30 340.29 C 184.19 391.17 78.13 394.68 56.42 348.13" fill="none" stroke="url(#mSmallTrail)" stroke-width="34" stroke-linecap="round"/>
+  </g>
+  <g inkscape:label="point-de-reconnexion">
+    <circle cx="451.58" cy="163.87" r="38" fill="#20DFFF"/>
+    <circle cx="443.22" cy="154.75" r="15.20" fill="#F6FAFF" opacity="0.92"/>
+  </g>
+</svg>
