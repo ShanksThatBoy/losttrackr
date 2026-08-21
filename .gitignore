@@ -34,3 +34,7 @@ updates/private/
 # Outillage local Claude Code
 .claude/
 .agents/
+
+# Landing page générée par le site-builder ChatGPT (770 Mo avec node_modules) —
+# expérimentation locale, ne jamais la committer dans ce repo
+site/
